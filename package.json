@@ -1,0 +1,25 @@
+{
+  "name": "pokemon-go-dps",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "directories": {
+    "doc": "doc"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/baseballlover723/pokemon-go-dps.git"
+  },
+  "author": "baseballlover723",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/baseballlover723/pokemon-go-dps/issues"
+  },
+  "homepage": "https://github.com/baseballlover723/pokemon-go-dps#readme",
+  "dependencies": {
+    "express": "^4.14.0"
+  }
+}

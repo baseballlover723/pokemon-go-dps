@@ -1,14 +1,16 @@
 $(document).ready(function () {
     //$('#data-table').DataTable({
-    //    data: dataSet, columns: [{title: '#'}, {title: 'Name'}, {title: 'Quick Moves'}, {title: 'Special Moves'}]
+    //    data: dataSet, columns: [{title: '#'}, {title: 'Name'}, {title: 'Fast Moves'}, {title: 'Special Moves'}]
     //});
     console.log("here");
     dataTable = $('#data-table').DataTable({
         ajax: {
-            url: "/data", dataSrc: "data"
+            url: "/data", dataSrc: function (jsonStr) {
+                return CircularJSON.parse(JSON.stringify(jsonStr)).data;
+            }
         },
         columns: [{title: "#", data: "number"}, {title: "Name", data: "name"},
-            {title: "Quick Move", data: "quickMove.name"}, {title: "Quick Move Damage", data: "quickMove.damage"},
+            {title: "Fast Move", data: "fastMove.name"}, {title: "Fast Move Damage", data: "fastMove.damage"},
             {title: "Special Move", data: "specialMove.name"},
             {title: "Special Move Damage", data: "specialMove.damage"}],
         autoWidth: true, // columnDefs: [

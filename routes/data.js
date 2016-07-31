@@ -1,6 +1,12 @@
 var fs = require('fs');
 var request = require('request');
 var cheerio = require('cheerio');
+var parseDuration = require('parse-duration');
+var async = require('async');
+var CircularJSON = require('circular-json');
+var moment = require('moment');
+
+// TODO, only scrape if its been more than a day
 
 String.prototype.replaceAll = function (search, replacement) {
     var target = this;
@@ -12,14 +18,23 @@ var list = JSON.parse(fs.readFileSync("json/pokemon.json"));
 var moveNames = JSON.parse(fs.readFileSync("json/moveNames.json"));
 
 var types = {};
-
 populateTypes();
+fs.stat("json/cachedMoves.json", function(err, stats){
+    var mtime = moment(stats.mtime);
+    if (moment().subtract(1, "days").isBefore(mtime)) {
+        fs.readFile("json/cachedMoves.json", function(err, jsonStr) {
+            moves = CircularJSON.parse(jsonStr);
+            console.log(moves);
+        })
+    }
+    // console.log(mtime);
+});
 
 function populateTypes() {
     var json = fs.readFileSync('json/types.json');
     var typeStrs = JSON.parse(json);
     for (var typeName in typeStrs) {
-        types[typeName]  =  new Type(typeName);
+        types[typeName] = new Type(typeName);
     }
     for (var typeName in types) {
         var type = types[typeName];
@@ -36,49 +51,101 @@ function Move(id, name) {
     this.id = id;
     this.name = name;
     this.damage = "Loading";
+    // this.prototype = {
+    //     toString: function () {
+    //         return this.name + " (Move Object)";
+    //     }
+    // }
 }
 
 function Type(name) {
     this.name = name;
     this.weaknesses = [];
     this.strengths = [];
+    // this.prototype = {
+    //     toString: function () {
+    //         return this.name + " (Type Object)";
+    //     }
+    // }
 }
 
 var moves = {};
 
 var count = 0;
+var done = [];
 for (var id in moveNames) {
-    count++;
     let idCopy = id;
     var move = new Move(idCopy, moveNames[idCopy]);
     moves[idCopy] = move;
-    // scrape(move);
 }
-
-function scrape(move) {
+var limit = 75;
+console.time("request loop");
+async.eachLimit(Object.keys(moveNames), limit, function(id, callback) {
+    scrape(moves[id], function (move) {
+        // count++;
+        // done.push(move.name);
+        // console.log(count + " / " + Object.keys(moveNames).length);
+        // if (Object.keys(moveNames).length - count < 20) {
+        //     console.log(Object.keys(moveNames).map(function (v) { return moveNames[v]; }).filter(
+        //         function (x) {return done.indexOf(x) < 0}));
+        // }
+        callback();
+    });
+}, function(err) {
+    console.timeEnd("request loop");
+    console.time("cache write");
+    fs.writeFile("json/cachedMoves.json", CircularJSON.stringify(moves), function() {
+        console.timeEnd("cache write");
+        console.log("done");
+    });
+});
+// 125 / 137
+//     [ 'Leaf Blade',
+//     'Air Cutter',
+//     'Dragon Breath
+// 'Karate Chop',
+//     'Peck',
+//     'Lick',
+//     'Razor Leaf',
+//     'Pound',
+//     'Metal Claw',
+//     'Poison Sting'
+// 'Ice Beam',
+//     'Mud Bomb' ]
+function scrape(move, callback = function (move) {}) {
     let url = 'http://bulbapedia.bulbagarden.net/wiki/' + convertToUrl(move);
-    var found = false;
     console.time(move.name + " request");
     request(url, function (error, response, html) {
-        console.log(move.name + ": " + url);
+        // console.log(move.name + ": " + url);
         if (!error) {
+            // console.log(move.name + ": " + response.statusCode);
             var $ = cheerio.load(html);
-            $('#mw-content-text h3').filter(function () {
+            if ($('.noarticletext').html()) {
+                console.log(move.name + " was not found at " + url);
+                console.timeEnd(move.name + " request");
+                console.log("");
+                return;
+            }
+            var c = $("#mw-content-text h3 #Pok\\.C3\\.A9mon_GO");
+            c.filter(function () {
                 var data = $(this);
                 var titleText = data.text();
+                // console.log(move.name + ": " + titleText + " == " + "Pokémon GO = " + (titleText == "Pokémon GO"));
                 if (titleText == "Pokémon GO") {
-                    found = true;
-                    parseMove($, move, data);
+                    parseMove($, move, data.parent());
+                    console.timeEnd(move.name + " request");
+                    callback(move);
                     // console.log("found pogo");
                 }
             });
-            setTimeout(function () {
-                if (!found) {
-                    console.log(move.name + " was not found at " + url);
-                    console.timeEnd(move.name + " request");
-                    console.log("");
-                }
-            }, 3000);
+            if (!c.html()) {
+                // $("#mw-content-text h3").filter(function() {
+                //     console.log(move.name + ": error with filter, " + $(this).html());
+                // });
+                console.timeEnd(move.name + " request");
+                fs.writeFile('json/debug.html', html);
+                scrape(move, function(move) {callback(move)});
+            }
         } else {
             console.log("error");
             console.log(error);
@@ -88,41 +155,54 @@ function scrape(move) {
 
 function parseMove($, move, data) {
     data = data.next();
-    // console.log(data.next().html());
-    var moveName = data.children().first().children().first().text();
-    console.log(moveName);
-    if (!moveName.includes(move.name)) {
+    var moveName = data.children().first().children().first().text().trim();
+    if (!move.name.includes(moveName)) {
         console.log("this isn't the right move page, saw " + moveName + " looking for move: " + move.name);
         console.timeEnd(move.name + " request");
         return;
     }
     var table = data.children().first().next().children().first().children().first();
     var rows = table.children();
-    var isFast = $(rows.get(0)).text().includes("Fast");
-    console.log("isFast: " + isFast);
-
-    parseType($(rows.get(1)).children().last().text());
-    //     .each(function(i, element) {
-    //     console.log($(element).html());
-    //     console.log(i);
-    //     console.log("i'm here");
-    //
-    // });
-    // for (var row of data.children()) {
-    //     console.log(row);
-    // }
-    // console.log(data.html());
-
-    console.timeEnd(move.name + " request");
-}
-
-function parseType(typeText) {
-    if (!types[typeText]) {
-        return new Type(typeText)
+    var isFast = $(rows.get(0)).text().includes("Fast"); // move class
+    move.class = isFast ? "Fast" : "Special";
+    move.damage = parseDamage($(rows.get(2)));
+    move.duration = parseDurationRow($(rows.get(4))); // s
+    if (isFast) {
+        move.energyGain = parseEnergyGain($(rows.get(3)));
+    } else {
+        move.energyRequired = parseEnergyRequired($(rows.get(3)));
+        move.critChange = parseCritChance($(rows.get(5)));
     }
-    return types[typeText];
+    move.type = parseType($(rows.get(1)));
 }
 
+function parseType(row) {
+    var typeText = row.children().last().text();
+    return types[typeText.toLowerCase().trim()];
+}
+
+function parseDamage(row) {
+    return parseInt(row.children().last().text());
+}
+
+function parseEnergyGain(row) {
+    return parseInt(row.children().last().text());
+}
+
+function parseEnergyRequired(row) {
+    var img = row.children().last().children().first().children().first();
+    var bars = parseInt(img.attr("alt"));
+    return 100 / bars;
+}
+
+// returns in s
+function parseDurationRow(row) {
+    return parseDuration(row.children().last().text()) / 1000;
+}
+
+function parseCritChance(row) {
+    return parseInt(row.children().last().text()) / 100;
+}
 // "134": "Scald Blastoise",
 // "135": "Hydro Pump Blastoise",
 // "232": "Water Gun Blastoise",
@@ -139,17 +219,17 @@ function convertToUrl(move) {
     return name.replaceAll(" ", "_") + "_(move)";
 }
 
-scrape(moves[100]);
+// scrape(moves[214]);
 var dataTable;
 
 // $(document).ready(function () {
 //     //$('#data-table').DataTable({
-//     //    data: dataSet, columns: [{title: '#'}, {title: 'Name'}, {title: 'Quick Moves'}, {title: 'Special Moves'}]
+//     //    data: dataSet, columns: [{title: '#'}, {title: 'Name'}, {title: 'Fast Moves'}, {title: 'Special Moves'}]
 //     //});
 //     console.log("here");
 //     dataTable = $('#data-table').DataTable({
 //         data: myDataSet,
-//         columns: [{title: '#'}, {title: 'Name'}, {title: 'Quick Move'}, {title: 'Quick Move Damage'}, {title:
+//         columns: [{title: '#'}, {title: 'Name'}, {title: 'Fast Move'}, {title: 'Fast Move Damage'}, {title:
 // 'Special Move'},{title: 'Special Move Damage'}], autoWidth: true, columnDefs: [ {targets: 0, width: "5%"},{ render:
 // function (data, type, row) { return data.name; }, targets: 2, width: "10%" }, { render: function (data) { return
 // data.damage || "Loading"; }, targets: 3, width: "10%" }] }); });
@@ -190,10 +270,10 @@ var myDataSet = [];
 //    var data = {
 //        'Num': padLeft(item.num, '000'),
 //        'Name': toProperCase(item.name),
-//        'Quick Moves': lookupMoves(item.quickMoves).join(', '),
+//        'Fast Moves': lookupMoves(item.fastMoves).join(', '),
 //        'Special Moves': lookupMoves(item.cinematicMoves).join(', ')
 //    };
-//    return [data['Num'], data['Name'], data['Quick Moves'], data['Special Moves']];
+//    return [data['Num'], data['Name'], data['Fast Moves'], data['Special Moves']];
 //});
 
 console.time("create data");
@@ -201,18 +281,17 @@ list.map(function (pokemon) {
     var data = {
         'Num': padLeft(pokemon.num, '000'), 'Name': toProperCase(pokemon.name),
     };
-    var quickMoves = lookupMoves(pokemon.quickMoves);
+    var fastMoves = lookupMoves(pokemon.quickMoves);
     var specialMoves = lookupMoves(pokemon.cinematicMoves);
-    for (var quickMove of quickMoves) {
+    for (var fastMove of fastMoves) {
         for (var specialMove of specialMoves) {
-            myDataSet.push({number: data['Num'], name: data['Name'], quickMove: quickMove, specialMove: specialMove});
+            myDataSet.push({number: data['Num'], name: data['Name'], fastMove: fastMove, specialMove: specialMove});
         }
     }
-    // pokemon.quickMoves = quickMoves.map(function(move) {return move.id});
+    // pokemon.fastMoves = fastMoves.map(function(move) {return move.id});
     // pokemon.cinematicMoves = specialMoves.map(function(move) {return move.id});
-    //myDataSet.append([data['Num'], data['Name'], data['Quick Moves'], data['Special Moves']]);
+    //myDataSet.append([data['Num'], data['Name'], data['Fast Moves'], data['Special Moves']]);
 });
-
 
 console.timeEnd("create data");
 
@@ -226,5 +305,9 @@ console.timeEnd("create data");
 //     //dataTable.draw();
 // }, 2000);
 
-module.exports.data = myDataSet;
+var exportTypes = Object.keys(types).map(function (v) { return types[v]; });
+exportTypes.sort(function (a, b) {
+    return a.weaknesses.length + a.strengths.length < b.weaknesses.length + b.strengths.length;
+});
+module.exports.getData = function () {return {data: myDataSet, types: exportTypes}};
 

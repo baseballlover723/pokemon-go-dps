@@ -1,7 +1,8 @@
 extends layout
 
 block content
-  h1= title
-  p Welcome to #{title}
-  p Hello world! This is HTML5 Boilerplate.
+  p This site gets its data from <a href='http://bulbapedia.bulbagarden.net/'>http://bulbapedia.bulbagarden.net/</a>.
+  p Is my data wrong or did the game just have an update? Update this wiki and then <a href='#'>force this site to reload its data from the wiki</a>. (It takes a few minutes to update) (Limited to once per hour, if this is abused or the wiki complains, I will remove this)
+  p Data last loaded at : #{lastUpdatedTime.format("LLLL")}
+  p Next data update at: #{nextUpdateTime.format("LLLL")}
   table#data-table.display.cell-border

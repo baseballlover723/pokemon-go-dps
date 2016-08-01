@@ -5,9 +5,14 @@ var parseDuration = require('parse-duration');
 var async = require('async');
 var CircularJSON = require('circular-json');
 var moment = require('moment');
-var LIMIT_VALUE = 5;
+var LIMIT_VALUE = 24;
 var LIMIT_UNITS = "hours";
+var CLIENT_REFRESH_VALUE = 1;
+var CLIENT_REFRESH_UNITS = "hour";
+
 var scrapping = false;
+var lastClientRefresh = false;
+
 
 // should probably clean up the globals
 
@@ -58,38 +63,39 @@ String.prototype.replaceAll = function (search, replacement) {
     var target = this;
     return target.replace(new RegExp(search, 'g'), replacement);
 };
+
 var data = [];
 var list = JSON.parse(fs.readFileSync("json/pokemon.json"));
 var moveNames = JSON.parse(fs.readFileSync("json/moveNames.json"));
 
-var limit = 10;
-console.time("type loop");
-async.eachLimit(list, limit, function (pokemon, callback) {
-    let url = 'http://pokeapi.co/api/v2/pokemon/' + pokemon.num;
-    console.time(pokemon.name + ": " + pokemon.num + " request");
-    request({url: url, json: true, timeout: parseDuration("2 minutes")}, function (error, response, json) {
-        if (!error) {
-            var types = json.types;
-            for (var type of types) {
-                if (type.slot == 1) {
-                    pokemon.type1 = type.type.name;
-                } else {
-                    pokemon.type2 = type.type.name;
-                }
-            }
-            console.timeEnd(pokemon.name + ": " + pokemon.num + " request");
-        } else {
-            console.timeEnd(pokemon.name + ": " + pokemon.num + " request");
-            console.log("with error ^ ");
-        }
-        callback();
-    });
-}, function (err) {
-    console.timeEnd("type loop");
-    fs.writeFile("json/pokemonTypes.json", JSON.stringify(list), function () {
-        console.log("done with write");
-    })
-});
+// var limit = 10;
+// console.time("type loop");
+// async.eachLimit(list, limit, function (pokemon, callback) {
+//     let url = 'http://pokeapi.co/api/v2/pokemon/' + pokemon.num;
+//     console.time(pokemon.name + ": " + pokemon.num + " request");
+//     request({url: url, json: true, timeout: parseDuration("2 minutes")}, function (error, response, json) {
+//         if (!error) {
+//             var types = json.types;
+//             for (var type of types) {
+//                 if (type.slot == 1) {
+//                     pokemon.type1 = type.type.name;
+//                 } else {
+//                     pokemon.type2 = type.type.name;
+//                 }
+//             }
+//             console.timeEnd(pokemon.name + ": " + pokemon.num + " request");
+//         } else {
+//             console.timeEnd(pokemon.name + ": " + pokemon.num + " request");
+//             console.log("with error ^ ");
+//         }
+//         callback();
+//     });
+// }, function (err) {
+//     console.timeEnd("type loop");
+//     fs.writeFile("json/pokemonTypes.json", JSON.stringify(list), function () {
+//         console.log("done with write");
+//     })
+// });
 var types = {};
 
 populateTypes();
@@ -109,7 +115,7 @@ isCachedValid(true, function (movesCopy, isValid) {
         fixLoadingMoves(moves);
         console.log("cached valid");
     } else {
-        refreshCache();
+        refreshCache(false);
     }
 });
 
@@ -136,23 +142,51 @@ exportTypes.sort(function (a, b) {
 });
 module.exports.getData = function () {return {data: data, types: exportTypes}};
 module.exports.checkCache = checkCache;
+module.exports.refreshCache = function (callback = function (isRefreshing, nextRefreshTime) {}) {
+    refreshCache(true, function (isRefreshing, nextRefreshTime) {
+        callback(isRefreshing, nextRefreshTime);
+    });
+};
+module.exports.getNextRefreshTime = function() {
+    if (!lastClientRefresh) {
+        return moment();
+    }
+    return moment(lastClientRefresh).add(CLIENT_REFRESH_VALUE, CLIENT_REFRESH_UNITS)
+};
 console.log("exported");
 
-function refreshCache(callback = function () {}) {
-    if (!scrapping || moment().subtract(5, "minutes").isAfter(scrapping)) {
-        console.log("cached expired, scrapping wiki");
-        scrapping = moment();
-        scrapeMoves(function (movesCopy) {
-            for (var id in movesCopy) {
-                moves[id].load(movesCopy[id]);
+function refreshCache(fromClient, callback = function (isRefreshing, nextRefreshTime) {}) {
+    if (!scrapping || moment().subtract(5, "minutes").isAfter(scrapping) || fromClient) {
+        var refresh = false;
+        if (fromClient) {
+            if (!lastClientRefresh || moment().subtract(CLIENT_REFRESH_VALUE, CLIENT_REFRESH_UNITS).isAfter(lastClientRefresh)) {
+                console.log("Client refreshed cache");
+                lastClientRefresh = moment();
+                refresh = true;
+            } else {
+                console.log("rejected client refresh");
             }
-            writeCachedMoves(moves, function () {
-                scrapping = false;
-                callback();
+        } else {
+            refresh = true;
+            console.log("cached expired, scrapping wiki");
+        }
+        if (refresh) {
+            scrapping = moment();
+            scrapeMoves(function (movesCopy) {
+                for (var id in movesCopy) {
+                    moves[id].load(movesCopy[id]);
+                }
+                writeCachedMoves(moves, function () {
+                    scrapping = false;
+                });
             });
-        });
+            callback(true, moment(lastClientRefresh).add(CLIENT_REFRESH_VALUE, CLIENT_REFRESH_UNITS));
+        } else {
+            callback(false, moment(lastClientRefresh).add(CLIENT_REFRESH_VALUE, CLIENT_REFRESH_UNITS));
+        }
     } else {
         console.log("already scrapping");
+        callback(false, moment(lastClientRefresh).add(CLIENT_REFRESH_VALUE, CLIENT_REFRESH_UNITS));
     }
 }
 
@@ -424,8 +458,7 @@ function checkCache(callback = function (lastUpdatedTime, nextUpdateTime) {}) {
     console.log("checking cache");
     isCachedValid(false, function (movesCopy, isValid, lastUpdatedTime, nextUpdatedTime) {
         if (!isValid) {
-            refreshCache(function () {
-            });
+            refreshCache(false);
         }
         callback(lastUpdatedTime, nextUpdatedTime)
     });

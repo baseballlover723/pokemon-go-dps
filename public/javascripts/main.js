@@ -3,6 +3,7 @@ $(document).ready(function () {
     //    data: dataSet, columns: [{title: '#'}, {title: 'Name'}, {title: 'Fast Moves'}, {title: 'Charge Moves'}]
     //});
     console.log("here");
+    console.log(jsVars.nextClientRefreshTime);
     dataTable = $('#data-table').DataTable({
         ajax: {
             url: "/data", dataSrc: function (jsonStr) {
@@ -45,7 +46,6 @@ $(document).ready(function () {
                 title: "Total DPS", data: null, render: function (data, type, row) {
                     var fm = row.fastMove;
                     var cm = row.specialMove;
-                    // TODO wrong
                     var dps = ((2 * fm.damage * cm.energyRequired) + (fm.energyGain * cm.damage * cm.critChance) +
                         (2 * fm.energyGain * cm.damage)) /
                         (2 * (fm.energyGain * cm.duration + fm.duration * cm.energyRequired));
@@ -66,4 +66,33 @@ $(document).ready(function () {
     });
 });
 
+$("#refresh").on("click", function () {
+    console.log("clicked");
+    if (moment().isBefore(jsVars.nextClientRefreshTime)) {
+        var timeUntilRefresh = moment.preciseDiff(moment(jsVars.nextClientRefreshTime), moment());
+        showAlert("This site has already been updated recently, you can update it again in <span id='refresh-time'>" + timeUntilRefresh + "</span>", "alert-danger");
+    } else {
+        $(location).attr('href', '/refresh');
+    }
+});
 
+var closeAlert;
+function showAlert(message, alertType) {
+    if ($('#alert-placeholder').html() == "") {
+        clearTimeout(closeAlert);
+        $('#alert-placeholder').append('<div id="alertdiv" class="alert ' + alertType + '"><a class="close" data-dismiss="alert">×</a><span>' + message + '</span></div>')
+        var countdown = setInterval(function () {
+            if (moment().isAfter(jsVars.nextClientRefreshTime)) {
+                $('#alertdiv').removeClass(alertType);
+                $('#alertdiv').addClass("alert-success");
+                $('#alertdiv > span').text("You can now reload the sites data")
+                clearInterval(countdown);
+            } else {
+                $('#refresh-time').text(moment.preciseDiff(moment(jsVars.nextClientRefreshTime), moment()));
+            }
+        }, 1000);
+        closeAlert = setTimeout(function () { // this will automatically close the alert and remove this if the users doesnt close it in 5 secs
+            $("#alertdiv").remove();
+        }, 5000);
+    }
+}

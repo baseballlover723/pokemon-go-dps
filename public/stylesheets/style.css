@@ -1,8 +1,35 @@
 body {
-  padding: 50px;
-  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+    padding: 85px 50px;
+    font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
 }
 
 a {
-  color: #00B7FF;
+    color: #00B7FF;
+}
+
+nav {
+    color: white
+}
+
+.title {
+    margin: 0px 50px;
+    float: left;
+}
+
+.navbar-right {
+    margin-right: 50px;
+}
+
+.vertically-center {
+    height: 67.5px;
+    vertical-align: middle;
+    line-height: 67.5px;
+}
+
+#vertically-center-text {
+    line-height: 37.5px;
+}
+
+.profile {
+    font: 24px "Lucida Grande", Helvetica, Arial, sans-serif;
 }

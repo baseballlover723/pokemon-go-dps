@@ -8,12 +8,13 @@ html.no-js(lang='')
     meta(name='viewport', content='width=device-width, initial-scale=1')
     link(rel='apple-touch-icon', href='apple-touch-icon.png')
     // Place favicon.ico in the root directory
+    link(rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous")
     link(rel='stylesheet', href='/stylesheets/normalize.css')
     link(rel='stylesheet', href='/stylesheets/main.css')
     link(rel='stylesheet', href='/stylesheets/style.css')
     link(rel='stylesheet', href='https://cdn.datatables.net/1.10.12/css/jquery.dataTables.min.css')
     script(src='/javascripts/vendor/modernizr-2.8.3.min.js')
-  body
+body
     //if lt IE 8
       p.browserupgrade
         | You are using an
@@ -22,16 +23,33 @@ html.no-js(lang='')
         a(href='http://browsehappy.com/') upgrade your browser
         |  to improve your experience.
     // Add your site or application content here
-    h1 Pokémon GO DPS analyzer
+    nav.navbar.navbar-inverse.navbar-fixed-top(role="navigation" data-topbar)
+      section.top-bar-section.navbar-collapse
+        ul.nav.navbar-nav.navbar-left
+          .title
+            h1 Pokémon GO DPS analyzer
+        .ul.nav.navbar-nav.navbar-right.vertically-center
+          li.dropdown.vertically-center
+            a#vertically-center-text.profile.dropdown-toggle(href="#" data-toggle="dropdown") Philip Ross
+            ul.dropdown-menu
+              li
+                a(href="https://www.linkedin.com/pub/philip-ross/a5/569/575") Philip's LinkedIn
+              li
+                a(href="https://github.com/baseballlover723") Philip's Github
+    #alert-placeholder
     block content
 
     script(src='https://code.jquery.com/jquery-1.12.0.min.js')
+    script(src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous")
     script.
       window.jQuery || document.write('<script src="/javascripts/vendor/jquery-1.12.0.min.js"><\\/script>')
     script(src='https://cdn.datatables.net/1.10.12/js/jquery.dataTables.min.js')
     script(src='/javascripts/plugins.js')
     script(src="/circular-json/circular-json.js")
     script(src="/moment/moment-with-locales.min.js")
+    script(src="/javascripts/vendor/moment-precise-range.js")
+    script.
+        !{state}
     script(src='/javascripts/main.js')
     // Google Analytics: change UA-XXXXX-X to be your site's ID.
     script.

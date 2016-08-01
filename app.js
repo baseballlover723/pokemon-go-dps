@@ -1,4 +1,5 @@
 var express = require('express');
+var expstate = require('express-state');
 var path = require('path');
 var favicon = require('serve-favicon');
 var logger = require('morgan');
@@ -8,6 +9,8 @@ var bodyParser = require('body-parser');
 var routes = require('./routes/index');
 
 var app = express();
+expstate.extend(app);
+app.set('state namespace', 'jsVars');
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));

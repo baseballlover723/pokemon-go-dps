@@ -6,7 +6,7 @@ var async = require('async');
 var CircularJSON = require('circular-json');
 var moment = require('moment');
 var LIMIT_VALUE = 5;
-var LIMIT_UNITS = "minutes";
+var LIMIT_UNITS = "hours";
 var scrapping = false;
 
 // should probably clean up the globals
@@ -62,25 +62,34 @@ var data = [];
 var list = JSON.parse(fs.readFileSync("json/pokemon.json"));
 var moveNames = JSON.parse(fs.readFileSync("json/moveNames.json"));
 
-// var limit = 50;
-// console.time("type loop");
-// list = [list[0]];
-// async.eachLimit(list, limit, function (pokemon, callback) {
-//     let url = 'http://pokeapi.co/api/v2/pokemon/' + pokemon.num;
-//     console.time(pokemon.name + ": " + pokemon.num + " request");
-//     request({url: url, json: true, timeout: parseDuration("30 seconds")}, function (error, response, json) {
-//         if (!error) {
-//             console.log(json.types);
-//         }
-//         console.timeEnd(pokemon.name + ": " + pokemon.num + " request");
-//     });
-//     callback();
-// }, function (err) {
-//     console.timeEnd("type loop");
-//     fs.writeFile("json/pokemonTypes.json", function () {
-//         console.log("done with write");
-//     })
-// });
+var limit = 10;
+console.time("type loop");
+async.eachLimit(list, limit, function (pokemon, callback) {
+    let url = 'http://pokeapi.co/api/v2/pokemon/' + pokemon.num;
+    console.time(pokemon.name + ": " + pokemon.num + " request");
+    request({url: url, json: true, timeout: parseDuration("2 minutes")}, function (error, response, json) {
+        if (!error) {
+            var types = json.types;
+            for (var type of types) {
+                if (type.slot == 1) {
+                    pokemon.type1 = type.type.name;
+                } else {
+                    pokemon.type2 = type.type.name;
+                }
+            }
+            console.timeEnd(pokemon.name + ": " + pokemon.num + " request");
+        } else {
+            console.timeEnd(pokemon.name + ": " + pokemon.num + " request");
+            console.log("with error ^ ");
+        }
+        callback();
+    });
+}, function (err) {
+    console.timeEnd("type loop");
+    fs.writeFile("json/pokemonTypes.json", JSON.stringify(list), function () {
+        console.log("done with write");
+    })
+});
 var types = {};
 
 populateTypes();

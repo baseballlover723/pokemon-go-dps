@@ -1,13 +1,14 @@
 extends layout
 
 block content
-  p This site gets its data from <a href='http://bulbapedia.bulbagarden.net/'>http://bulbapedia.bulbagarden.net/</a>.
-  p Is my data wrong or did the game just have an update? Update this wiki and then <button id='refresh'>force this site to reload its data from the wiki</button>. (It takes a few minutes to update) (Limited to once per hour, if this is abused or the wiki complains, I will remove this)
-  p Data last loaded at : #{lastUpdatedTime.format("LLLL")}
-  p Next data update at: #{nextUpdateTime.format("LLLL")}
-  p Total dps this the DPS if you used fast move until you could use your charge move and then used that.
-  p TODO List
-    ul
-      li Factor in STAB
-      li Add a feature to calculate DPS against specific Pokémon
-  table#data-table.display.cell-border
+    p This site gets its data from <a href='http://bulbapedia.bulbagarden.net/'>http://bulbapedia.bulbagarden.net/</a>.
+    p Is my data wrong or did the game just have an update? Update this wiki and then <button id='refresh'>force this site to reload its data from the wiki</button>. (It takes a few minutes to update) (Limited to once per hour, if this is abused or the wiki complains, I will remove this)
+    p Data last loaded at : #{lastUpdatedTime.format("LLLL")}
+    p Next data update at: #{nextUpdateTime.format("LLLL")}
+    p Total dps is the DPS you would expect if you used your charge move as often as possible. Currently takes into account fast move DPS, charge move DPS, how fast the fast move generates energy, how much energy the charge move requires, and how likely the charge move is to crit (150% crit)
+    p PS: The search bar is pretty useful
+    p TODO List
+        ul
+            li Factor in STAB
+            li Add a feature to calculate DPS against specific Pokémon
+    table#data-table.display.cell-border

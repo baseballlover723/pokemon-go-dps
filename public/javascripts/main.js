@@ -53,6 +53,7 @@ $(document).ready(function () {
                 }
             }],
         pageLength: 50,
+        order: [[15, "desc"]],
         autoWidth: true, // columnDefs: [
         //     {targets: 0, width: "5%"},{
         //     render: function (data, type, row) {

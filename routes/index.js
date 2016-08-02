@@ -6,8 +6,8 @@ var data = require('./data');
 /* GET home page. */
 router.get('/', function (req, res, next) {
     data.checkCache(function (lastUpdatedTime, nextUpdateTime) {
-        console.log("last updated time: " + new Date(lastUpdatedTime));
-        console.log("next updated time: " + new Date(nextUpdateTime));
+        res.expose(lastUpdatedTime, "lastUpdatedTime");
+        res.expose(nextUpdateTime, "nextUpdateTime");
         res.expose(data.getNextRefreshTime(), "nextClientRefreshTime");
         res.render('index', {
             title: 'Express',

@@ -19,6 +19,7 @@
     "express-state": "^1.4.0",
     "jade": "~1.11.0",
     "moment": "^2.14.1",
+    "moment-timezone": "^0.5.5",
     "morgan": "~1.7.0",
     "parse-duration": "^0.1.1",
     "request": "^2.74.0",

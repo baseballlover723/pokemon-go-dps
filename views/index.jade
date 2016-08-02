@@ -8,8 +8,8 @@ block content
             p This is for attacking data only right now
             p Total dps is the DPS you would expect if you used your charge move as often as possible. Currently takes into account fast move DPS, charge move DPS, how fast the fast move generates energy, how much energy the charge move requires, how likely the charge move is to crit (150% crit), as well as STAB (25% bonus)
         .col-sm-6
-            p Data last loaded at : #{lastUpdatedTime.format("LLLL")}
-            p Next data update at: #{nextUpdateTime.format("LLLL")}
+            p Data last loaded at: <span id='last-update-time'>#{lastUpdatedTime.format("LLLL")} UTC</span>
+            p Next data update at: <span id='next-update-time'>#{nextUpdateTime.format("LLLL")} UTC</span>
             p TODO List
                 ul
                     li <s>Factor in STAB</s>

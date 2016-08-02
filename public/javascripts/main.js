@@ -1,7 +1,11 @@
 // var poke = new Pokemon(1, "work", null, null,  "bug", "grass");
 // console.log(poke.getSTABDamage({"id":"100","name":"X-Scissor","class":"Special","damage":35,"duration":2.1,"type":{"name":"bug","weaknesses":[]}}));
 // new Pokemon(poke);
+
 $(document).ready(function () {
+    $('#last-update-time').text(moment.tz(jsVars.lastUpdatedTime, moment.tz.guess()).format("LLLL z"));
+    $('#next-update-time').text(moment.tz(jsVars.nextUpdateTime, moment.tz.guess()).format("LLLL z"));
+
     dataTable = $('#data-table').DataTable({
         ajax: {
             url: "/data", dataSrc: function (jsonStr) {
@@ -102,14 +106,13 @@ $(document).ready(function () {
                 targets: 3, width: "10%"
             }]
     });
-    dataTable.on("init", function() {
+    dataTable.on("init", function () {
         var header = $("<tr id='top-column-header'></tr>");
         header.append("<th colspan='3'>Pokemon</th>");
         header.append("<th colspan='7'>Fast Move</th>");
         header.append("<th colspan='8'>Charge Move</th>");
         header.append("<th colspan='2'>Fast & Charge</th>");
         $('.dataTables_scrollHeadInner thead').prepend(header);
-        // todo my the sections more distinct
         console.log("inited");
     });
 });

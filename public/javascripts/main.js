@@ -1,60 +1,99 @@
+// var poke = new Pokemon(1, "work", null, null,  "bug", "grass");
+// console.log(poke.getSTABDamage({"id":"100","name":"X-Scissor","class":"Special","damage":35,"duration":2.1,"type":{"name":"bug","weaknesses":[]}}));
+// new Pokemon(poke);
 $(document).ready(function () {
     //$('#data-table').DataTable({
     //    data: dataSet, columns: [{title: '#'}, {title: 'Name'}, {title: 'Fast Moves'}, {title: 'Charge Moves'}]
     //});
-    console.log("here");
-    console.log(jsVars.nextClientRefreshTime);
     dataTable = $('#data-table').DataTable({
         ajax: {
             url: "/data", dataSrc: function (jsonStr) {
-                return CircularJSON.parse(JSON.stringify(jsonStr)).data;
-            }
-        },
-        columns: [{title: "#", data: "number"}, {title: "Name", data: "name"},
-            {title: "Fast Move", data: "fastMove.name"}, {
-                title: "Fast Move Type", data: "fastMove.type.name", render: function (data, type, row) {
-                    return data[0].toUpperCase() + data.slice(1); // capitalize first letter
+                var pokemons = CircularJSON.parse(JSON.stringify(jsonStr)).data;
+                for (var index in pokemons) {
+                    pokemons[index] = new Pokemon(pokemons[index]);
                 }
-            }, {title: "Fast Move Damage", data: "fastMove.damage"},
+                return pokemons;
+            }
+        }, columns: [{
+            title: "#", data: "id", render: function (data, type, row) {
+                if (type == "display") {
+                    return "#" + data;
+                } else if (type == "filter") {
+                    return "#" + data + "#";
+                } else {
+                    return data;
+                }
+            }
+        }, {title: "Name", data: "name"}, {
+            title: "Type(s)", data: null, render: function (data, type, pokemon) {
+                if (pokemon.type2) {
+                    return capitalize(pokemon.type1) + " / " + capitalize(pokemon.type2);
+                } else {
+                    return capitalize(pokemon.type1);
+                }
+            }
+        }, {title: "Fast Move", data: "fastMove.name"}, {
+            title: "Fast Move Type", data: "fastMove.type.name", render: function (data, type, pokemon) {
+                return capitalize(data);
+            }
+        }, {title: "Fast Move Damage", data: "fastMove.damage"},
             {title: "Fast Move Duration", data: "fastMove.duration"},
             {title: "Fast Move Energy Gain", data: "fastMove.energyGain"}, {
-                title: "Fast Move DPS", data: "fastMove", render: function (data, type, row) {
+                title: "Fast Move DPS", data: "fastMove", render: function (data, type, pokemon) {
                     var dps = data.damage / data.duration;
                     return dps.toFixed(3);
                 }
-            }, {title: "Charge Move", data: "specialMove.name"}, {
-                title: "Charge Move Type", data: "specialMove.type.name", render: function (data, type, row) {
-                    return data[0].toUpperCase() + data.slice(1); // capitalize first letter
+            }, {
+                title: "Fast Move STAB DPS", data: "fastMove", render: function (data, type, pokemon) {
+                    var dps = pokemon.getSTABDamage(data) / data.duration;
+                    return dps.toFixed(3);
                 }
-            }, {title: "Charge Move Damage", data: "specialMove.damage"},
-            {title: "Charge Move Duration", data: "specialMove.duration"}, {
+            }, {title: "Charge Move", data: "chargeMove.name"}, {
+                title: "Charge Move Type", data: "chargeMove.type.name", render: function (data, type, pokemon) {
+                    return capitalize(data);
+                }
+            }, {title: "Charge Move Damage", data: "chargeMove.damage"},
+            {title: "Charge Move Duration", data: "chargeMove.duration"}, {
                 title: "Charge Move Energy Required",
-                data: "specialMove.energyRequired",
-                render: function (data, type, row) {
+                data: "chargeMove.energyRequired",
+                render: function (data, type, pokemon) {
                     return Math.round(data * 100) / 100; // round to 2 decimal places
                 }
             }, {
-                title: "Charge Move Crit Chance", data: "specialMove.critChance", render: function (data, type, row) {
+                title: "Charge Move Crit Chance", data: "chargeMove.critChance", render: function (data, type, pokemon) {
                     return data * 100 + "%"; // convert to percent
                 }
             }, {
-                title: "Charge Move DPS", data: "specialMove", render: function (data, type, row) {
+                title: "Charge Move DPS", data: "chargeMove", render: function (data, type, pokemon) {
                     var dps = data.damage * (data.critChance / 2 + 1) / data.duration;
                     return dps.toFixed(3);
                 }
             }, {
-                title: "Total DPS", data: null, render: function (data, type, row) {
-                    var fm = row.fastMove;
-                    var cm = row.specialMove;
+                title: "Charge Move STAB DPS", data: "chargeMove", render: function (data, type, pokemon) {
+                    var dps = pokemon.getSTABDamage(data) * (data.critChance / 2 + 1) / data.duration;
+                    return dps.toFixed(3);
+                }
+            }, {
+                title: "Total DPS", data: null, render: function (data, type, pokemon) {
+                    var fm = pokemon.fastMove;
+                    var cm = pokemon.chargeMove;
                     var dps = ((2 * fm.damage * cm.energyRequired) + (fm.energyGain * cm.damage * cm.critChance) +
                         (2 * fm.energyGain * cm.damage)) /
                         (2 * (fm.energyGain * cm.duration + fm.duration * cm.energyRequired));
                     return dps.toFixed(3);
                 }
-            }],
-        pageLength: 50,
-        order: [[15, "desc"]],
-        autoWidth: true, // columnDefs: [
+            },{
+                title: "Total STAB DPS", data: null, render: function (data, type, pokemon) {
+                    var fm = pokemon.fastMove;
+                    var cm = pokemon.chargeMove;
+                    var fmDamage = pokemon.getSTABDamage(fm);
+                    var cmDamage = pokemon.getSTABDamage(cm);
+                    var dps = ((2 * fmDamage * cm.energyRequired) + (fm.energyGain * cmDamage * cm.critChance) +
+                        (2 * fm.energyGain * cmDamage)) /
+                        (2 * (fm.energyGain * cm.duration + fm.duration * cm.energyRequired));
+                    return dps.toFixed(3);
+                }
+            }], pageLength: 50, order: [[19, "desc"]], autoWidth: true, // columnDefs: [
         //     {targets: 0, width: "5%"},{
         //     render: function (data, type, row) {
         //         return data.name;
@@ -71,7 +110,8 @@ $("#refresh").on("click", function () {
     console.log("clicked");
     if (moment().isBefore(jsVars.nextClientRefreshTime)) {
         var timeUntilRefresh = moment.preciseDiff(moment(jsVars.nextClientRefreshTime), moment());
-        showAlert("This site has already been updated recently, you can update it again in <span id='refresh-time'>" + timeUntilRefresh + "</span>", "alert-danger");
+        showAlert("This site has already been updated recently, you can update it again in <span id='refresh-time'>" +
+            timeUntilRefresh + "</span>", "alert-danger");
     } else {
         $(location).attr('href', '/refresh');
     }
@@ -81,7 +121,9 @@ var closeAlert;
 function showAlert(message, alertType) {
     if ($('#alert-placeholder').html() == "") {
         clearTimeout(closeAlert);
-        $('#alert-placeholder').append('<div id="alertdiv" class="alert ' + alertType + '"><a class="close" data-dismiss="alert">×</a><span>' + message + '</span></div>')
+        $('#alert-placeholder').append(
+            '<div id="alertdiv" class="alert ' + alertType + '"><a class="close" data-dismiss="alert">×</a><span>' +
+            message + '</span></div>')
         var countdown = setInterval(function () {
             if (moment().isAfter(jsVars.nextClientRefreshTime)) {
                 $('#alertdiv').removeClass(alertType);
@@ -96,4 +138,8 @@ function showAlert(message, alertType) {
             $("#alertdiv").remove();
         }, 5000);
     }
+}
+
+function capitalize(str) {
+    return str[0].toUpperCase() + str.slice(1)
 }

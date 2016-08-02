@@ -5,6 +5,11 @@ var parseDuration = require('parse-duration');
 var async = require('async');
 var CircularJSON = require('circular-json');
 var moment = require('moment');
+var Pokemon = require('./../lib/pokemon');
+var Move = require('./../lib/move');
+var Type = require('./../lib/type');
+
+
 var LIMIT_VALUE = 24;
 var LIMIT_UNITS = "hours";
 var CLIENT_REFRESH_VALUE = 1;
@@ -13,52 +18,7 @@ var CLIENT_REFRESH_UNITS = "hour";
 var scrapping = false;
 var lastClientRefresh = false;
 
-
 // should probably clean up the globals
-
-function Move(id, name) {
-    var self = this;
-    this.id = id;
-    this.name = name;
-    this.class = id >= 200 ? "Fast" : "Special";
-    this.damage = "Loading";
-    this.duration = "Loading";
-    this.type = "Loading";
-    if (self.isFast()) {
-        this.energyGain = "Loading";
-    } else {
-        this.energyRequired = "Loading";
-        this.critChance = "Loading";
-    }
-}
-
-Move.prototype = {
-    isFast: function () {
-        return this.class == "Fast";
-    }, hasAnyLoading: function () {
-        return this.damage == "Loading" || this.duration == "Loading" || this.type == "Loading" ||
-            (move.isFast() && this.energyGain == "Loading") ||
-            (!move.isFast() && (this.energyRequired == "Loading" || this.critChance == "Loading"));
-    }, load: function (move) {
-        this.class = move.class;
-        this.damage = move.damage;
-        this.duration = move.duration;
-        this.type = move.type;
-        if (this.isFast()) {
-            this.energyGain = move.energyGain;
-        } else {
-            this.energyRequired = move.energyRequired;
-            this.critChance = move.critChance;
-        }
-    }
-};
-
-function Type(name) {
-    this.name = name;
-    this.weaknesses = [];
-    this.strengths = [];
-}
-
 String.prototype.replaceAll = function (search, replacement) {
     var target = this;
     return target.replace(new RegExp(search, 'g'), replacement);
@@ -67,35 +27,9 @@ String.prototype.replaceAll = function (search, replacement) {
 var data = [];
 var list = JSON.parse(fs.readFileSync("json/pokemon.json"));
 var moveNames = JSON.parse(fs.readFileSync("json/moveNames.json"));
+var pokemonWithTypes = JSON.parse(fs.readFileSync("json/pokemonTypes.json"));
 
-// var limit = 10;
-// console.time("type loop");
-// async.eachLimit(list, limit, function (pokemon, callback) {
-//     let url = 'http://pokeapi.co/api/v2/pokemon/' + pokemon.num;
-//     console.time(pokemon.name + ": " + pokemon.num + " request");
-//     request({url: url, json: true, timeout: parseDuration("2 minutes")}, function (error, response, json) {
-//         if (!error) {
-//             var types = json.types;
-//             for (var type of types) {
-//                 if (type.slot == 1) {
-//                     pokemon.type1 = type.type.name;
-//                 } else {
-//                     pokemon.type2 = type.type.name;
-//                 }
-//             }
-//             console.timeEnd(pokemon.name + ": " + pokemon.num + " request");
-//         } else {
-//             console.timeEnd(pokemon.name + ": " + pokemon.num + " request");
-//             console.log("with error ^ ");
-//         }
-//         callback();
-//     });
-// }, function (err) {
-//     console.timeEnd("type loop");
-//     fs.writeFile("json/pokemonTypes.json", JSON.stringify(list), function () {
-//         console.log("done with write");
-//     })
-// });
+// populatePokemonTypes();
 var types = {};
 
 populateTypes();
@@ -120,19 +54,25 @@ isCachedValid(true, function (movesCopy, isValid) {
 });
 
 console.time("create data");
-list.map(function (pokemon) {
-    var num = padLeft(pokemon.num, '000');
-    var name = toProperCase(pokemon.name);
-    var fastMoves = lookupMoves(pokemon.quickMoves);
-    var specialMoves = lookupMoves(pokemon.cinematicMoves);
+list.map(function (pokemonHash) {
+    var num = pokemonHash.num;
+    var name = toProperCase(pokemonHash.name);
+    var fastMoves = lookupMoves(pokemonHash.quickMoves);
+    var chargeMoves = lookupMoves(pokemonHash.cinematicMoves);
     for (var fastMove of fastMoves) {
-        for (var specialMove of specialMoves) {
-            data.push({number: num, name: name, fastMove: fastMove, specialMove: specialMove});
+        for (var chargeMove of chargeMoves) {
+            var pokemonTypeHash = pokemonWithTypes[num - 1];
+            if (pokemonTypeHash.type2) {
+                data.push(new Pokemon(num, name, fastMove, chargeMove, pokemonTypeHash.type1, pokemonTypeHash.type2));
+            } else {
+                data.push(new Pokemon(num, name, fastMove, chargeMove, pokemonTypeHash.type1));
+            }
+            // data.push({number: num, name: name, fastMove: fastMove, chargeMove: chargeMove});
         }
     }
     // pokemon.fastMoves = fastMoves.map(function(move) {return move.id});
-    // pokemon.cinematicMoves = specialMoves.map(function(move) {return move.id});
-    //myDataSet.append([data['Num'], data['Name'], data['Fast Moves'], data['Special Moves']]);
+    // pokemon.cinematicMoves = chargeMoves.map(function(move) {return move.id});
+    //myDataSet.append([data['Num'], data['Name'], data['Fast Moves'], data['Charge Moves']]);
 });
 console.timeEnd("create data");
 
@@ -147,7 +87,7 @@ module.exports.refreshCache = function (callback = function (isRefreshing, nextR
         callback(isRefreshing, nextRefreshTime);
     });
 };
-module.exports.getNextRefreshTime = function() {
+module.exports.getNextRefreshTime = function () {
     if (!lastClientRefresh) {
         return moment();
     }
@@ -155,11 +95,44 @@ module.exports.getNextRefreshTime = function() {
 };
 console.log("exported");
 
+function populatePokemonTypes(callback = function () {}) {
+    var limit = 10;
+    console.time("type loop");
+    async.eachLimit(list, limit, function (pokemon, callback) {
+        let url = 'http://pokeapi.co/api/v2/pokemon/' + pokemon.num;
+        console.time(pokemon.name + ": " + pokemon.num + " request");
+        request({url: url, json: true, timeout: parseDuration("2 minutes")}, function (error, response, json) {
+            if (!error) {
+                var types = json.types;
+                for (var type of types) {
+                    if (type.slot == 1) {
+                        pokemon.type1 = type.type.name;
+                    } else {
+                        pokemon.type2 = type.type.name;
+                    }
+                }
+                console.timeEnd(pokemon.name + ": " + pokemon.num + " request");
+            } else {
+                console.timeEnd(pokemon.name + ": " + pokemon.num + " request");
+                console.log("with error ^ ");
+            }
+            callback();
+        });
+    }, function (err) {
+        console.timeEnd("type loop");
+        fs.writeFile("json/pokemonTypes.json", JSON.stringify(list), function () {
+            console.log("done with write");
+            callback();
+        })
+    });
+}
+
 function refreshCache(fromClient, callback = function (isRefreshing, nextRefreshTime) {}) {
     if (!scrapping || moment().subtract(5, "minutes").isAfter(scrapping) || fromClient) {
         var refresh = false;
         if (fromClient) {
-            if (!lastClientRefresh || moment().subtract(CLIENT_REFRESH_VALUE, CLIENT_REFRESH_UNITS).isAfter(lastClientRefresh)) {
+            if (!lastClientRefresh ||
+                moment().subtract(CLIENT_REFRESH_VALUE, CLIENT_REFRESH_UNITS).isAfter(lastClientRefresh)) {
                 console.log("Client refreshed cache");
                 lastClientRefresh = moment();
                 refresh = true;
@@ -351,7 +324,7 @@ function parseMove($, move, data) {
     var table = data.children().first().next().children().first().children().first();
     var rows = table.children();
     var isFast = $(rows.get(0)).text().includes("Fast"); // move class
-    move.class = isFast ? "Fast" : "Special";
+    move.class = isFast ? "Fast" : "Charge";
     move.damage = parseDamage($(rows.get(2)));
     move.duration = parseDurationRow($(rows.get(4))); // s
     if (isFast) {
@@ -413,13 +386,13 @@ var dataTable;
 
 // $(document).ready(function () {
 //     //$('#data-table').DataTable({
-//     //    data: dataSet, columns: [{title: '#'}, {title: 'Name'}, {title: 'Fast Moves'}, {title: 'Special Moves'}]
+//     //    data: dataSet, columns: [{title: '#'}, {title: 'Name'}, {title: 'Fast Moves'}, {title: 'Charge Moves'}]
 //     //});
 //     console.log("here");
 //     dataTable = $('#data-table').DataTable({
 //         data: myDataSet,
 //         columns: [{title: '#'}, {title: 'Name'}, {title: 'Fast Move'}, {title: 'Fast Move Damage'}, {title:
-// 'Special Move'},{title: 'Special Move Damage'}], autoWidth: true, columnDefs: [ {targets: 0, width: "5%"},{ render:
+// 'Charge Move'},{title: 'Charge Move Damage'}], autoWidth: true, columnDefs: [ {targets: 0, width: "5%"},{ render:
 // function (data, type, row) { return data.name; }, targets: 2, width: "10%" }, { render: function (data) { return
 // data.damage || "Loading"; }, targets: 3, width: "10%" }] }); });
 
@@ -469,9 +442,9 @@ function checkCache(callback = function (lastUpdatedTime, nextUpdateTime) {}) {
 //        'Num': padLeft(item.num, '000'),
 //        'Name': toProperCase(item.name),
 //        'Fast Moves': lookupMoves(item.fastMoves).join(', '),
-//        'Special Moves': lookupMoves(item.cinematicMoves).join(', ')
+//        'Charge Moves': lookupMoves(item.cinematicMoves).join(', ')
 //    };
-//    return [data['Num'], data['Name'], data['Fast Moves'], data['Special Moves']];
+//    return [data['Num'], data['Name'], data['Fast Moves'], data['Charge Moves']];
 //});
 
 // setTimeout(function () {

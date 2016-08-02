@@ -25,6 +25,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/circular-json', express.static(__dirname + '/node_modules/circular-json/build'));
 app.use('/moment', express.static(__dirname + '/node_modules/moment/min'));
+app.use('/class', express.static(__dirname + '/lib'));
 app.use('/', routes);
 
 // catch 404 and forward to error handler

@@ -1,16 +1,19 @@
 extends layout
 
 block content
-    p This site gets its data from <a href='http://bulbapedia.bulbagarden.net/'>http://bulbapedia.bulbagarden.net/</a>.
-    p Is my data wrong or did the game just have an update? Update this wiki and then <button id='refresh'>force this site to reload its data from the wiki</button>. (It takes a few minutes to update) (Limited to once per hour, if this is abused or the wiki complains, I will remove this)
-    p Data last loaded at : #{lastUpdatedTime.format("LLLL")}
-    p Next data update at: #{nextUpdateTime.format("LLLL")}
-    p This is for attacking data only right now
-    p Total dps is the DPS you would expect if you used your charge move as often as possible. Currently takes into account fast move DPS, charge move DPS, how fast the fast move generates energy, how much energy the charge move requires, how likely the charge move is to crit (150% crit), as well as STAB (25% bonus)
+    .row
+        .col-sm-6
+            p This site gets its data from <a href='http://bulbapedia.bulbagarden.net/'>http://bulbapedia.bulbagarden.net/</a>.
+            p Is my data wrong or did the game just have an update? Update this wiki and then <button id='refresh'>force this site to reload its data from the wiki.</button> (It takes a few minutes to update) (Limited to once per hour, if this is abused or the wiki complains, I will remove this)
+            p This is for attacking data only right now
+            p Total dps is the DPS you would expect if you used your charge move as often as possible. Currently takes into account fast move DPS, charge move DPS, how fast the fast move generates energy, how much energy the charge move requires, how likely the charge move is to crit (150% crit), as well as STAB (25% bonus)
+        .col-sm-6
+            p Data last loaded at : #{lastUpdatedTime.format("LLLL")}
+            p Next data update at: #{nextUpdateTime.format("LLLL")}
+            p TODO List
+                ul
+                    li <s>Factor in STAB</s>
+                    li Split into 2 tabs for attacking and defending
+                    li Add a tab to calculate DPS against specific Pokémon
     p PS: The search bar is pretty useful. Note, if you want to search for a specific pokemon number, you can add an additional '#' at the end to signal the end of the number. ex) '#13#' will show Weedle (#13) and not Eevee (#133) or Gyaradoes (#130)
-    p TODO List
-        ul
-            li <s>Factor in STAB</s>
-            li Add a tab to calculate for defending
-            li Add a feature to calculate DPS against specific Pokémon
-    table#data-table.display.cell-border
+    table#data-table.display.cell-border.table-striped.table-bordered.table

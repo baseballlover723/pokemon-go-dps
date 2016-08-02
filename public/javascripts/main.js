@@ -2,9 +2,6 @@
 // console.log(poke.getSTABDamage({"id":"100","name":"X-Scissor","class":"Special","damage":35,"duration":2.1,"type":{"name":"bug","weaknesses":[]}}));
 // new Pokemon(poke);
 $(document).ready(function () {
-    //$('#data-table').DataTable({
-    //    data: dataSet, columns: [{title: '#'}, {title: 'Name'}, {title: 'Fast Moves'}, {title: 'Charge Moves'}]
-    //});
     dataTable = $('#data-table').DataTable({
         ajax: {
             url: "/data", dataSrc: function (jsonStr) {
@@ -32,49 +29,51 @@ $(document).ready(function () {
                     return capitalize(pokemon.type1);
                 }
             }
-        }, {title: "Fast Move", data: "fastMove.name"}, {
-            title: "Fast Move Type", data: "fastMove.type.name", render: function (data, type, pokemon) {
+        }, {title: "Move Name", data: "fastMove.name"}, {
+            title: "Type", data: "fastMove.type.name", render: function (data, type, pokemon) {
                 return capitalize(data);
             }
-        }, {title: "Fast Move Damage", data: "fastMove.damage"},
-            {title: "Fast Move Duration", data: "fastMove.duration"},
-            {title: "Fast Move Energy Gain", data: "fastMove.energyGain"}, {
-                title: "Fast Move DPS", data: "fastMove", render: function (data, type, pokemon) {
+        }, {title: "Damage", data: "fastMove.damage"},
+            {title: "Duration", data: "fastMove.duration"},
+            {title: "Energy Gain", data: "fastMove.energyGain"}, {
+                title: "DPS", data: "fastMove", render: function (data, type, pokemon) {
                     var dps = data.damage / data.duration;
                     return dps.toFixed(3);
                 }
             }, {
-                title: "Fast Move STAB DPS", data: "fastMove", render: function (data, type, pokemon) {
+                title: "STAB DPS", data: "fastMove", render: function (data, type, pokemon) {
                     var dps = pokemon.getSTABDamage(data) / data.duration;
                     return dps.toFixed(3);
                 }
-            }, {title: "Charge Move", data: "chargeMove.name"}, {
-                title: "Charge Move Type", data: "chargeMove.type.name", render: function (data, type, pokemon) {
+            }, {title: "Move Name", data: "chargeMove.name"}, {
+                title: "Type", data: "chargeMove.type.name", render: function (data, type, pokemon) {
                     return capitalize(data);
                 }
-            }, {title: "Charge Move Damage", data: "chargeMove.damage"},
-            {title: "Charge Move Duration", data: "chargeMove.duration"}, {
-                title: "Charge Move Energy Required",
+            }, {title: "Damage", data: "chargeMove.damage"},
+            {title: "Duration", data: "chargeMove.duration"}, {
+                title: "Energy Required",
                 data: "chargeMove.energyRequired",
                 render: function (data, type, pokemon) {
                     return Math.round(data * 100) / 100; // round to 2 decimal places
                 }
             }, {
-                title: "Charge Move Crit Chance", data: "chargeMove.critChance", render: function (data, type, pokemon) {
+                title: "Crit Chance",
+                data: "chargeMove.critChance",
+                render: function (data, type, pokemon) {
                     return data * 100 + "%"; // convert to percent
                 }
             }, {
-                title: "Charge Move DPS", data: "chargeMove", render: function (data, type, pokemon) {
+                title: "DPS", data: "chargeMove", render: function (data, type, pokemon) {
                     var dps = data.damage * (data.critChance / 2 + 1) / data.duration;
                     return dps.toFixed(3);
                 }
             }, {
-                title: "Charge Move STAB DPS", data: "chargeMove", render: function (data, type, pokemon) {
+                title: "STAB DPS", data: "chargeMove", render: function (data, type, pokemon) {
                     var dps = pokemon.getSTABDamage(data) * (data.critChance / 2 + 1) / data.duration;
                     return dps.toFixed(3);
                 }
             }, {
-                title: "Total DPS", data: null, render: function (data, type, pokemon) {
+                title: "DPS", data: null, render: function (data, type, pokemon) {
                     var fm = pokemon.fastMove;
                     var cm = pokemon.chargeMove;
                     var dps = ((2 * fm.damage * cm.energyRequired) + (fm.energyGain * cm.damage * cm.critChance) +
@@ -82,8 +81,8 @@ $(document).ready(function () {
                         (2 * (fm.energyGain * cm.duration + fm.duration * cm.energyRequired));
                     return dps.toFixed(3);
                 }
-            },{
-                title: "Total STAB DPS", data: null, render: function (data, type, pokemon) {
+            }, {
+                title: "STAB DPS", data: null, render: function (data, type, pokemon) {
                     var fm = pokemon.fastMove;
                     var cm = pokemon.chargeMove;
                     var fmDamage = pokemon.getSTABDamage(fm);
@@ -93,16 +92,25 @@ $(document).ready(function () {
                         (2 * (fm.energyGain * cm.duration + fm.duration * cm.energyRequired));
                     return dps.toFixed(3);
                 }
-            }], pageLength: 50, order: [[19, "desc"]], autoWidth: true, // columnDefs: [
-        //     {targets: 0, width: "5%"},{
-        //     render: function (data, type, row) {
-        //         return data.name;
-        //     }, targets: 2, width: "10%"
-        // }, {
-        //     render: function (data) {
-        //         return data.damage || "Loading";
-        //     }, targets: 3, width: "10%"
-        // }]
+            }], pageLength: 50, order: [[19, "desc"]], autoWidth: true, scrollY: '50vh', scrollCollapse: true,
+        columnDefs: [
+            {
+                targets: 0, width: "5%"
+            }, {
+                targets: 2, width: "10%"
+            }, {
+                targets: 3, width: "10%"
+            }]
+    });
+    dataTable.on("init", function() {
+        var header = $("<tr id='top-column-header'></tr>");
+        header.append("<th colspan='3'>Pokemon</th>");
+        header.append("<th colspan='7'>Fast Move</th>");
+        header.append("<th colspan='8'>Charge Move</th>");
+        header.append("<th colspan='2'>Fast & Charge</th>");
+        $('.dataTables_scrollHeadInner thead').prepend(header);
+        // todo my the sections more distinct
+        console.log("inited");
     });
 });
 

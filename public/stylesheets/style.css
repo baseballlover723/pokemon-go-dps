@@ -1,5 +1,5 @@
 body {
-    padding: 85px 50px;
+    padding: 85px 50px 0 50px;
     font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
 }
 
@@ -32,4 +32,10 @@ nav {
 
 .profile {
     font: 24px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+
+#top-column-header th{
+    border-collapse: collapse;
+    border-bottom-width: 0px;
+    text-align: center;
 }

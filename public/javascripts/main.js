@@ -87,6 +87,8 @@ $(document).ready(function () {
                         (2 * (fm.energyGain * cm.duration + fm.duration * cm.energyRequired));
                     return dps.toFixed(3);
                 }
+            }, {
+                title: "Rank", data: null, searchable: false, orderable: false
             }],
         pageLength: 50,
         order: [[19, "desc"]],
@@ -137,6 +139,11 @@ $(document).ready(function () {
         }
     });
 
+    dataTable.on( 'order.dt search.dt', function () {
+        dataTable.column(20, {search:'applied', order:'applied'}).nodes().each( function (cell, i) {
+            cell.innerHTML = i+1;
+        } );
+    } ).draw();
     // dataTable.on("responsive-resize", function (e, datatable, columns) {
     //     var pokemonStart = 0;
     //     var fastHeader = 3;

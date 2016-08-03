@@ -1,5 +1,4 @@
 body {
-    padding: 85px 50px 0 50px;
     font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
 }
 
@@ -11,23 +10,8 @@ nav {
     color: white
 }
 
-.title {
-    margin: 0px 50px;
-    float: left;
-}
-
 .navbar-right {
     margin-right: 50px;
-}
-
-.vertically-center {
-    height: 67.5px;
-    vertical-align: middle;
-    line-height: 67.5px;
-}
-
-#vertically-center-text {
-    line-height: 37.5px;
 }
 
 .profile {
@@ -38,4 +22,8 @@ nav {
     border-collapse: collapse;
     border-bottom-width: 0px;
     text-align: center;
+}
+
+.main-content {
+    margin: 0 50px;
 }

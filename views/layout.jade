@@ -10,7 +10,7 @@ html.no-js(lang='')
     // Place favicon.ico in the root directory
     link(rel='stylesheet', href='/stylesheets/normalize.css')
     link(rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous")
-    link(rel='stylesheet', href='https://cdn.datatables.net/v/bs/dt-1.10.12/datatables.min.css')
+    link(rel='stylesheet', href='https://cdn.datatables.net/v/bs/dt-1.10.12/fh-3.1.2/r-2.1.0/datatables.min.css')
     link(rel='stylesheet', href='/stylesheets/main.css')
     link(rel='stylesheet', href='/stylesheets/style.css')
     script(src='/javascripts/vendor/modernizr-2.8.3.min.js')
@@ -23,27 +23,36 @@ body
         a(href='http://browsehappy.com/') upgrade your browser
         |  to improve your experience.
     // Add your site or application content here
-    nav.navbar.navbar-inverse.navbar-fixed-top(role="navigation" data-topbar)
-      section.top-bar-section.navbar-collapse
-        ul.nav.navbar-nav.navbar-left
-          .title
-            h1 Pokémon GO DPS analyzer
-        .ul.nav.navbar-nav.navbar-right.vertically-center
-          li.dropdown.vertically-center
-            a#vertically-center-text.profile.dropdown-toggle(href="#" data-toggle="dropdown") Philip Ross
-            ul.dropdown-menu
-              li
-                a(href="https://www.linkedin.com/pub/philip-ross/a5/569/575") Philip's LinkedIn
-              li
-                a(href="https://github.com/baseballlover723") Philip's Github
-    #alert-placeholder
-    block content
+    nav.navbar.navbar-default.navbar-inverse.navbar-static-top
+      .container-fluid
+        // Brand and toggle get grouped for better mobile display
+        .navbar-header
+          button.navbar-toggle.collapsed(type='button', data-toggle='collapse', data-target='#bs-example-navbar-collapse-1', aria-expanded='false')
+            span.sr-only Toggle navigation
+            span.icon-bar
+            span.icon-bar
+            span.icon-bar
+          a.navbar-brand(href='/').title Pokémon GO DPS Analyzer
+
+        // Collect the nav links, forms, and other content for toggling
+        #bs-example-navbar-collapse-1.collapse.navbar-collapse
+          ul.nav.navbar-nav.navbar-right
+            li.dropdown.vertically-center
+              a#vertically-center-text.profile.dropdown-toggle(href="#" data-toggle="dropdown") Philip Ross <span class='caret'></span>
+              ul.dropdown-menu
+                li
+                  a(href="https://www.linkedin.com/pub/philip-ross/a5/569/575") Philip's LinkedIn
+                li
+                  a(href="https://github.com/baseballlover723") Philip's Github
+    .container-fluid
+      #alert-placeholder
+      block content
 
     script(src='https://code.jquery.com/jquery-1.12.0.min.js')
     script(src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous")
     script.
       window.jQuery || document.write('<script src="/javascripts/vendor/jquery-1.12.0.min.js"><\\/script>')
-    script(src='https://cdn.datatables.net/v/bs/dt-1.10.12/datatables.min.js')
+    script(src='https://cdn.datatables.net/v/bs/dt-1.10.12/fh-3.1.2/r-2.1.0/datatables.min.js')
     script(src='/javascripts/plugins.js')
     script(src="/circular-json/circular-json.js")
     script(src="/moment/moment-with-locales.min.js")

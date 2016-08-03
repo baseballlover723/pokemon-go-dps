@@ -92,7 +92,7 @@ $(document).ready(function () {
                         (2 * (fm.energyGain * cm.duration + fm.duration * cm.energyRequired));
                     return dps.toFixed(3);
                 }
-            }], pageLength: 50, order: [[19, "desc"]], autoWidth: true, scrollY: '50vh', scrollCollapse: true,
+            }], pageLength: 50, order: [[19, "desc"]], autoWidth: true, fixedHeader: true,
         columnDefs: [
             {
                 targets: 0, width: "5%"

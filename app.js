@@ -28,6 +28,7 @@ app.use('/moment', express.static(__dirname + '/node_modules/moment/min'));
 app.use('/moment-timezone', express.static(__dirname + '/node_modules/moment-timezone/builds'));
 app.use('/class', express.static(__dirname + '/lib'));
 app.use('/', routes);
+app.expose(app.settings.env, "env");
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

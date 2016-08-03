@@ -124,7 +124,6 @@ $(document).ready(function () {
         header.append("<th id='charge-header' colspan='8' class='charge-move-highlight'>Charge Move</th>");
         header.append("<th id='total-dps-header' colspan='2'>Fast & Charge</th>");
         $('#data-table thead').prepend(header);
-        console.log("init");
     });
 
     // dataTable.on("responsive-resize", function (e, datatable, columns) {

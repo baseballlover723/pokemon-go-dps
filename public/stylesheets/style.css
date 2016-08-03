@@ -4,6 +4,7 @@ body {
 
 a {
     color: #00B7FF;
+    cursor: pointer;
 }
 
 nav {
@@ -33,7 +34,6 @@ nav {
 }
 
 #data-table_length {
-    /*float: left;*/
     text-align: right;
 }
 

@@ -4,16 +4,11 @@ block content
     .row
         .col-md-8.col-sm-6
             p Is my data wrong or did the game just have an update? Update this wiki and then <button id='refresh'>force this site to reload its data from the wiki.</button> (It takes a few minutes to update) (Limited to once per hour, if this is abused or the wiki complains, I will remove this)
-            p This is for attacking data only right now
-            p Total dps is the DPS you would expect if you used your charge move as often as possible. Currently takes into account fast move DPS, charge move DPS, how fast the fast move generates energy, how much energy the charge move requires, how likely the charge move is to crit (150% crit), as well as STAB (25% bonus)
+            p This is the equation used is below, fm is data from the fast move and cm is data from the charge move
+            img(src='/images/equation.gif')
         .col-md-4.col-sm-6
             p This site gets its data from <a href='http://bulbapedia.bulbagarden.net/'>http://bulbapedia.bulbagarden.net/</a>.
             p Data last loaded at: <span id='last-update-time'>#{lastUpdatedTime.format("LLLL")} UTC</span>
             p Next data update at: <span id='next-update-time'>#{nextUpdateTime.format("LLLL")} UTC</span>
-            p TODO List
-                ul
-                    li <s>Factor in STAB</s>
-                    li Split into 2 tabs for attacking and defending
-                    li Add a tab to calculate DPS against specific Pokémon
     p Note, if you want to search for a specific pokemon number, you can add an additional '#' at the end to signal the end of the number. ex) '#13#' will show Weedle (#13) and not Eevee (#133) or Gyaradoes (#130)
     table#data-table.display.cell-border.table-striped.table-bordered.table

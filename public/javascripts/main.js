@@ -2,7 +2,7 @@ $(document).ready(function () {
     $('#last-update-time').text(moment.tz(jsVars.lastUpdatedTime, moment.tz.guess()).format("LLLL z"));
     $('#next-update-time').text(moment.tz(jsVars.nextUpdateTime, moment.tz.guess()).format("LLLL z"));
 
-    dataTable = $('#data-table').DataTable({
+    var dataTable = $('#data-table').DataTable({
         ajax: {
             url: "/data", dataSrc: function (jsonStr) {
                 var pokemons = CircularJSON.parse(JSON.stringify(jsonStr)).data;
@@ -92,33 +92,79 @@ $(document).ready(function () {
         order: [[19, "desc"]],
         autoWidth: true,
         fixedHeader: true,
-        // paging: false,
+        // responsive: true, // paging: false,
         dom: "<'row'<'col-sm-6'f><'col-sm-6'l>>" + "<'row'<'col-sm-12'tr>>" + "<'row'<'col-sm-5'i><'col-sm-7'p>>",
         columnDefs: [{
-            targets: 0, width: "2%"
+            //     targets: 0, width: "2%"
+            // }, {
+            //     targets: 1, width: "6%"
+            // }, {
+            //     targets: 2, width: "7%"
+            // }, {
+            //     targets: 3, width: "7%"
+            // }, {
+            //     targets: 10, width: "7%"
+            // }, {
+            targets: [3, 4, 5, 6, 7, 8, 9], className: "fast-move-highlight"
         }, {
-            targets: 1, width: "6%"
-        }, {
-            targets: 2, width: "7%"
-        }, {
-            targets: 3, width: "7%"
-        }, {
-            targets: 10, width: "7%"
-        }, {
-            targets: [3,4,5,6,7,8,9], className: "fast-move-highlight"
-        }, {
-            targets: [10,11,12,13,14,15,16, 17], className: "charge-move-highlight"
+            targets: [10, 11, 12, 13, 14, 15, 16, 17], className: "charge-move-highlight"
+        // }, {
+        //     targets: [0, 1, 3, 10, 18, 19], responsivePriority: 0
+        // }, {
+        //     targets: [8, 9, 16, 17], responsivePriority: 1
+        // }, {
+        //     targets: [2, 4, 11], responsivePriority: 2
         }]
     });
+
     dataTable.on("init", function () {
         var header = $("<tr id='top-column-header'></tr>");
-        header.append("<th colspan='3'>Pokemon</th>");
-        header.append("<th colspan='7' class='fast-move-highlight'>Fast Move</th>");
-        header.append("<th colspan='8' class='charge-move-highlight'>Charge Move</th>");
-        header.append("<th colspan='2'>Fast & Charge</th>");
+        header.append("<th id='pokemon-header' colspan='3'>Pokemon</th>");
+        header.append("<th id='fast-header' colspan='7' class='fast-move-highlight'>Fast Move</th>");
+        header.append("<th id='charge-header' colspan='8' class='charge-move-highlight'>Charge Move</th>");
+        header.append("<th id='total-dps-header' colspan='2'>Fast & Charge</th>");
         $('#data-table thead').prepend(header);
-        console.log("inited");
+        console.log("init");
     });
+
+    // dataTable.on("responsive-resize", function (e, datatable, columns) {
+    //     var pokemonStart = 0;
+    //     var fastHeader = 3;
+    //     var chargeHeader = 10;
+    //     var totalDpsHeader = 18;
+    //
+    //     var pokemon = 0;
+    //     var fast = 0;
+    //     var charge = 0;
+    //     var total = 0;
+    //     for (var i in columns) {
+    //         if (i >= pokemonStart && i < fastHeader) {
+    //             if (columns[i]) {
+    //                 pokemon++;
+    //             }
+    //         } else if (i >= fastHeader && i < chargeHeader) {
+    //             if (columns[i]) {
+    //                 fast++;
+    //             }
+    //         } else if (i >= chargeHeader && i < totalDpsHeader) {
+    //             if (columns[i]) {
+    //                 charge++;
+    //             }
+    //         } else {
+    //             if (columns[i]) {
+    //                 total++;
+    //             }
+    //         }
+    //     }
+    //     $('#pokemon-header').attr("colspan", pokemon);
+    //     $('#fast-header').attr("colspan", fast);
+    //     $('#charge-header').attr("colspan", charge);
+    //     $('#total-dps-header').attr("colspan", total);
+    //     console.log([pokemon, fast, charge, total]);
+    //     console.log($('#charge-header').attr("colspan"));
+    //     console.log($('#total-dps-header').attr("colspan"));
+    //     console.log("resize");
+    // });
 });
 
 $("#refresh").on("click", function () {

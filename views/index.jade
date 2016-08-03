@@ -3,11 +3,11 @@ extends layout
 block content
     .row
         .col-md-8.col-sm-6
-            p Is my data wrong or did the game just have an update? Update this wiki and then <button id='refresh'>force this site to reload its data from the wiki.</button> (It takes a few minutes to update) (Limited to once per hour, if this is abused or the wiki complains, I will remove this)
+            p Is my data wrong or did the game just have an update? Update this wiki and then <button id='refresh'>force this site to reload its data from the wiki.</button> (It takes a few minutes to update, limited to once per hour) <strong>PLEASE DO NOT RELOAD THE DATA</strong> unless you have made changes to the wiki. If this is pressed too much I will be forced to remove this button, and this website will only update once a day!
             p This is the equation used is below, fm is data from the fast move and cm is data from the charge move
             img(src='/images/equation.gif')
         .col-md-4.col-sm-6
-            p This site gets its data from <a href='http://bulbapedia.bulbagarden.net/'>http://bulbapedia.bulbagarden.net/</a>.
+            p This site gets its data from <a href='http://bulbapedia.bulbagarden.net/'>http://bulbapedia.bulbagarden.net/</a>
             p Data last loaded at: <span id='last-update-time'>#{lastUpdatedTime.format("LLLL")} UTC</span>
             p Next data update at: <span id='next-update-time'>#{nextUpdateTime.format("LLLL")} UTC</span>
     p Note, if you want to search for a specific pokemon number, you can add an additional '#' at the end to signal the end of the number. ex) '#13#' will show Weedle (#13) and not Eevee (#133) or Gyaradoes (#130)

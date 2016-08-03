@@ -133,7 +133,7 @@ function refreshCache(fromClient, callback = function (isRefreshing, nextRefresh
         if (fromClient) {
             if (!lastClientRefresh ||
                 moment().subtract(CLIENT_REFRESH_VALUE, CLIENT_REFRESH_UNITS).isAfter(lastClientRefresh)) {
-                console.log("Client refreshed cache");
+                console.log("Client forced cache refresh: " + moment().tz('America/Los_Angeles').format("LLLL z"));
                 lastClientRefresh = moment();
                 refresh = true;
             } else {
@@ -428,7 +428,6 @@ function updateMove(move, fast) {
 }
 
 function checkCache(callback = function (lastUpdatedTime, nextUpdateTime) {}) {
-    console.log("checking cache");
     isCachedValid(false, function (movesCopy, isValid, lastUpdatedTime, nextUpdatedTime) {
         if (!isValid) {
             refreshCache(false);

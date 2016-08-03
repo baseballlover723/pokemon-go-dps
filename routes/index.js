@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var CircularJSON = require('circular-json');
+var moment = require('moment-timezone');
 var data = require('./data');
 
 /* GET home page. */
@@ -24,8 +25,6 @@ router.get("/data", function (req, res, next) {
 
 router.get("/refresh", function (req, res, next) {
     data.refreshCache(function (isRefreshing, nextRefreshTime) {
-        console.log("isRefreshing: " + isRefreshing);
-        console.log("nextRefreshTime: " + nextRefreshTime);
         res.redirect("/");
     });
 });

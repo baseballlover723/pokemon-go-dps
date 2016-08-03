@@ -11,7 +11,8 @@ $(document).ready(function () {
                 }
                 return pokemons;
             }
-        }, columns: [{
+        },
+        columns: [{
             title: "#", data: "id", render: function (data, type, row) {
                 if (type == "display") {
                     return "#" + data;
@@ -33,9 +34,8 @@ $(document).ready(function () {
             title: "Type", data: "fastMove.type.name", render: function (data, type, pokemon) {
                 return capitalize(data);
             }
-        }, {title: "Damage", data: "fastMove.damage"},
-            {title: "Duration", data: "fastMove.duration"},
-            {title: "Energy Gain", data: "fastMove.energyGain"}, {
+        }, {title: "Damage", data: "fastMove.damage"}, {title: "Duration", data: "fastMove.duration"},
+            {title: "Energy", data: "fastMove.energyGain"}, {
                 title: "DPS", data: "fastMove", render: function (data, type, pokemon) {
                     var dps = data.damage / data.duration;
                     return dps.toFixed(3);
@@ -49,17 +49,12 @@ $(document).ready(function () {
                 title: "Type", data: "chargeMove.type.name", render: function (data, type, pokemon) {
                     return capitalize(data);
                 }
-            }, {title: "Damage", data: "chargeMove.damage"},
-            {title: "Duration", data: "chargeMove.duration"}, {
-                title: "Energy Required",
-                data: "chargeMove.energyRequired",
-                render: function (data, type, pokemon) {
+            }, {title: "Damage", data: "chargeMove.damage"}, {title: "Duration", data: "chargeMove.duration"}, {
+                title: "Energy", data: "chargeMove.energyRequired", render: function (data, type, pokemon) {
                     return Math.round(data * 100) / 100; // round to 2 decimal places
                 }
             }, {
-                title: "Crit Chance",
-                data: "chargeMove.critChance",
-                render: function (data, type, pokemon) {
+                title: "Crit %", data: "chargeMove.critChance", render: function (data, type, pokemon) {
                     return data * 100 + "%"; // convert to percent
                 }
             }, {
@@ -92,23 +87,36 @@ $(document).ready(function () {
                         (2 * (fm.energyGain * cm.duration + fm.duration * cm.energyRequired));
                     return dps.toFixed(3);
                 }
-            }], pageLength: 50, order: [[19, "desc"]], autoWidth: true, fixedHeader: true,
-        columnDefs: [
-            {
-                targets: 0, width: "5%"
-            }, {
-                targets: 2, width: "10%"
-            }, {
-                targets: 3, width: "10%"
-            }]
+            }],
+        pageLength: 50,
+        order: [[19, "desc"]],
+        autoWidth: true,
+        fixedHeader: true,
+        // paging: false,
+        dom: "<'row'<'col-sm-6'f><'col-sm-6'l>>" + "<'row'<'col-sm-12'tr>>" + "<'row'<'col-sm-5'i><'col-sm-7'p>>",
+        columnDefs: [{
+            targets: 0, width: "2%"
+        }, {
+            targets: 1, width: "6%"
+        }, {
+            targets: 2, width: "7%"
+        }, {
+            targets: 3, width: "7%"
+        }, {
+            targets: 10, width: "7%"
+        }, {
+            targets: [3,4,5,6,7,8,9], className: "fast-move-highlight"
+        }, {
+            targets: [10,11,12,13,14,15,16, 17], className: "charge-move-highlight"
+        }]
     });
     dataTable.on("init", function () {
         var header = $("<tr id='top-column-header'></tr>");
         header.append("<th colspan='3'>Pokemon</th>");
-        header.append("<th colspan='7'>Fast Move</th>");
-        header.append("<th colspan='8'>Charge Move</th>");
+        header.append("<th colspan='7' class='fast-move-highlight'>Fast Move</th>");
+        header.append("<th colspan='8' class='charge-move-highlight'>Charge Move</th>");
         header.append("<th colspan='2'>Fast & Charge</th>");
-        $('.dataTables_scrollHeadInner thead').prepend(header);
+        $('#data-table thead').prepend(header);
         console.log("inited");
     });
 });

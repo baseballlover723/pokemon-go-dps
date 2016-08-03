@@ -27,3 +27,20 @@ nav {
 .main-content {
     margin: 0 50px;
 }
+
+#data-table_filter {
+    text-align: left;
+}
+
+#data-table_length {
+    /*float: left;*/
+    text-align: right;
+}
+
+.fast-move-highlight {
+    background-color: #e3eef2;
+}
+
+.charge-move-highlight {
+    background-color: #e3f2ea;
+}

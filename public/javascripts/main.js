@@ -92,6 +92,11 @@ $(document).ready(function () {
         order: [[19, "desc"]],
         autoWidth: true,
         fixedHeader: true,
+        search: {
+            regex: true,
+            smart: false,
+            caseInsensitive: true
+        },
         // responsive: true, // paging: false,
         dom: "<'row'<'col-sm-6'f><'col-sm-6'l>>" + "<'row'<'col-sm-12'tr>>" + "<'row'<'col-sm-5'i><'col-sm-7'p>>",
         columnDefs: [{
@@ -108,12 +113,12 @@ $(document).ready(function () {
             targets: [3, 4, 5, 6, 7, 8, 9], className: "fast-move-highlight"
         }, {
             targets: [10, 11, 12, 13, 14, 15, 16, 17], className: "charge-move-highlight"
-        // }, {
-        //     targets: [0, 1, 3, 10, 18, 19], responsivePriority: 0
-        // }, {
-        //     targets: [8, 9, 16, 17], responsivePriority: 1
-        // }, {
-        //     targets: [2, 4, 11], responsivePriority: 2
+            // }, {
+            //     targets: [0, 1, 3, 10, 18, 19], responsivePriority: 0
+            // }, {
+            //     targets: [8, 9, 16, 17], responsivePriority: 1
+            // }, {
+            //     targets: [2, 4, 11], responsivePriority: 2
         }]
     });
 
@@ -124,6 +129,12 @@ $(document).ready(function () {
         header.append("<th id='charge-header' colspan='8' class='charge-move-highlight'>Charge Move</th>");
         header.append("<th id='total-dps-header' colspan='2'>Fast & Charge</th>");
         $('#data-table thead').prepend(header);
+    });
+
+    $("#data-table_filter input").on("keypress", function(event) {
+        if (event.keyCode == 124) {
+            dataTable.search("").draw();
+        }
     });
 
     // dataTable.on("responsive-resize", function (e, datatable, columns) {

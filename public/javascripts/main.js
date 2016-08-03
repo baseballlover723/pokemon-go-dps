@@ -1,7 +1,3 @@
-// var poke = new Pokemon(1, "work", null, null,  "bug", "grass");
-// console.log(poke.getSTABDamage({"id":"100","name":"X-Scissor","class":"Special","damage":35,"duration":2.1,"type":{"name":"bug","weaknesses":[]}}));
-// new Pokemon(poke);
-
 $(document).ready(function () {
     $('#last-update-time').text(moment.tz(jsVars.lastUpdatedTime, moment.tz.guess()).format("LLLL z"));
     $('#next-update-time').text(moment.tz(jsVars.nextUpdateTime, moment.tz.guess()).format("LLLL z"));

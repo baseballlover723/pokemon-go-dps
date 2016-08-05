@@ -151,7 +151,7 @@ $(document).ready(function () {
         var desc = dataTable.order()[0][1] == "desc";
         var rows = dataTable.column(column, {order: 'applied'}).nodes();
         var ranks = dataTable.column(20).nodes();
-        if ([0, 1, 2, 3, 4, 10, 11].includes(column)) {
+        if ([0, 1, 2, 3, 4, 10, 11].indexOf(column) != -1) {
             desc = !desc;
         }
         dataTable.column(20, {order: 'applied'}).nodes().each(function (cell, i) {

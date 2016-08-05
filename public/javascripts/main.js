@@ -140,7 +140,7 @@ $(document).ready(function () {
             dataTable.search("").draw();
         }
     });
-    
+
     $("#data-table_filter input").on("keyup", function (event) {
         var search = dataTable.search();
         window.history.replaceState("page1", "title", "?search=" + search.replaceAll("#", "%23"));

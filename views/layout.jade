@@ -54,6 +54,8 @@ body
         #bs-example-navbar-collapse-1.collapse.navbar-collapse
           ul.nav.navbar-nav.navbar-right
             li
+              a(herf='#' data-toggle='modal', data-target='#change-log') Change Log
+            li
               a(herf='#' data-toggle='modal', data-target='#contact-me') Contact Me
             li
               a(herf='#' data-toggle='modal', data-target='#disclaimer') Disclaimer
@@ -66,6 +68,19 @@ body
                   a(href="https://www.linkedin.com/pub/philip-ross/a5/569/575") Philip's LinkedIn
                 li
                   a(href="https://github.com/baseballlover723") Philip's Github
+    #change-log.modal.fade(role='dialog')
+      .modal-dialog.modal-lg
+        .modal-content
+          .modal-header
+            button.close(type='button', data-dismiss='modal') ×
+            h4.modal-title Change Log
+          .modal-body
+            p 8/5/2016:
+              ul
+                li Added support for searching from the url, now you can share your searchs with your friends or enemies, I'm not too picky.
+                li Made the rank column show the global ranking of the row in the current sort
+          .modal-footer
+            button.btn.btn-default(type='button', data-dismiss='modal') Close
     #contact-me.modal.fade(role='dialog')
       .modal-dialog.modal-lg
         .modal-content

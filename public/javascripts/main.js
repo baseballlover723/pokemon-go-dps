@@ -1,3 +1,7 @@
+String.prototype.replaceAll = function (search, replacement) {
+    var target = this;
+    return target.replace(new RegExp(search, 'g'), replacement);
+};
 $(document).ready(function () {
     $('#last-update-time').text(moment.tz(jsVars.lastUpdatedTime, moment.tz.guess()).format("LLLL z"));
     $('#next-update-time').text(moment.tz(jsVars.nextUpdateTime, moment.tz.guess()).format("LLLL z"));
@@ -88,18 +92,15 @@ $(document).ready(function () {
                     return dps.toFixed(3);
                 }
             }, {
-                title: "Rank", data: null, searchable: false, orderable: false
+                title: "Rank", data: null
             }],
         pageLength: 50,
         order: [[19, "desc"]],
         autoWidth: true,
         fixedHeader: true,
         search: {
-            regex: true,
-            smart: false,
-            caseInsensitive: true
-        },
-        // responsive: true, // paging: false,
+            regex: true, smart: false, caseInsensitive: true
+        }, // responsive: true, // paging: false,
         dom: "<'row'<'col-sm-6'f><'col-sm-6'l>>" + "<'row'<'col-sm-12'tr>>" + "<'row'<'col-sm-5'i><'col-sm-7'p>>",
         columnDefs: [{
             //     targets: 0, width: "2%"
@@ -131,19 +132,48 @@ $(document).ready(function () {
         header.append("<th id='charge-header' colspan='8' class='charge-move-highlight'>Charge Move</th>");
         header.append("<th id='total-dps-header' colspan='2'>Fast & Charge</th>");
         $('#data-table thead').prepend(header);
+        dataTable.search(jsVars.search).draw();
     });
 
-    $("#data-table_filter input").on("keypress", function(event) {
+    $("#data-table_filter input").on("keypress", function (event) {
         if (event.keyCode == 124) {
             dataTable.search("").draw();
         }
     });
+    
+    $("#data-table_filter input").on("keyup", function (event) {
+        var search = dataTable.search();
+        window.history.replaceState("page1", "title", "?search=" + search.replaceAll("#", "%23"));
+    });
 
-    dataTable.on( 'order.dt search.dt', function () {
-        dataTable.column(20, {search:'applied', order:'applied'}).nodes().each( function (cell, i) {
-            cell.innerHTML = i+1;
-        } );
-    } ).draw();
+    dataTable.on('order.dt search.dt', function () {
+        var column = dataTable.order()[0][0];
+        var desc = dataTable.order()[0][1] == "desc";
+        var rows = dataTable.column(column, {order: 'applied'}).nodes();
+        var ranks = dataTable.column(20).nodes();
+        if ([0, 1, 2, 3, 4, 10, 11].includes(column)) {
+            desc = !desc;
+        }
+        dataTable.column(20, {order: 'applied'}).nodes().each(function (cell, i) {
+            if (i == 0 && desc) {
+                cell.innerHTML = 1;
+            } else {
+                if (desc) {
+                    if ($(rows[i - 1]).text() == $(rows[i]).text()) {
+                        cell.innerHTML = $(ranks[i - 1]).text();
+                    } else {
+                        cell.innerHTML = i + 1;
+                    }
+                } else {
+                    var count = 0;
+                    while ($(rows[i + count]).text() == $(rows[i + count + 1]).text()) {
+                        count++;
+                    }
+                    cell.innerHTML = rows.length - i - count;
+                }
+            }
+        });
+    }).draw();
     // dataTable.on("responsive-resize", function (e, datatable, columns) {
     //     var pokemonStart = 0;
     //     var fastHeader = 3;

@@ -1,7 +1,7 @@
 // I got my math equation from http://www.codecogs.com/latex/eqneditor.php with comic sans and 12pt font
-// dps = \frac{\frac{cm.energy}{fm.energy} * fm.power + cm.power(1+\frac{cm.crit}{2})}{\frac{cm.energy}{fm.energy} * fm.duration + cm.duration + 0.5}
-// offensive power rating at 10pt with 15 resolution
-// OffensivePowerRating = \frac{pokemon.attack * pokemon.stamina * stabDps}{1000}
+// dps = \frac{\frac{cm.energy}{fm.energy} * fm.power + cm.power(1+\frac{cm.crit}{2})}{\frac{cm.energy}{fm.energy} *
+// fm.duration + cm.duration + 0.5} offensive power rating at 10pt with 150 resolution OffensivePowerRating =
+// \frac{(pokemon.attack + 7) * (pokemon.stamina + 7) * stabDps}{1000}
 String.prototype.replaceAll = function (search, replacement) {
     var target = this;
     return target.replace(new RegExp(search, 'g'), replacement);
@@ -111,7 +111,7 @@ $(document).ready(function () {
                     var cm = pokemon.chargeMove;
                     var fmDamage = pokemon.getSTABDamage(fm);
                     var cmDamage = pokemon.getSTABDamage(cm);
-                    var dps = pokemon.attack * pokemon.stamina *
+                    var dps = (pokemon.attack + 7) * (pokemon.stamina + 7) *
                         ((cm.energyRequired * fmDamage / fm.energyGain) + (cmDamage * (1 + cm.critChance / 2))) /
                         ((cm.energyRequired * fm.duration / fm.energyGain) + cm.duration + 0.5) / 1000;
                     return dps.toFixed(1);

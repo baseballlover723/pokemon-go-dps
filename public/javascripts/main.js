@@ -55,7 +55,8 @@ $(document).ready(function () {
                 }
             }, {
                 title: "STAB Offensive Rating", data: "fastMove", render: function (data, type, pokemon) {
-                    var dps = pokemon.attack * pokemon.getSTABDamage(data) / data.duration;
+                    var dps = (pokemon.attack + 7) * (pokemon.stamina + 7) * pokemon.getSTABDamage(data) /
+                        data.duration / 1000;
                     return dps.toFixed(3);
                 }
             }, {title: "Move Name", data: "chargeMove.name"}, {
@@ -82,8 +83,8 @@ $(document).ready(function () {
                 }
             }, {
                 title: "STAB Offensive Rating", data: "chargeMove", render: function (data, type, pokemon) {
-                    var dps = pokemon.attack * pokemon.getSTABDamage(data) * (data.critChance / 2 + 1) /
-                        (data.duration + 0.5);
+                    var dps = (pokemon.attack + 7) * (pokemon.stamina + 7) * pokemon.getSTABDamage(data) *
+                        (data.critChance / 2 + 1) / (data.duration + 0.5) / 1000;
                     return dps.toFixed(3);
                 }
             }, {

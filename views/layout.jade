@@ -54,13 +54,13 @@ body
         #bs-example-navbar-collapse-1.collapse.navbar-collapse
           ul.nav.navbar-nav.navbar-right
             li
-              a(herf='#' data-toggle='modal', data-target='#change-log') Change Log
+              a(herf='#' data-toggle='modal', data-target='#todo-list') TODO List
             li
-              a(herf='#' data-toggle='modal', data-target='#contact-me') Contact Me
+              a(herf='#' data-toggle='modal', data-target='#change-log') Change Log
             li
               a(herf='#' data-toggle='modal', data-target='#disclaimer') Disclaimer
             li
-              a(herf='#' data-toggle='modal', data-target='#about') About this Website
+              a(herf='#' data-toggle='modal', data-target='#contact-me') Contact Me
             li.dropdown
               a.profile.dropdown-toggle(href="#" data-toggle="dropdown") Philip Ross <span class='caret'></span>
               ul.dropdown-menu
@@ -68,6 +68,21 @@ body
                   a(href="https://www.linkedin.com/pub/philip-ross/a5/569/575") Philip's LinkedIn
                 li
                   a(href="https://github.com/baseballlover723") Philip's Github
+    #todo-list.modal.fade(role='dialog')
+      .modal-dialog.modal-lg
+        .modal-content
+          .modal-header
+            button.close(type='button', data-dismiss='modal') ×
+            h4.modal-title TODO List
+          .modal-body
+            p TODO List
+              ul
+                li <s>Factor in STAB</s>
+                li <s>Factor in base stats</s>
+                li Split into 2 tabs for attacking and defending
+                li Add a tab to calculate DPS against specific Pokémon
+          .modal-footer
+            button.btn.btn-default(type='button', data-dismiss='modal') Close
     #change-log.modal.fade(role='dialog')
       .modal-dialog.modal-lg
         .modal-content
@@ -86,16 +101,6 @@ body
                 li Changed my header library so now if should line up with the table correctly once you scroll down now
           .modal-footer
             button.btn.btn-default(type='button', data-dismiss='modal') Close
-    #contact-me.modal.fade(role='dialog')
-      .modal-dialog.modal-lg
-        .modal-content
-          .modal-header
-            button.close(type='button', data-dismiss='modal') ×
-            h4.modal-title Contact Me
-          .modal-body
-            p Got an idea or any feedback for this website? Contact me at <a href='mailto:baseballlover723@gmail.com?subject=Pokémon%20GO%20DPS%20Optimizer%20Feedback'>baseballlover723@gmail.com</a>
-          .modal-footer
-            button.btn.btn-default(type='button', data-dismiss='modal') Close
     #disclaimer.modal.fade(role='dialog')
       .modal-dialog.modal-lg
         .modal-content
@@ -106,24 +111,14 @@ body
             p Pokémon GO DPS Analyzer is not endorsed by Niantic, Nintendo or The Pokémon Company and doesn't reflect the views or opinions of Niantic, Nintendo, The Pokémon Company or anyone officially involved in producing or managing Pokémon GO.
           .modal-footer
             button.btn.btn-default(type='button', data-dismiss='modal') Close
-    #about.modal.fade(role='dialog')
+    #contact-me.modal.fade(role='dialog')
       .modal-dialog.modal-lg
         .modal-content
           .modal-header
             button.close(type='button', data-dismiss='modal') ×
-            h4.modal-title About this Website
+            h4.modal-title Contact Me
           .modal-body
-            .row
-              .col-md-8.col-sm-6
-                p This is for attacking data only right now
-                p Total dps is the DPS you would expect if you used your charge move as often as possible. Currently takes into account fast move DPS, charge move DPS, how fast the fast move generates energy, how much energy the charge move requires, how likely the charge move is to crit (150% crit), as well as STAB (25% bonus)
-              .col-md-4.col-sm-6
-                p TODO List
-                  ul
-                    li <s>Factor in STAB</s>
-                    li Try and factor in CP and HP (Or possibly base attack and HP)
-                    li Split into 2 tabs for attacking and defending
-                    li Add a tab to calculate DPS against specific Pokémon
+            p Got an idea or any feedback for this website? Contact me at <a href='mailto:baseballlover723@gmail.com?subject=Pokémon%20GO%20DPS%20Optimizer%20Feedback'>baseballlover723@gmail.com</a>
           .modal-footer
             button.btn.btn-default(type='button', data-dismiss='modal') Close
     .container-fluid

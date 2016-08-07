@@ -26,7 +26,7 @@ html.no-js(lang='')
     // Place favicon.ico in the root directory
     link(rel='stylesheet', href='/stylesheets/normalize.css')
     link(rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous")
-    link(rel='stylesheet', href='https://cdn.datatables.net/v/bs/dt-1.10.12/fh-3.1.2/r-2.1.0/datatables.min.css')
+    link(rel='stylesheet', href='https://cdn.datatables.net/v/bs/dt-1.10.12/b-1.2.2/b-colvis-1.2.2/datatables.min.css')
     link(rel='stylesheet', href='/stylesheets/main.css')
     link(rel='stylesheet', href='/stylesheets/style.css')
     script(src='/javascripts/vendor/modernizr-2.8.3.min.js')
@@ -77,8 +77,13 @@ body
           .modal-body
             p 8/5/2016:
               ul
-                li Added support for searching from the url, now you can share your searchs with your friends or enemies, I'm not too picky.
+                li Added support for searching from the url, now you can share your searches with your friends or enemies, I'm not too picky.
                 li Made the rank column show the global ranking of the row in the current sort
+            p 8/6/2016:
+              ul
+                li Added STAB Offensive Rating, which takes into account the pokemon's base stats
+                li Added Column visibility options, since the table is getting hard to fit on one screen
+                li Changed my header library so now if should line up with the table correctly once you scroll down now
           .modal-footer
             button.btn.btn-default(type='button', data-dismiss='modal') Close
     #contact-me.modal.fade(role='dialog')
@@ -129,12 +134,13 @@ body
     script(src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous")
     script.
       window.jQuery || document.write('<script src="/javascripts/vendor/jquery-1.12.0.min.js"><\\/script>')
-    script(src='https://cdn.datatables.net/v/bs/dt-1.10.12/fh-3.1.2/r-2.1.0/datatables.min.js')
+    script(src='https://cdn.datatables.net/v/bs/dt-1.10.12/b-1.2.2/b-colvis-1.2.2/datatables.min.js')
     script(src='/javascripts/plugins.js')
     script(src="/circular-json/circular-json.js")
     script(src="/moment/moment-with-locales.min.js")
     script(src="/moment-timezone/moment-timezone-with-data.min.js")
     script(src="/javascripts/vendor/moment-precise-range.js")
+    script(src="/sticky-table-headers/jquery.stickytableheaders.min.js")
     script(src="/class/pokemon.js")
     script(src="/class/move.js")
     script(src="/class/type.js")

@@ -11,18 +11,37 @@ nav {
     color: white
 }
 
+th {
+    background-color: white;
+}
+
+img {
+    margin: 3px 0 8px 0;
+}
+
+#data-table th {
+    border: 1px solid #ddd;
+    border-collapse: collapse;
+    padding-right: 15px;
+    padding-left: 3px;
+}
+
+#data-table {
+    width: 100% !important;
+}
+
+#top-column-header th {
+    border-collapse: collapse;
+    border-bottom-width: 0px;
+    text-align: center;
+}
+
 .navbar-right {
     margin-right: 50px;
 }
 
 .profile {
     font: 24px "Lucida Grande", Helvetica, Arial, sans-serif;
-}
-
-#top-column-header th{
-    border-collapse: collapse;
-    border-bottom-width: 0px;
-    text-align: center;
 }
 
 .main-content {
@@ -43,4 +62,12 @@ nav {
 
 .charge-move-highlight {
     background-color: #e3f2ea;
+}
+
+.buttons-columnVisibility {
+    padding: 6px 5.5px;
+}
+
+.btn-group {
+    margin-bottom: 10px;
 }

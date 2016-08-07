@@ -9,7 +9,6 @@ var Pokemon = require('./../lib/pokemon');
 var Move = require('./../lib/move');
 var Type = require('./../lib/type');
 
-
 var LIMIT_VALUE = 24;
 var LIMIT_UNITS = "hours";
 var CLIENT_REFRESH_VALUE = 1;
@@ -26,13 +25,14 @@ String.prototype.replaceAll = function (search, replacement) {
 
 var data = [];
 var list = JSON.parse(fs.readFileSync("json/pokemon.json"));
+var pokemonWithTypesStats = JSON.parse(fs.readFileSync("json/pokemonTypeStats.json"));
 var moveNames = JSON.parse(fs.readFileSync("json/moveNames.json"));
-var pokemonWithTypes = JSON.parse(fs.readFileSync("json/pokemonTypes.json"));
 
 // populatePokemonTypes();
 var types = {};
 
 populateTypes();
+// populateBaseStats();
 var moves = {};
 
 for (var id in moveNames) {
@@ -54,18 +54,18 @@ isCachedValid(true, function (movesCopy, isValid) {
 });
 
 console.time("create data");
-list.map(function (pokemonHash) {
-    var num = pokemonHash.num;
-    var name = toProperCase(pokemonHash.name);
-    var fastMoves = lookupMoves(pokemonHash.quickMoves);
-    var chargeMoves = lookupMoves(pokemonHash.cinematicMoves);
+list.map(function (pokemonNameHash) {
+    var num = pokemonNameHash.num;
+    var name = toProperCase(pokemonNameHash.name);
+    var fastMoves = lookupMoves(pokemonNameHash.quickMoves);
+    var chargeMoves = lookupMoves(pokemonNameHash.cinematicMoves);
     for (var fastMove of fastMoves) {
         for (var chargeMove of chargeMoves) {
-            var pokemonTypeHash = pokemonWithTypes[num - 1];
-            if (pokemonTypeHash.type2) {
-                data.push(new Pokemon(num, name, fastMove, chargeMove, pokemonTypeHash.type1, pokemonTypeHash.type2));
+            var pokemonHash = pokemonWithTypesStats[num - 1];
+            if (pokemonHash.type2) {
+                data.push(new Pokemon(num, name, fastMove, chargeMove, pokemonHash.stamina, pokemonHash.attack, pokemonHash.defense, pokemonHash.type1, pokemonHash.type2));
             } else {
-                data.push(new Pokemon(num, name, fastMove, chargeMove, pokemonTypeHash.type1));
+                data.push(new Pokemon(num, name, fastMove, chargeMove, pokemonHash.stamina, pokemonHash.attack, pokemonHash.defense, pokemonHash.type1));
             }
             // data.push({number: num, name: name, fastMove: fastMove, chargeMove: chargeMove});
         }
@@ -94,6 +94,100 @@ module.exports.getNextRefreshTime = function () {
     return moment(lastClientRefresh).add(CLIENT_REFRESH_VALUE, CLIENT_REFRESH_UNITS)
 };
 console.log("exported");
+
+function populateBaseStats() {
+    let url = 'http://bulbapedia.bulbagarden.net/wiki/List_of_Pok%C3%A9mon_by_base_stats_(Generation_VI-present)';
+    console.time("base stats request");
+    request({url: url, timeout: parseDuration("30 seconds")}, function (error, response, html) {
+        if (!error) {
+            var $ = cheerio.load(html);
+            if ($('.noarticletext').html()) {
+                console.log("base stats was not found at " + url);
+                console.timeEnd("base stats request");
+                console.log("");
+                return;
+            }
+            var first = true;
+            var c = $("table.sortable tr");
+            c.filter(function () {
+                if (first) {
+                    first = false;
+                    return;
+                }
+                // parse the page
+                var data = $(this);
+                data = data.children().first();
+                var number = data.text();
+                if (number.includes("M")) {
+                    return;
+                }
+                number = parseInt(number);
+                if (number > 151) {
+                    return;
+                }
+                data = data.next().next();
+                var name = data.text().trim();
+
+                data = data.next();
+                var hp = parseInt(data.text());
+
+                data = data.next();
+                var attack = parseInt(data.text());
+
+                data = data.next();
+                var defense = parseInt(data.text());
+
+                data = data.next();
+                var spAttack = parseInt(data.text());
+
+                data = data.next();
+                var spDefense = parseInt(data.text());
+
+                data = data.next();
+                var speed = parseInt(data.text());
+
+                console.log([number, name, hp, attack, defense, spAttack, spDefense, speed]);
+                var pokemon = pokemonWithTypesStats[number - 1];
+                pokemon.stamina = calculateStamina(hp);
+                pokemon.attack = calculateAttack(attack, spAttack, speed);
+                pokemon.defense = calculateDefense(defense, spDefense, speed);
+                // var titleText = data.text();
+                // if (titleText == "Pokémon GO") {
+                //     parseMove($, move, data.parent());
+                //     console.timeEnd(move.name + " request");
+                //     callback(move);
+                // }
+            });
+            fs.writeFile("json/pokemonTypeStats.json", JSON.stringify(pokemonWithTypesStats), function () {
+                console.log("wrote file");
+            });
+            if (!c.html()) {
+                console.timeEnd("base stats request");
+                console.log("didn't get all the page");
+                fs.writeFile("json/debug.html", c.html())
+            }
+        } else {
+            if (error.Error == "ESOCKETTIMEDOUT") {
+                console.log("base stats request: timed out");
+            } else {
+                console.log("error scraping base stats");
+                console.log(error);
+            }
+        }
+    });
+}
+
+function calculateStamina(hp) {
+    return hp * 2;
+}
+
+function calculateAttack(attack, spAttack, speed) {
+    return 2 * Math.round(Math.sqrt(attack) * Math.sqrt(spAttack) + Math.sqrt(speed));
+}
+
+function calculateDefense(defense, spDefense, speed) {
+    return 2 * Math.round(Math.sqrt(defense) * Math.sqrt(spDefense) + Math.sqrt(speed));
+}
 
 function populatePokemonTypes(callback = function () {}) {
     var limit = 10;

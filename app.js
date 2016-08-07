@@ -26,6 +26,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/circular-json', express.static(__dirname + '/node_modules/circular-json/build'));
 app.use('/moment', express.static(__dirname + '/node_modules/moment/min'));
 app.use('/moment-timezone', express.static(__dirname + '/node_modules/moment-timezone/builds'));
+app.use('/sticky-table-headers', express.static(__dirname + '/node_modules/sticky-table-headers/js'));
 app.use('/class', express.static(__dirname + '/lib'));
 app.use('/', routes);
 app.expose(app.settings.env, "env");

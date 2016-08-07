@@ -1,3 +1,7 @@
+// I got my math equation from http://www.codecogs.com/latex/eqneditor.php with comic sans and 12pt font
+// dps = \frac{\frac{cm.energy}{fm.energy} * fm.power + cm.power(1+\frac{cm.crit}{2})}{\frac{cm.energy}{fm.energy} * fm.duration + cm.duration + 0.5}
+// offensive power rating at 10pt with 15 resolution
+// OffensivePowerRating = \frac{pokemon.attack * pokemon.stamina * stabDps}{1000}
 String.prototype.replaceAll = function (search, replacement) {
     var target = this;
     return target.replace(new RegExp(search, 'g'), replacement);
@@ -15,8 +19,7 @@ $(document).ready(function () {
                 }
                 return pokemons;
             }
-        },
-        columns: [{
+        }, columns: [{
             title: "#", data: "id", render: function (data, type, row) {
                 if (type == "display") {
                     return "#" + data;
@@ -34,11 +37,12 @@ $(document).ready(function () {
                     return capitalize(pokemon.type1);
                 }
             }
-        }, {title: "Move Name", data: "fastMove.name"}, {
-            title: "Type", data: "fastMove.type.name", render: function (data, type, pokemon) {
-                return capitalize(data);
-            }
-        }, {title: "Damage", data: "fastMove.damage"}, {title: "Duration", data: "fastMove.duration"},
+        }, {title: "Sta", data: "stamina"}, {title: "Att", data: "attack"}, {title: "Def", data: "defense"},
+            {title: "Move Name", data: "fastMove.name"}, {
+                title: "Type", data: "fastMove.type.name", render: function (data, type, pokemon) {
+                    return capitalize(data);
+                }
+            }, {title: "Pow", data: "fastMove.damage"}, {title: "Duration", data: "fastMove.duration"},
             {title: "Energy", data: "fastMove.energyGain"}, {
                 title: "DPS", data: "fastMove", render: function (data, type, pokemon) {
                     var dps = data.damage / data.duration;
@@ -49,11 +53,16 @@ $(document).ready(function () {
                     var dps = pokemon.getSTABDamage(data) / data.duration;
                     return dps.toFixed(3);
                 }
+            }, {
+                title: "STAB Offensive Rating", data: "fastMove", render: function (data, type, pokemon) {
+                    var dps = pokemon.attack * pokemon.getSTABDamage(data) / data.duration;
+                    return dps.toFixed(3);
+                }
             }, {title: "Move Name", data: "chargeMove.name"}, {
                 title: "Type", data: "chargeMove.type.name", render: function (data, type, pokemon) {
                     return capitalize(data);
                 }
-            }, {title: "Damage", data: "chargeMove.damage"}, {title: "Duration", data: "chargeMove.duration"}, {
+            }, {title: "Pow", data: "chargeMove.damage"}, {title: "Duration", data: "chargeMove.duration"}, {
                 title: "Energy", data: "chargeMove.energyRequired", render: function (data, type, pokemon) {
                     return Math.round(data * 100) / 100; // round to 2 decimal places
                 }
@@ -72,12 +81,18 @@ $(document).ready(function () {
                     return dps.toFixed(3);
                 }
             }, {
+                title: "STAB Offensive Rating", data: "chargeMove", render: function (data, type, pokemon) {
+                    var dps = pokemon.attack * pokemon.getSTABDamage(data) * (data.critChance / 2 + 1) /
+                        (data.duration + 0.5);
+                    return dps.toFixed(3);
+                }
+            }, {
                 title: "DPS", data: null, render: function (data, type, pokemon) {
                     var fm = pokemon.fastMove;
                     var cm = pokemon.chargeMove;
-                    var dps = ((2 * fm.damage * cm.energyRequired) + (fm.energyGain * cm.damage * cm.critChance) +
-                        (2 * fm.energyGain * cm.damage)) /
-                        (2 * (fm.energyGain * cm.duration + fm.duration * cm.energyRequired));
+                    var dps = ((cm.energyRequired * fm.damage / fm.energyGain) +
+                        (cm.damage * (1 + cm.critChance / 2))) /
+                        ((cm.energyRequired * fm.duration / fm.energyGain) + cm.duration + 0.5);
                     return dps.toFixed(3);
                 }
             }, {
@@ -86,36 +101,50 @@ $(document).ready(function () {
                     var cm = pokemon.chargeMove;
                     var fmDamage = pokemon.getSTABDamage(fm);
                     var cmDamage = pokemon.getSTABDamage(cm);
-                    var dps = ((2 * fmDamage * cm.energyRequired) + (fm.energyGain * cmDamage * cm.critChance) +
-                        (2 * fm.energyGain * cmDamage)) /
-                        (2 * (fm.energyGain * cm.duration + fm.duration * cm.energyRequired));
+                    var dps = ((cm.energyRequired * fmDamage / fm.energyGain) + (cmDamage * (1 + cm.critChance / 2))) /
+                        ((cm.energyRequired * fm.duration / fm.energyGain) + cm.duration + 0.5);
                     return dps.toFixed(3);
                 }
             }, {
+                title: "STAB Offensive Rating", data: null, render: function (data, type, pokemon) {
+                    var fm = pokemon.fastMove;
+                    var cm = pokemon.chargeMove;
+                    var fmDamage = pokemon.getSTABDamage(fm);
+                    var cmDamage = pokemon.getSTABDamage(cm);
+                    var dps = pokemon.attack * pokemon.stamina *
+                        ((cm.energyRequired * fmDamage / fm.energyGain) + (cmDamage * (1 + cm.critChance / 2))) /
+                        ((cm.energyRequired * fm.duration / fm.energyGain) + cm.duration + 0.5) / 1000;
+                    return dps.toFixed(1);
+                }
+            }, {
                 title: "Rank", data: null
-            }],
-        pageLength: 50,
-        order: [[19, "desc"]],
-        autoWidth: true,
-        fixedHeader: true,
-        search: {
+            }], buttons: [{text: "Visibility Options"}, {
+            action: function (e, dt, node, config) {
+                console.log(e);
+                console.log(dt);
+                console.log(node);
+                console.log(config);
+                alert('Activated!');
+                // this.disable(); // disable button
+            }, extend: 'columnsToggle'
+        }], autoWidth: true, pageLength: 50, order: [[25, "desc"]], search: {
             regex: true, smart: false, caseInsensitive: true
         }, // responsive: true, // paging: false,
-        dom: "<'row'<'col-sm-6'f><'col-sm-6'l>>" + "<'row'<'col-sm-12'tr>>" + "<'row'<'col-sm-5'i><'col-sm-7'p>>",
-        columnDefs: [{
+        dom: "<'row'<'col-sm-12'B>><'row'<'col-sm-6'f><'col-sm-6'l>>" + "<'row'<'col-sm-12'tr>>" +
+        "<'row'<'col-sm-5'i><'col-sm-7'p>>", columnDefs: [{
             //     targets: 0, width: "2%"
             // }, {
             //     targets: 1, width: "6%"
             // }, {
-            //     targets: 2, width: "7%"
-            // }, {
-            //     targets: 3, width: "7%"
-            // }, {
+            targets: [0, 5, 6, 7, 13, 14, 15, 16], width: "0"
+        }, {
+            targets: [2, 6, 14], width: "6%"
+        }, {
             //     targets: 10, width: "7%"
             // }, {
-            targets: [3, 4, 5, 6, 7, 8, 9], className: "fast-move-highlight"
+            targets: [6, 7, 8, 9, 10, 11, 12, 13], className: "fast-move-highlight"
         }, {
-            targets: [10, 11, 12, 13, 14, 15, 16, 17], className: "charge-move-highlight"
+            targets: [14, 15, 16, 17, 18, 19, 20, 21, 22], className: "charge-move-highlight"
             // }, {
             //     targets: [0, 1, 3, 10, 18, 19], responsivePriority: 0
             // }, {
@@ -127,12 +156,27 @@ $(document).ready(function () {
 
     dataTable.on("init", function () {
         var header = $("<tr id='top-column-header'></tr>");
-        header.append("<th id='pokemon-header' colspan='3'>Pokemon</th>");
-        header.append("<th id='fast-header' colspan='7' class='fast-move-highlight'>Fast Move</th>");
-        header.append("<th id='charge-header' colspan='8' class='charge-move-highlight'>Charge Move</th>");
-        header.append("<th id='total-dps-header' colspan='2'>Fast & Charge</th>");
+        header.append("<th id='pokemon-header' colspan='6'>Pokemon</th>");
+        header.append("<th id='fast-header' colspan='8' class='fast-move-highlight'>Fast Move</th>");
+        header.append("<th id='charge-header' colspan='9' class='charge-move-highlight'>Charge Move</th>");
+        header.append("<th id='total-dps-header' colspan='4'>Fast & Charge</th>");
         $('#data-table thead').prepend(header);
         dataTable.search(jsVars.search).draw();
+        $('#data-table').stickyTableHeaders();
+    });
+
+    dataTable.on('buttons-action', function (e, buttonApi, dataTable, node, config) {
+        var adjustment = node.hasClass("active") ? 1 : -1;
+        var col = config.columns;
+        if (col < 6) {
+            $('#pokemon-header').attr("colspan", parseInt($("#pokemon-header").attr("colspan")) + adjustment);
+        } else if (col < 14) {
+            $('#fast-header').attr("colspan", parseInt($("#fast-header").attr("colspan")) + adjustment);
+        } else if (col < 23) {
+            $('#charge-header').attr("colspan", parseInt($("#charge-header").attr("colspan")) + adjustment);
+        } else {
+            $('#total-dps-header').attr("colspan", parseInt($("#total-dps-header").attr("colspan")) + adjustment);
+        }
     });
 
     $("#data-table_filter input").on("keypress", function (event) {
@@ -150,11 +194,11 @@ $(document).ready(function () {
         var column = dataTable.order()[0][0];
         var desc = dataTable.order()[0][1] == "desc";
         var rows = dataTable.column(column, {order: 'applied'}).nodes();
-        var ranks = dataTable.column(20).nodes();
-        if ([0, 1, 2, 3, 4, 10, 11].indexOf(column) != -1) {
+        var ranks = dataTable.column(26).nodes();
+        if ([0, 1, 2, 6, 7, 14, 15].indexOf(column) != -1) {
             desc = !desc;
         }
-        dataTable.column(20, {order: 'applied'}).nodes().each(function (cell, i) {
+        dataTable.column(26, {order: 'applied'}).nodes().each(function (cell, i) {
             if (i == 0 && desc) {
                 cell.innerHTML = 1;
             } else {
@@ -236,7 +280,7 @@ function showAlert(message, alertType) {
             if (moment().isAfter(jsVars.nextClientRefreshTime)) {
                 $('#alertdiv').removeClass(alertType);
                 $('#alertdiv').addClass("alert-success");
-                $('#alertdiv > span').text("You can now reload the sites data")
+                $('#alertdiv > span').text("You can now reload the sites data");
                 clearInterval(countdown);
             } else {
                 $('#refresh-time').text(moment.preciseDiff(moment(jsVars.nextClientRefreshTime), moment()));

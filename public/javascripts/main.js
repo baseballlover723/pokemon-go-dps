@@ -43,7 +43,11 @@ $(document).ready(function () {
                     return capitalize(data);
                 }
             }, {title: "Pow", data: "fastMove.damage"}, {title: "Duration", data: "fastMove.duration"},
-            {title: "Energy", data: "fastMove.energyGain"}, {
+            {title: "Energy", data: "fastMove.energyGain"},
+            {title: "EPS", data: "fastMove", render: function (data, type, pokemon) {
+                var eps = data.energyGain / data.duration;
+                return eps.toFixed(3);
+            }}, {
                 title: "DPS", data: "fastMove", render: function (data, type, pokemon) {
                     var dps = data.damage / data.duration;
                     return dps.toFixed(3);
@@ -128,7 +132,7 @@ $(document).ready(function () {
                 alert('Activated!');
                 // this.disable(); // disable button
             }, extend: 'columnsToggle'
-        }], autoWidth: true, pageLength: 50, order: [[25, "desc"]], search: {
+        }], autoWidth: true, pageLength: 50, order: [[26, "desc"]], search: {
             regex: true, smart: false, caseInsensitive: true
         }, // responsive: true, // paging: false,
         dom: "<'row'<'col-sm-12'B>><'row'<'col-sm-6'f><'col-sm-6'l>>" + "<'row'<'col-sm-12'tr>>" +
@@ -137,15 +141,15 @@ $(document).ready(function () {
             // }, {
             //     targets: 1, width: "6%"
             // }, {
-            targets: [0, 5, 6, 7, 13, 14, 15, 16], width: "0"
+            // targets: [0, 3, 4, 5, 7,8,9,10,11,12,13,14,17,18,19,20,21,22,23,24,25,26,27, 15, 16, 17], width: "0"
         }, {
-            targets: [2, 6, 14], width: "6%"
+            targets: [2, 6, 15], width: "6%"
         }, {
             //     targets: 10, width: "7%"
             // }, {
-            targets: [6, 7, 8, 9, 10, 11, 12, 13], className: "fast-move-highlight"
+            targets: [6, 7, 8, 9, 10, 11, 12, 13, 14], className: "fast-move-highlight"
         }, {
-            targets: [14, 15, 16, 17, 18, 19, 20, 21, 22], className: "charge-move-highlight"
+            targets: [15, 16, 17, 18, 19, 20, 21, 22, 23], className: "charge-move-highlight"
             // }, {
             //     targets: [0, 1, 3, 10, 18, 19], responsivePriority: 0
             // }, {
@@ -158,7 +162,7 @@ $(document).ready(function () {
     dataTable.on("init", function () {
         var header = $("<tr id='top-column-header'></tr>");
         header.append("<th id='pokemon-header' colspan='6'>Pokemon</th>");
-        header.append("<th id='fast-header' colspan='8' class='fast-move-highlight'>Fast Move</th>");
+        header.append("<th id='fast-header' colspan='9' class='fast-move-highlight'>Fast Move</th>");
         header.append("<th id='charge-header' colspan='9' class='charge-move-highlight'>Charge Move</th>");
         header.append("<th id='total-dps-header' colspan='4'>Fast & Charge</th>");
         $('#data-table thead').prepend(header);
@@ -171,9 +175,9 @@ $(document).ready(function () {
         var col = config.columns;
         if (col < 6) {
             $('#pokemon-header').attr("colspan", parseInt($("#pokemon-header").attr("colspan")) + adjustment);
-        } else if (col < 14) {
+        } else if (col < 15) {
             $('#fast-header').attr("colspan", parseInt($("#fast-header").attr("colspan")) + adjustment);
-        } else if (col < 23) {
+        } else if (col < 24) {
             $('#charge-header').attr("colspan", parseInt($("#charge-header").attr("colspan")) + adjustment);
         } else {
             $('#total-dps-header').attr("colspan", parseInt($("#total-dps-header").attr("colspan")) + adjustment);
@@ -195,11 +199,11 @@ $(document).ready(function () {
         var column = dataTable.order()[0][0];
         var desc = dataTable.order()[0][1] == "desc";
         var rows = dataTable.column(column, {order: 'applied'}).nodes();
-        var ranks = dataTable.column(26).nodes();
-        if ([0, 1, 2, 6, 7, 14, 15].indexOf(column) != -1) {
+        var ranks = dataTable.column(27).nodes();
+        if ([0, 1, 2, 6, 7, 15, 16].indexOf(column) != -1) {
             desc = !desc;
         }
-        dataTable.column(26, {order: 'applied'}).nodes().each(function (cell, i) {
+        dataTable.column(27, {order: 'applied'}).nodes().each(function (cell, i) {
             if (i == 0 && desc) {
                 cell.innerHTML = 1;
             } else {

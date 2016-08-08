@@ -16,7 +16,7 @@ th {
 }
 
 img {
-    margin: 3px 0 8px 0;
+    margin: 3px 20px 8px 0;
 }
 
 #data-table th {
@@ -64,8 +64,9 @@ img {
     background-color: #e3f2ea;
 }
 
-.buttons-columnVisibility {
+.buttons-columnVisibility, #data-table_wrapper .btn{
     padding: 6px 5.5px;
+    font-size: 10.3pt;
 }
 
 .btn-group {

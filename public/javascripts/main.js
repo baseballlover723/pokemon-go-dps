@@ -2,7 +2,7 @@
 // dps = \frac{\frac{cm.energy}{fm.energy} * fm.power + cm.power(1+\frac{cm.crit}{2})}{\frac{cm.energy}{fm.energy} *
 // fm.duration + cm.duration + 0.5} offensive power rating at 10pt with 150 resolution OffensivePowerRating =
 // \frac{(pokemon.attack + 7) * (pokemon.stamina + 7) * stabDps}{1000}
-// AdjustedDPS = \frac{(pokemon.attack + 7) * stabDps}{10}
+// AdjustedDPS = \frac{(pokemon.attack + 7) * stabDps}{2}
 
 var inited = false;
 var pokemonHeaderLength = 6;
@@ -80,7 +80,7 @@ $(document).ready(function () {
                 }
             }, {
                 title: "Adjusted DPS", data: "fastMove", render: function (data, type, pokemon) {
-                    var dps = (pokemon.attack + 7) * pokemon.getSTABDamage(data) / data.duration / 10;
+                    var dps = (pokemon.attack + 7) * pokemon.getSTABDamage(data) / data.duration / 2;
                     return dps.toFixed(3);
                 }
             }, {title: "Move Name", data: "chargeMove.name"}, {
@@ -107,7 +107,7 @@ $(document).ready(function () {
                 }
             }, {
                 title: "Adjusted DPS", data: "chargeMove", render: function (data, type, pokemon) {
-                    var dps = (pokemon.attack + 7) * pokemon.getSTABDamage(data) * (data.critChance / 2 + 1) / (data.duration + 0.5) / 10;
+                    var dps = (pokemon.attack + 7) * pokemon.getSTABDamage(data) * (data.critChance / 2 + 1) / (data.duration + 0.5) / 2;
                     return dps.toFixed(3);
                 }
             }, {
@@ -135,7 +135,7 @@ $(document).ready(function () {
                     var fmDamage = pokemon.getSTABDamage(fm);
                     var cmDamage = pokemon.getSTABDamage(cm);
                     var dps = (pokemon.attack + 7) * ((cm.energyRequired * fmDamage / fm.energyGain) + (cmDamage * (1 + cm.critChance / 2))) /
-                        ((cm.energyRequired * fm.duration / fm.energyGain) + cm.duration + 0.5) / 10;
+                        ((cm.energyRequired * fm.duration / fm.energyGain) + cm.duration + 0.5) / 2;
                     return dps.toFixed(3);
                 }
             }, {

@@ -39,7 +39,8 @@ $(document).ready(function () {
                 }
                 return pokemons;
             }
-        }, columns: [{
+        },
+        columns: [{
             title: "#", data: "id", render: function (data, type, row) {
                 if (type == "display") {
                     return "#" + data;
@@ -151,10 +152,16 @@ $(document).ready(function () {
                 }
             }, {
                 title: "Rank", data: null
-            }], autoWidth: true, pageLength: 50, order: [[27, "desc"]], buttons: [{text: "Visibility Options"}, 'columnsToggle'], search: {
+            }],
+        autoWidth: true,
+        pageLength: 50,
+        order: [[pokemonHeaderLength + fastHeaderLength + chargeHeaderLength + totalDpsHeaderLength - 2, "desc"]],
+        buttons: [{text: "Visibility Options"}, 'columnsToggle'],
+        search: {
             regex: true, smart: false, caseInsensitive: true
         }, // responsive: true, // paging: false,
-        dom: "<'row'<'col-sm-12'B>><'row'<'col-sm-6'f><'col-sm-6'l>>" + "<'row'<'col-sm-12'tr>>" + "<'row'<'col-sm-5'i><'col-sm-7'p>>", columnDefs: [{
+        dom: "<'row'<'col-sm-12'B>><'row'<'col-sm-6'f><'col-sm-6'l>>" + "<'row'<'col-sm-12'tr>>" + "<'row'<'col-sm-5'i><'col-sm-7'p>>",
+        columnDefs: [{
             //     targets: 0, width: "2%"
             // }, {
             //     targets: 1, width: "6%"
@@ -179,7 +186,7 @@ $(document).ready(function () {
 
     dataTable.on("init", function () {
         var header = $("<tr id='top-column-header'></tr>");
-        header.append("<th id='pokemon-header' colspan='" + pokemonHeaderLength + "'>Pokemon</th>");
+        header.append("<th id='pokemon-header' colspan='" + pokemonHeaderLength + "'>Pokémon</th>");
         header.append("<th id='fast-header' colspan='" + fastHeaderLength + "' class='fast-move-highlight'>Fast Move</th>");
         header.append("<th id='charge-header' colspan='" + chargeHeaderLength + "' class='charge-move-highlight'>Charge Move</th>");
         header.append("<th id='total-dps-header' colspan='" + totalDpsHeaderLength + "'>Fast & Charge</th>");
@@ -212,16 +219,8 @@ $(document).ready(function () {
             if (inited) {
                 var column = dataTable.order()[0][0];
                 var header = getTopHeader(column);
-                var category = "Pokémon ";
-                if (header.hasClass("charge-move-highlight")) {
-                    category = "Charge Move ";
-                } else if (header.hasClass("fast-move-highlight")) {
-                    category = "Fast Move ";
-                } else if (header.attr("id") == "#total-dps-header") {
-                    category = "Fast & Charge ";
-                }
                 var headerText = $(dataTable.column(column).header()).text();
-                var sortingEvent = category + headerText + " " + dataTable.order()[0][1];
+                var sortingEvent = header.text() + headerText + " " + dataTable.order()[0][1];
                 ga('send', 'event', 'Sort', sortingEvent);
             }
         }

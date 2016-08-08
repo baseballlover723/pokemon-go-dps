@@ -2,6 +2,8 @@
 // dps = \frac{\frac{cm.energy}{fm.energy} * fm.power + cm.power(1+\frac{cm.crit}{2})}{\frac{cm.energy}{fm.energy} *
 // fm.duration + cm.duration + 0.5} offensive power rating at 10pt with 150 resolution OffensivePowerRating =
 // \frac{(pokemon.attack + 7) * (pokemon.stamina + 7) * stabDps}{1000}
+
+var inited = false;
 String.prototype.replaceAll = function (search, replacement) {
     var target = this;
     return target.replace(new RegExp(search, 'g'), replacement);
@@ -43,11 +45,12 @@ $(document).ready(function () {
                     return capitalize(data);
                 }
             }, {title: "Pow", data: "fastMove.damage"}, {title: "Duration", data: "fastMove.duration"},
-            {title: "Energy", data: "fastMove.energyGain"},
-            {title: "EPS", data: "fastMove", render: function (data, type, pokemon) {
-                var eps = data.energyGain / data.duration;
-                return eps.toFixed(3);
-            }}, {
+            {title: "Energy", data: "fastMove.energyGain"}, {
+                title: "EPS", data: "fastMove", render: function (data, type, pokemon) {
+                    var eps = data.energyGain / data.duration;
+                    return eps.toFixed(3);
+                }
+            }, {
                 title: "DPS", data: "fastMove", render: function (data, type, pokemon) {
                     var dps = data.damage / data.duration;
                     return dps.toFixed(3);
@@ -168,6 +171,7 @@ $(document).ready(function () {
         $('#data-table thead').prepend(header);
         dataTable.search(jsVars.search).draw();
         $('#data-table').stickyTableHeaders();
+        inited = true;
     });
 
     dataTable.on('buttons-action', function (e, buttonApi, dataTable, node, config) {
@@ -193,6 +197,25 @@ $(document).ready(function () {
     $("#data-table_filter input").on("keyup", function (event) {
         var search = dataTable.search();
         window.history.replaceState("page1", "title", "?search=" + search.replaceAll("#", "%23"));
+    });
+
+    dataTable.on('order.dt', function () {
+        if (ga) {
+            if (inited) {
+                var column = dataTable.order()[0][0];
+                var header = $(dataTable.column(column).header());
+                var category = "Pokémon ";
+                if (header.hasClass("charge-move-highlight")) {
+                    category = "Charge Move ";
+                } else if (header.hasClass("fast-move-highlight")) {
+                    category = "Fast Move ";
+                } else if (column > 10) {
+                    category = "Fast & Charge ";
+                }
+                var sortingEvent = category + header.text() + " " + dataTable.order()[0][1];
+                ga('send', 'event', 'Sort', sortingEvent);
+            }
+        }
     });
 
     dataTable.on('order.dt search.dt', function () {

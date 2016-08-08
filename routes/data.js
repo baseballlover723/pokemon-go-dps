@@ -247,7 +247,14 @@ function refreshCache(fromClient, callback = function (isRefreshing, nextRefresh
                     scrapping = false;
                 });
             });
-            callback(true, moment(lastClientRefresh).add(CLIENT_REFRESH_VALUE, CLIENT_REFRESH_UNITS));
+            if (!lastClientRefresh) {
+                fs.stat("json/cachedMoves.json", function (err, stats) {
+                    lastClientRefresh = err ? moment().subtract(7, "days") : moment(stats.mtime);
+                    callback(true, moment(lastClientRefresh).add(CLIENT_REFRESH_VALUE, CLIENT_REFRESH_UNITS));
+                });
+            } else {
+                callback(true, moment(lastClientRefresh).add(CLIENT_REFRESH_VALUE, CLIENT_REFRESH_UNITS));
+            }
         } else {
             callback(false, moment(lastClientRefresh).add(CLIENT_REFRESH_VALUE, CLIENT_REFRESH_UNITS));
         }

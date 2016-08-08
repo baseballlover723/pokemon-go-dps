@@ -220,7 +220,8 @@ $(document).ready(function () {
                 } else if (header.attr("id") == "#total-dps-header") {
                     category = "Fast & Charge ";
                 }
-                var sortingEvent = category + header.text() + " " + dataTable.order()[0][1];
+                var headerText = $(dataTable.column(column).header()).text();
+                var sortingEvent = category + headerText + " " + dataTable.order()[0][1];
                 ga('send', 'event', 'Sort', sortingEvent);
             }
         }

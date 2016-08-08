@@ -220,7 +220,7 @@ $(document).ready(function () {
                 var column = dataTable.order()[0][0];
                 var header = getTopHeader(column);
                 var headerText = $(dataTable.column(column).header()).text();
-                var sortingEvent = header.text() + headerText + " " + dataTable.order()[0][1];
+                var sortingEvent = header.text() + " " + headerText + " " + dataTable.order()[0][1];
                 ga('send', 'event', 'Sort', sortingEvent);
             }
         }
@@ -293,6 +293,12 @@ $(document).ready(function () {
     //     console.log($('#total-dps-header').attr("colspan"));
     //     console.log("resize");
     // });
+});
+
+$('a.modal-trigger').on('click', function () {
+    if (typeof ga !== 'undefined') {
+        ga('send', 'event', 'Modal', "Opened Modal: " + $(this).text());
+    }
 });
 
 $("#refresh").on("click", function () {

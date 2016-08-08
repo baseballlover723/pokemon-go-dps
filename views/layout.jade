@@ -31,131 +31,152 @@ html.no-js(lang='')
     link(rel='stylesheet', href='/stylesheets/style.css')
     script(src='/javascripts/vendor/modernizr-2.8.3.min.js')
 body
-    //if lt IE 8
-      p.browserupgrade
-        | You are using an
-        strong outdated
-        |  browser. Please
-        a(href='http://browsehappy.com/') upgrade your browser
-        |  to improve your experience.
-    // Add your site or application content here
-    nav.navbar.navbar-default.navbar-inverse.navbar-static-top
-      .container-fluid
-        // Brand and toggle get grouped for better mobile display
-        .navbar-header
-          button.navbar-toggle.collapsed(type='button', data-toggle='collapse', data-target='#bs-example-navbar-collapse-1', aria-expanded='false')
-            span.sr-only Toggle navigation
-            span.icon-bar
-            span.icon-bar
-            span.icon-bar
-          a.navbar-brand(href='/').title Pokémon GO DPS Analyzer
-
-        // Collect the nav links, forms, and other content for toggling
-        #bs-example-navbar-collapse-1.collapse.navbar-collapse
-          ul.nav.navbar-nav.navbar-right
-            li
-              a(herf='#' data-toggle='modal', data-target='#todo-list') TODO List
-            li
-              a(herf='#' data-toggle='modal', data-target='#change-log') Change Log
-            li
-              a(herf='#' data-toggle='modal', data-target='#disclaimer') Disclaimer
-            li
-              a(herf='#' data-toggle='modal', data-target='#contact-me') Contact Me
-            li.dropdown
-              a.profile.dropdown-toggle(href="#" data-toggle="dropdown") Philip Ross <span class='caret'></span>
-              ul.dropdown-menu
-                li
-                  a(href="https://www.linkedin.com/pub/philip-ross/a5/569/575") Philip's LinkedIn
-                li
-                  a(href="https://github.com/baseballlover723") Philip's Github
-    #todo-list.modal.fade(role='dialog')
-      .modal-dialog.modal-lg
-        .modal-content
-          .modal-header
-            button.close(type='button', data-dismiss='modal') ×
-            h4.modal-title TODO List
-          .modal-body
-            p TODO List
-              ul
-                li <s>Factor in STAB</s>
-                li <s>Factor in base stats</s>
-                li Split into 2 tabs for attacking and defending
-                li Add a tab to calculate DPS against specific Pokémon
-          .modal-footer
-            button.btn.btn-default(type='button', data-dismiss='modal') Close
-    #change-log.modal.fade(role='dialog')
-      .modal-dialog.modal-lg
-        .modal-content
-          .modal-header
-            button.close(type='button', data-dismiss='modal') ×
-            h4.modal-title Change Log
-          .modal-body
-            p 8/5/2016:
-              ul
-                li Added support for searching from the url, now you can share your searches with your friends or enemies, I'm not too picky.
-                li Made the rank column show the global ranking of the row in the current sort
-            p 8/6/2016:
-              ul
-                li Added STAB Offensive Rating, which takes into account the pokemon's base stats
-                li Added Column visibility options, since the table is getting hard to fit on one screen
-                li Changed my header library so now if should line up with the table correctly once you scroll down now
-            p 8/7/2016:
-              ul
-                li forgot to update the offensive rating for the fast and charge move.
-                li Second update: added EPS
-                li Third update: added Adjusted DPS
-          .modal-footer
-            button.btn.btn-default(type='button', data-dismiss='modal') Close
-    #disclaimer.modal.fade(role='dialog')
-      .modal-dialog.modal-lg
-        .modal-content
-          .modal-header
-            button.close(type='button', data-dismiss='modal') ×
-            h4.modal-title Disclaimer
-          .modal-body
-            p Pokémon GO DPS Analyzer is not endorsed by Niantic, Nintendo or The Pokémon Company and doesn't reflect the views or opinions of Niantic, Nintendo, The Pokémon Company or anyone officially involved in producing or managing Pokémon GO.
-          .modal-footer
-            button.btn.btn-default(type='button', data-dismiss='modal') Close
-    #contact-me.modal.fade(role='dialog')
-      .modal-dialog.modal-lg
-        .modal-content
-          .modal-header
-            button.close(type='button', data-dismiss='modal') ×
-            h4.modal-title Contact Me
-          .modal-body
-            p Got an idea or any feedback for this website? Contact me at <a href='mailto:baseballlover723@gmail.com?subject=Pokémon%20GO%20DPS%20Optimizer%20Feedback'>baseballlover723@gmail.com</a>
-          .modal-footer
-            button.btn.btn-default(type='button', data-dismiss='modal') Close
+  //if lt IE 8
+    p.browserupgrade
+      | You are using an
+      strong outdated
+      |  browser. Please
+      a(href='http://browsehappy.com/') upgrade your browser
+      |  to improve your experience.
+  // Add your site or application content here
+  nav.navbar.navbar-default.navbar-inverse.navbar-static-top
     .container-fluid
-      #alert-placeholder
-      block content
+      // Brand and toggle get grouped for better mobile display
+      .navbar-header
+        button.navbar-toggle.collapsed(type='button', data-toggle='collapse', data-target='#bs-example-navbar-collapse-1', aria-expanded='false')
+          span.sr-only Toggle navigation
+          span.icon-bar
+          span.icon-bar
+          span.icon-bar
+        a.navbar-brand(href='/').title Pokémon GO DPS Analyzer
 
-    script(src='https://code.jquery.com/jquery-1.12.0.min.js')
-    script(src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous")
-    script.
-      window.jQuery || document.write('<script src="/javascripts/vendor/jquery-1.12.0.min.js"><\\/script>')
-    script(src='https://cdn.datatables.net/v/bs/dt-1.10.12/b-1.2.2/b-colvis-1.2.2/datatables.min.js')
-    script(src='/javascripts/plugins.js')
-    script(src="/circular-json/circular-json.js")
-    script(src="/moment/moment-with-locales.min.js")
-    script(src="/moment-timezone/moment-timezone-with-data.min.js")
-    script(src="/javascripts/vendor/moment-precise-range.js")
-    script(src="/sticky-table-headers/jquery.stickytableheaders.min.js")
-    script(src="/class/pokemon.js")
-    script(src="/class/move.js")
-    script(src="/class/type.js")
-    script.
-        !{state}
-    // Google Analytics: change UA-XXXXX-X to be your site's ID.
-    script.
-      if (jsVars.env == "production") {
-        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-                  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-                m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-        })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-        ga('create', 'UA-81849549-1', 'auto');
-        ga('send', 'pageview');
-        window.ga = ga;
-        setTimeout(function(){ga('send', 'event', 'Used Site', 'Used site for more than 60 seconds')}, 60 * 1000); // time in ms
-      }
-    script(src='/javascripts/main.js')
+      // Collect the nav links, forms, and other content for toggling
+      #bs-example-navbar-collapse-1.collapse.navbar-collapse
+        ul.nav.navbar-nav.navbar-right
+          li
+            a.modal-trigger(herf='#' data-toggle='modal', data-target='#todo-list') TODO List
+          li
+            a.modal-trigger(herf='#' data-toggle='modal', data-target='#change-log') Change Log
+          li
+            a.modal-trigger(herf='#' data-toggle='modal', data-target='#disclaimer') Disclaimer
+          li
+            a.modal-trigger(herf='#' data-toggle='modal', data-target='#contact-me') Contact Me
+          li.dropdown
+            a.profile.dropdown-toggle(href="#" data-toggle="dropdown") Philip Ross <span class='caret'></span>
+            ul.dropdown-menu
+              li
+                a(href="https://www.linkedin.com/pub/philip-ross/a5/569/575") Philip's LinkedIn
+              li
+                a(href="https://github.com/baseballlover723") Philip's Github
+  #todo-list.modal.fade(role='dialog')
+    .modal-dialog.modal-lg
+      .modal-content
+        .modal-header
+          button.close(type='button', data-dismiss='modal') ×
+          h4.modal-title TODO List
+        .modal-body
+          p TODO List
+            ul
+              li <s>Factor in STAB</s>
+              li <s>Factor in base stats</s>
+              li Split into 2 tabs for attacking and defending
+              li Add a tab to calculate DPS against specific Pokémon
+        .modal-footer
+          button.btn.btn-default(type='button', data-dismiss='modal') Close
+  #change-log.modal.fade(role='dialog')
+    .modal-dialog.modal-lg
+      .modal-content
+        .modal-header
+          button.close(type='button', data-dismiss='modal') ×
+          h4.modal-title Change Log
+        .modal-body
+          p 8/5/2016:
+            ul
+              li Added support for searching from the url, now you can share your searches with your friends or enemies, I'm not too picky.
+              li Made the rank column show the global ranking of the row in the current sort
+          p 8/6/2016:
+            ul
+              li Added STAB Offensive Rating, which takes into account the pokemon's base stats
+              li Added Column visibility options, since the table is getting hard to fit on one screen
+              li Changed my header library so now if should line up with the table correctly once you scroll down now
+          p 8/7/2016:
+            ul
+              li forgot to update the offensive rating for the fast and charge move.
+              li Second update: added EPS
+              li Third update: added Adjusted DPS
+        .modal-footer
+          button.btn.btn-default(type='button', data-dismiss='modal') Close
+  #disclaimer.modal.fade(role='dialog')
+    .modal-dialog.modal-lg
+      .modal-content
+        .modal-header
+          button.close(type='button', data-dismiss='modal') ×
+          h4.modal-title Disclaimer
+        .modal-body
+          p Pokémon GO DPS Analyzer is not endorsed by Niantic, Nintendo or The Pokémon Company and doesn't reflect the views or opinions of Niantic, Nintendo, The Pokémon Company or anyone officially involved in producing or managing Pokémon GO.
+        .modal-footer
+          button.btn.btn-default(type='button', data-dismiss='modal') Close
+  #contact-me.modal.fade(role='dialog')
+    .modal-dialog.modal-lg
+      .modal-content
+        .modal-header
+          button.close(type='button', data-dismiss='modal') ×
+          h4.modal-title Contact Me
+        .modal-body
+          p Got an idea or any feedback for this website? Contact me at <a href='mailto:baseballlover723@gmail.com?subject=Pokémon%20GO%20DPS%20Optimizer%20Feedback'>baseballlover723@gmail.com</a>
+        .modal-footer
+          button.btn.btn-default(type='button', data-dismiss='modal') Close
+  .container-fluid
+    #alert-placeholder
+    block content
+
+  script(src='https://code.jquery.com/jquery-1.12.0.min.js')
+  script(src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous")
+  script.
+    window.jQuery || document.write('<script src="/javascripts/vendor/jquery-1.12.0.min.js"><\\/script>')
+  script(src='https://cdn.datatables.net/v/bs/dt-1.10.12/b-1.2.2/b-colvis-1.2.2/datatables.min.js')
+  script(src='/javascripts/plugins.js')
+  script(src="/circular-json/circular-json.js")
+  script(src="/moment/moment-with-locales.min.js")
+  script(src="/moment-timezone/moment-timezone-with-data.min.js")
+  script(src="/javascripts/vendor/moment-precise-range.js")
+  script(src="/sticky-table-headers/jquery.stickytableheaders.min.js")
+  script(src="/class/pokemon.js")
+  script(src="/class/move.js")
+  script(src="/class/type.js")
+  script.
+    !{state}
+  // Google Analytics: change UA-XXXXX-X to be your site's ID.
+  script.
+    if (jsVars.env == "production") {
+      (function (i, s, o, g, r, a, m) {
+        i['GoogleAnalyticsObject'] = r;
+        i[r] = i[r] || function () {
+                  (i[r].q = i[r].q || []).push(arguments)
+                }, i[r].l = 1 * new Date();
+        a = s.createElement(o),
+                m = s.getElementsByTagName(o)[0];
+        a.async = 1;
+        a.src = g;
+        m.parentNode.insertBefore(a, m)
+      })(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');
+      ga('create', 'UA-81849549-1', 'auto');
+      ga('send', 'pageview');
+      window.ga = ga;
+      ga('send', {
+        hitType: 'event',
+        eventCategory: 'Used Site',
+        eventAction: 'Opened Site (non interaction)',
+        nonInteraction: true
+      });
+      setTimeout(function () {
+        ga('send', {
+          hitType: 'event',
+          eventCategory: 'Used Site',
+          eventAction: 'Used site for more than 30 seconds (non interaction)',
+          nonInteraction: true
+        })
+      }, 30 * 1000); // time in ms
+      setTimeout(function () {ga('send', 'event', 'Used Site', 'Used site for more than 60 seconds')}, 60 * 1000); // time in ms
+    }
+  script(src='/javascripts/main.js')

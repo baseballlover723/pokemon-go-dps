@@ -1,5 +1,5 @@
 body {
-    font: 12.5px "Lucida Grande", Helvetica, Arial, sans-serif;
+    font: 12.25px "Lucida Grande", Helvetica, Arial, sans-serif;
 }
 
 a {
@@ -66,7 +66,7 @@ img {
 
 .buttons-columnVisibility, #data-table_wrapper .btn{
     padding: 6px 5.5px;
-    font-size: 10pt;
+    font-size: 9.5pt;
 }
 
 .btn-group {

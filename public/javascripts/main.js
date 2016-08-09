@@ -1,11 +1,11 @@
 // I got my math equation from http://www.codecogs.com/latex/eqneditor.php with comic sans and 12pt font
 // dps = \frac{\frac{cm.energy}{fm.energy} * fm.power + cm.power(1+\frac{cm.crit}{2})}{\frac{cm.energy}{fm.energy} *
 // fm.duration + cm.duration + 0.5} offensive power rating at 10pt with 150 resolution OffensivePowerRating =
-// \frac{(pokemon.attack + 7) * (pokemon.stamina + 7) * stabDps}{1000}
+// OffensiveRating = \frac{(pokemon.attack + 7) * (pokemon.stamina + 7) * (pokemon.defense + 7) * stabDps}{100,000}
 // AdjustedDPS = \frac{(pokemon.attack + 7) * stabDps}{2}
 
 var inited = false;
-var pokemonHeaderLength = 6;
+var pokemonHeaderLength = 7;
 var fastHeaderLength = 9;
 var chargeHeaderLength = 9;
 var totalDpsHeaderLength = 5;
@@ -59,6 +59,11 @@ $(document).ready(function () {
                 }
             }
         }, {title: "Sta", data: "stamina"}, {title: "Att", data: "attack"}, {title: "Def", data: "defense"},
+            {
+                title: "Total", data: "", render: function (data, type, pokemon) {
+                return pokemon.stamina + pokemon.attack + pokemon.defense;
+            }
+            },
             {title: "Move Name", data: "fastMove.name"}, {
                 title: "Type", data: "fastMove.type.name", render: function (data, type, pokemon) {
                     return capitalize(data);
@@ -145,9 +150,9 @@ $(document).ready(function () {
                     var cm = pokemon.chargeMove;
                     var fmDamage = pokemon.getSTABDamage(fm);
                     var cmDamage = pokemon.getSTABDamage(cm);
-                    var dps = (pokemon.attack + 7) * (pokemon.stamina + 7) *
+                    var dps = (pokemon.attack + 7) * (pokemon.stamina + 7) * (pokemon.defense + 7) *
                         ((cm.energyRequired * fmDamage / fm.energyGain) + (cmDamage * (1 + cm.critChance / 2))) /
-                        ((cm.energyRequired * fm.duration / fm.energyGain) + cm.duration + 0.5) / 1000;
+                        ((cm.energyRequired * fm.duration / fm.energyGain) + cm.duration + 0.5) / 100 / 1000;
                     return dps.toFixed(1);
                 }
             }, {
@@ -172,9 +177,21 @@ $(document).ready(function () {
         }, {
             //     targets: 10, width: "7%"
             // }, {
-            targets: [6, 7, 8, 9, 10, 11, 12, 13, 14], className: "fast-move-highlight"
+            className: "fast-move-highlight", targets: (function () {
+                var cols = [];
+                for (var i=0;i<fastHeaderLength;i++) {
+                    cols.push(pokemonHeaderLength + i);
+                }
+                return cols;
+            })()
         }, {
-            targets: [15, 16, 17, 18, 19, 20, 21, 22, 23], className: "charge-move-highlight"
+            className: "charge-move-highlight", targets: (function () {
+                var cols = [];
+                for (var i=0;i<chargeHeaderLength;i++) {
+                    cols.push(pokemonHeaderLength + fastHeaderLength + i);
+                }
+                return cols;
+            })()
             // }, {
             //     targets: [0, 1, 3, 10, 18, 19], responsivePriority: 0
             // }, {

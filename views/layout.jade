@@ -75,12 +75,13 @@ body
           button.close(type='button', data-dismiss='modal') ×
           h4.modal-title TODO List
         .modal-body
-          p TODO List
+          p TODO List, note that actual completion dates can be very different than the estimated depending on what happens irl with me, these estimates are fairly conservative though
             ul
               li <s>Factor in STAB</s>
               li <s>Factor in base stats</s>
-              li Split into 2 tabs for attacking and defending
-              li Add a tab to calculate DPS against specific Pokémon
+              li Add gym defense (Estimated completion: Sunday, 8/14/2016)
+              li Add a tab to calculate DPS against specific Pokémon (Estimated Completion: Sunday: 8/21/2016)
+              li Add gym defense with dodging assumption (Estimated Completion: Sunday: 8/28/2016)
         .modal-footer
           button.btn.btn-default(type='button', data-dismiss='modal') Close
   #change-log.modal.fade(role='dialog')
@@ -104,6 +105,11 @@ body
               li forgot to update the offensive rating for the fast and charge move.
               li Second update: added EPS
               li Third update: added Adjusted DPS
+          p 8/9/2016:
+            ul
+              li Updated the offensive rating to also take into account defense
+              li Added a column for total stats
+              li Puts estimated completion dates for the TODO list
         .modal-footer
           button.btn.btn-default(type='button', data-dismiss='modal') Close
   #disclaimer.modal.fade(role='dialog')

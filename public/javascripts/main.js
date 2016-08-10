@@ -3,7 +3,7 @@
 // fm.duration + cm.duration + 0.5} offensive power rating at 10pt with 150 resolution OffensivePowerRating =
 // OffensiveRating = \frac{(pokemon.attack + 7) * (pokemon.stamina + 7) * (pokemon.defense + 7) * stabDps}{100,000}
 // AdjustedDPS = \frac{(pokemon.attack + 7) * stabDps}{2}
-
+var CALCULATE_CRIT = false;
 var inited = false;
 var pokemonHeaderLength = 7;
 var fastHeaderLength = 9;
@@ -20,6 +20,16 @@ function getTopHeader(index) {
     } else {
         return $('#total-dps-header');
     }
+}
+
+function calculateDPS(pokemon, stab) {
+    var fm = pokemon.fastMove;
+    var cm = pokemon.chargeMove;
+    var fmDamage = stab ? pokemon.getSTABDamage(fm) : fm.damage;
+    var cmDamage = stab ? pokemon.getSTABDamage(cm) : cm.damage;
+    var critChance = CALCULATE_CRIT ? cm.critChance : 0;
+    return ((cm.energyRequired * fmDamage / fm.energyGain) + (cmDamage * (1 + critChance / 2))) /
+        ((cm.energyRequired * fm.duration / fm.energyGain) + cm.duration + 0.5);
 }
 
 String.prototype.replaceAll = function (search, replacement) {
@@ -58,106 +68,95 @@ $(document).ready(function () {
                     return capitalize(pokemon.type1);
                 }
             }
-        }, {title: "Sta", data: "stamina"}, {title: "Att", data: "attack"}, {title: "Def", data: "defense"},
-            {
-                title: "Total", data: "", render: function (data, type, pokemon) {
+        }, {title: "Sta", data: "stamina"}, {title: "Att", data: "attack"}, {title: "Def", data: "defense"}, {
+            title: "Total", data: "", render: function (data, type, pokemon) {
                 return pokemon.stamina + pokemon.attack + pokemon.defense;
             }
-            },
-            {title: "Move Name", data: "fastMove.name"}, {
-                title: "Type", data: "fastMove.type.name", render: function (data, type, pokemon) {
-                    return capitalize(data);
+        }, {title: "Move Name", data: "fastMove.name"}, {
+            title: "Type", data: "fastMove.type.name", render: function (data, type, pokemon) {
+                return capitalize(data);
+            }
+        }, {title: "Pow", data: "fastMove.damage"}, {title: "Duration", data: "fastMove.duration"}, {
+            title: "Energy", data: "fastMove.energyGain", render: function (data, type, pokemon) {
+                return data + "%";
+            }
+        }, {
+            title: "EPS", data: "fastMove", render: function (data, type, pokemon) {
+                var eps = data.energyGain / data.duration;
+                return eps.toFixed(3);
+            }
+        }, {
+            title: "DPS", data: "fastMove", render: function (data, type, pokemon) {
+                var dps = data.damage / data.duration;
+                return dps.toFixed(3);
+            }
+        }, {
+            title: "STAB DPS", data: "fastMove", render: function (data, type, pokemon) {
+                var dps = pokemon.getSTABDamage(data) / data.duration;
+                return dps.toFixed(3);
+            }
+        }, {
+            title: "Adjusted DPS", data: "fastMove", render: function (data, type, pokemon) {
+                var dps = (pokemon.attack + 7) * pokemon.getSTABDamage(data) / data.duration / 2;
+                return dps.toFixed(3);
+            }
+        }, {title: "Move Name", data: "chargeMove.name"}, {
+            title: "Type", data: "chargeMove.type.name", render: function (data, type, pokemon) {
+                return capitalize(data);
+            }
+        }, {title: "Pow", data: "chargeMove.damage"}, {title: "Duration", data: "chargeMove.duration"}, {
+            title: "Energy", data: "chargeMove.energyRequired", render: function (data, type, pokemon) {
+                return Math.round(data * 100) / 100 + "%"; // round to 2 decimal places
+            }
+        }, {
+            title: "Crit %", data: "chargeMove.critChance", render: function (data, type, pokemon) {
+                return data * 100 + "%"; // convert to percent
+            }
+        }, {
+            title: "DPS", data: "chargeMove", render: function (data, type, pokemon) {
+                var dps = data.damage / data.duration;
+                if (CALCULATE_CRIT) {
+                    dps *= (data.critChance / 2 + 1)
                 }
-            }, {title: "Pow", data: "fastMove.damage"}, {title: "Duration", data: "fastMove.duration"},
-            {title: "Energy", data: "fastMove.energyGain"}, {
-                title: "EPS", data: "fastMove", render: function (data, type, pokemon) {
-                    var eps = data.energyGain / data.duration;
-                    return eps.toFixed(3);
+                return dps.toFixed(3);
+            }
+        }, {
+            title: "STAB DPS", data: "chargeMove", render: function (data, type, pokemon) {
+                var dps = pokemon.getSTABDamage(data) / data.duration;
+                if (CALCULATE_CRIT) {
+                    dps *= (data.critChance / 2 + 1)
                 }
-            }, {
-                title: "DPS", data: "fastMove", render: function (data, type, pokemon) {
-                    var dps = data.damage / data.duration;
-                    return dps.toFixed(3);
+                return dps.toFixed(3);
+            }
+        }, {
+            title: "Adjusted DPS", data: "chargeMove", render: function (data, type, pokemon) {
+                var dps = (pokemon.attack + 7) * pokemon.getSTABDamage(data) / (data.duration + 0.5) / 2;
+                if (CALCULATE_CRIT) {
+                    dps *= (data.critChance / 2 + 1)
                 }
-            }, {
-                title: "STAB DPS", data: "fastMove", render: function (data, type, pokemon) {
-                    var dps = pokemon.getSTABDamage(data) / data.duration;
-                    return dps.toFixed(3);
-                }
-            }, {
-                title: "Adjusted DPS", data: "fastMove", render: function (data, type, pokemon) {
-                    var dps = (pokemon.attack + 7) * pokemon.getSTABDamage(data) / data.duration / 2;
-                    return dps.toFixed(3);
-                }
-            }, {title: "Move Name", data: "chargeMove.name"}, {
-                title: "Type", data: "chargeMove.type.name", render: function (data, type, pokemon) {
-                    return capitalize(data);
-                }
-            }, {title: "Pow", data: "chargeMove.damage"}, {title: "Duration", data: "chargeMove.duration"}, {
-                title: "Energy", data: "chargeMove.energyRequired", render: function (data, type, pokemon) {
-                    return Math.round(data * 100) / 100; // round to 2 decimal places
-                }
-            }, {
-                title: "Crit %", data: "chargeMove.critChance", render: function (data, type, pokemon) {
-                    return data * 100 + "%"; // convert to percent
-                }
-            }, {
-                title: "DPS", data: "chargeMove", render: function (data, type, pokemon) {
-                    var dps = data.damage * (data.critChance / 2 + 1) / data.duration;
-                    return dps.toFixed(3);
-                }
-            }, {
-                title: "STAB DPS", data: "chargeMove", render: function (data, type, pokemon) {
-                    var dps = pokemon.getSTABDamage(data) * (data.critChance / 2 + 1) / data.duration;
-                    return dps.toFixed(3);
-                }
-            }, {
-                title: "Adjusted DPS", data: "chargeMove", render: function (data, type, pokemon) {
-                    var dps = (pokemon.attack + 7) * pokemon.getSTABDamage(data) * (data.critChance / 2 + 1) / (data.duration + 0.5) / 2;
-                    return dps.toFixed(3);
-                }
-            }, {
-                title: "DPS", data: null, render: function (data, type, pokemon) {
-                    var fm = pokemon.fastMove;
-                    var cm = pokemon.chargeMove;
-                    var dps = ((cm.energyRequired * fm.damage / fm.energyGain) + (cm.damage * (1 + cm.critChance / 2))) /
-                        ((cm.energyRequired * fm.duration / fm.energyGain) + cm.duration + 0.5);
-                    return dps.toFixed(3);
-                }
-            }, {
-                title: "STAB DPS", data: null, render: function (data, type, pokemon) {
-                    var fm = pokemon.fastMove;
-                    var cm = pokemon.chargeMove;
-                    var fmDamage = pokemon.getSTABDamage(fm);
-                    var cmDamage = pokemon.getSTABDamage(cm);
-                    var dps = ((cm.energyRequired * fmDamage / fm.energyGain) + (cmDamage * (1 + cm.critChance / 2))) /
-                        ((cm.energyRequired * fm.duration / fm.energyGain) + cm.duration + 0.5);
-                    return dps.toFixed(3);
-                }
-            }, {
-                title: "Adjusted DPS", data: null, render: function (data, type, pokemon) {
-                    var fm = pokemon.fastMove;
-                    var cm = pokemon.chargeMove;
-                    var fmDamage = pokemon.getSTABDamage(fm);
-                    var cmDamage = pokemon.getSTABDamage(cm);
-                    var dps = (pokemon.attack + 7) * ((cm.energyRequired * fmDamage / fm.energyGain) + (cmDamage * (1 + cm.critChance / 2))) /
-                        ((cm.energyRequired * fm.duration / fm.energyGain) + cm.duration + 0.5) / 2;
-                    return dps.toFixed(3);
-                }
-            }, {
-                title: "STAB Offensive Rating", data: null, render: function (data, type, pokemon) {
-                    var fm = pokemon.fastMove;
-                    var cm = pokemon.chargeMove;
-                    var fmDamage = pokemon.getSTABDamage(fm);
-                    var cmDamage = pokemon.getSTABDamage(cm);
-                    var dps = (pokemon.attack + 7) * (pokemon.stamina + 7) * (pokemon.defense + 7) *
-                        ((cm.energyRequired * fmDamage / fm.energyGain) + (cmDamage * (1 + cm.critChance / 2))) /
-                        ((cm.energyRequired * fm.duration / fm.energyGain) + cm.duration + 0.5) / 100 / 1000;
-                    return dps.toFixed(1);
-                }
-            }, {
-                title: "Rank", data: null
-            }],
+                return dps.toFixed(3);
+            }
+        }, {
+            title: "DPS", data: null, render: function (data, type, pokemon) {
+                return calculateDPS(pokemon, false).toFixed(3);
+            }
+        }, {
+            title: "STAB DPS", data: null, render: function (data, type, pokemon) {
+                return calculateDPS(pokemon, true).toFixed(3);
+            }
+        }, {
+            title: "Adjusted DPS", data: null, render: function (data, type, pokemon) {
+                var dps = (pokemon.attack + 7) * calculateDPS(pokemon, true) / 2;
+                return dps.toFixed(3);
+            }
+        }, {
+            title: "STAB Offensive Rating", data: null, render: function (data, type, pokemon) {
+                var dps = (pokemon.attack + 7) * (pokemon.stamina + 7) * (pokemon.defense + 7) * calculateDPS(pokemon, true) / 100 / 1000;
+                return dps.toFixed(1);
+            }
+        }, {
+            title: "Rank", data: null
+        }],
         autoWidth: true,
         pageLength: 50,
         order: [[pokemonHeaderLength + fastHeaderLength + chargeHeaderLength + totalDpsHeaderLength - 2, "desc"]],
@@ -179,7 +178,7 @@ $(document).ready(function () {
             // }, {
             className: "fast-move-highlight", targets: (function () {
                 var cols = [];
-                for (var i=0;i<fastHeaderLength;i++) {
+                for (var i = 0; i < fastHeaderLength; i++) {
                     cols.push(pokemonHeaderLength + i);
                 }
                 return cols;
@@ -187,7 +186,7 @@ $(document).ready(function () {
         }, {
             className: "charge-move-highlight", targets: (function () {
                 var cols = [];
-                for (var i=0;i<chargeHeaderLength;i++) {
+                for (var i = 0; i < chargeHeaderLength; i++) {
                     cols.push(pokemonHeaderLength + fastHeaderLength + i);
                 }
                 return cols;
@@ -249,7 +248,8 @@ $(document).ready(function () {
         var rows = dataTable.column(column, {order: 'applied'}).nodes();
         var numberOfColumns = dataTable.settings().columns()[0].length;
         var ranks = dataTable.column(numberOfColumns - 1).nodes();
-        if ([0, 1, 2, 6, 7, 15, 16].indexOf(column) != -1) {
+        var isPokemon = column < pokemonHeaderLength;
+        if ([0, 1, 2, 7, 8, 16, 17].indexOf(column) != -1) {
             desc = !desc;
         }
         dataTable.column(dataTable.settings().columns()[0].length - 1, {order: 'applied'}).nodes().each(function (cell, i) {

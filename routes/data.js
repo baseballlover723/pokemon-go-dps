@@ -316,21 +316,23 @@ function populateTypes() {
 }
 
 function scrapeMoves(callback = function (moves) {}) {
-    var limit = 50;
+    var limit = 5;
     var count = 0;
     var done = [];
     console.time("request loop");
     async.eachLimit(Object.keys(moveNames), limit, function (id, callback) {
-        scrape(new Move(id, moveNames[id]), function (move) {
-            moves[id].load(move);
-            count++;
-            done.push(move.name);
-            console.log(count + " / " + Object.keys(moveNames).length);
-            if (Object.keys(moveNames).length - count < 5) {
-                console.log(Object.keys(moveNames).map(function (v) { return moveNames[v]; }).filter(
-                    function (x) {return done.indexOf(x) < 0}));
-            }
-            callback();
+        process.nextTick(function() {
+            scrape(new Move(id, moveNames[id]), function (move) {
+                moves[id].load(move);
+                count++;
+                done.push(move.name);
+                console.log(count + " / " + Object.keys(moveNames).length);
+                if (Object.keys(moveNames).length - count < 5) {
+                    console.log(Object.keys(moveNames).map(function (v) { return moveNames[v]; }).filter(
+                        function (x) {return done.indexOf(x) < 0}));
+                }
+                callback();
+            });
         });
     }, function (err) {
         console.timeEnd("request loop");

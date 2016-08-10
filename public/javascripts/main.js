@@ -155,7 +155,7 @@ $(document).ready(function () {
                 return dps.toFixed(1);
             }
         }, {
-            title: "Rank", data: null
+            title: "Rank", data: null, orderable: false
         }],
         autoWidth: true,
         pageLength: 50,

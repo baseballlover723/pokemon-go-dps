@@ -324,7 +324,13 @@ $("#refresh").on("click", function () {
         var timeUntilRefresh = moment.preciseDiff(moment(jsVars.nextClientRefreshTime), moment());
         showAlert("This site has already been updated recently, you can update it again in <span id='refresh-time'>" + timeUntilRefresh + "</span>",
             "alert-danger");
+        if (typeof ga !== 'undefined') {
+            ga('send', 'event', 'Reload', "Reload Client Rejected");
+        }
     } else {
+        if (typeof ga !== 'undefined') {
+            ga('send', 'event', 'Reload', "Reload Client Accepted");
+        }
         $(location).attr('href', '/refresh');
     }
 });

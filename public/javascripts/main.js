@@ -6,87 +6,15 @@
 var CALCULATE_CRIT = false;
 var inited = false;
 var staticPokemon = [];
-var selectedPokemon = [];
 
 var pokemonHeaderLength = 7;
 var fastHeaderLength = 9;
 var chargeHeaderLength = 9;
 var totalDpsHeaderLength = 5;
 
-function makePkmSelectionList(){
-    pkmbar = document.getElementById('pkmbar');
-    pkmbar.innerHTML = '';
-    for (var i = 0; i<selectedPokemon.length; i++) {
-        pkm = selectedPokemon[i];
-        var temp = document.createElement('button');
-        $(temp).text(pkm.name);
-        $(temp).click(x => pkmRemove(x));
-        $(pkmbar).append(temp);
-    }
-}
-
-function makeSelectors(){
-    var pkmbar = document.createElement('span');
-    pkmbar.id = 'pkmbar';
-
-    var area = $('#selection');
-    var frm = document.createElement('form');
-    frm.id = 'pkmfrm1';
-    //frm.setAttribute('onsubmit',"return pkmSelect();");
-    $(frm).submit(pkmSelect);
-    var inp1 = document.createElement('input');
-    inp1.setAttribute('list',"pkmlst");
-    inp1.name = "pkmSelection";
-    inp1.id = 'pkmselinp1';
-    var dl = document.createElement('datalist');
-    var smt = document.createElement('input');
-    smt.type = "submit";
-    dl.id="pkmlst";
-    for (var i = 0; i < staticPokemon.length; i++) {
-        var temp = document.createElement('option');
-        pkm = staticPokemon[i];
-        temp.value = pkm.name;
-        $(dl).append(temp);
-    }
-    $(frm).append(inp1);
-    $(frm).append(dl);
-    $(frm).append(smt);
-    area.append(pkmbar);
-    area.append(frm);
-    makePkmSelectionList();
-}
-
-function pkmRemove(pkm){
-    selectedPokemon.splice(selectedPokemon.indexOf(pkm),1);
-    makePkmSelectionList();
-}
-
-function pkmSelect(event){
-    event.preventDefault();
-    var inp1 = $('#pkmselinp1');
-    var name = inp1.val();
-    spkm = null;
-    for (var i = staticPokemon.length - 1; i >= 0; i--) {
-        var pkm = staticPokemon[i];
-        if(pkm.name === name){
-            spkm = pkm;
-            break;
-        }
-    }
-    if(!spkm){
-        alert('Error: invalid selection');
-        return false;
-    }
-    if(true)selectedPokemon.push(spkm);//!selectedPokemon.includes(spkm)
-    else {
-        alert('Error: invalid selection');
-        return false;
-    }
-    $('#pkmfrm1').trigger('reset');
-    makePkmSelectionList();
-}
-
-populateStaticPokemon(makeSelectors);
+populateStaticPokemon(function () {
+    console.log(getCounterMatchupPokemon()[0].type1.getModifier(getCounterMatchupPokemon()[0].type1));
+});
 
 function populateStaticPokemon(callback) {
     callback = callback || function () {};

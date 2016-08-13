@@ -5,13 +5,46 @@
 // AdjustedDPS = \frac{(pokemon.attack + 7) * stabDps}{2}
 var CALCULATE_CRIT = false;
 var inited = false;
+var staticPokemon = [];
+
 var pokemonHeaderLength = 7;
 var fastHeaderLength = 9;
 var chargeHeaderLength = 9;
 var totalDpsHeaderLength = 5;
 
+populateStaticPokemon(function () {
+    console.log(getCounterMatchupPokemon()[0].type1.getModifier(getCounterMatchupPokemon()[0].type1));
+});
+
+function populateStaticPokemon(callback) {
+    callback = callback || function () {};
+    $.ajax({
+        dataType: "text", url: "/json/staticPokemon.json", success: function (pokemonJson) {
+            var staticPokemonJson = CircularJSON.parse(pokemonJson);
+            for (var pokemon in staticPokemonJson) {
+                pokemon = staticPokemonJson[pokemon];
+                pokemon = new Pokemon(pokemon);
+                pokemon.type1.__proto__ = Type.prototype; // some hacky shit to get types functions
+                if (pokemon.type2) {
+                    pokemon.type2.__proto__ = Type.prototype; // some hacky shit to get types functions
+                }
+                staticPokemon.push(new Pokemon(pokemon));
+            }
+            callback();
+        }, error: function (xhr, status) {
+            console.log("error loading counter matchups");
+            console.log(status);
+
+        }
+    })
+}
+
 function getCounterMatchupPokemon() {
-    return [];
+    return [staticPokemon[0]];
+}
+
+function toProperCase(str) {
+    return str.replace(/\w\S*/g, function (txt) {return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
 }
 
 function getTopHeader(index) {

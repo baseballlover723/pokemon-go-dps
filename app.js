@@ -28,6 +28,7 @@ app.use('/moment', express.static(__dirname + '/node_modules/moment/min'));
 app.use('/moment-timezone', express.static(__dirname + '/node_modules/moment-timezone/builds'));
 app.use('/sticky-table-headers', express.static(__dirname + '/node_modules/sticky-table-headers/js'));
 app.use('/class', express.static(__dirname + '/lib'));
+app.use('/json', express.static(__dirname + '/json'));
 app.use('/', routes);
 app.expose(app.settings.env, "env");
 

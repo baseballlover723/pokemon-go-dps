@@ -63,9 +63,11 @@ list.map(function (pokemonNameHash) {
         for (var chargeMove of chargeMoves) {
             var pokemonHash = pokemonWithTypesStats[num - 1];
             if (pokemonHash.type2) {
-                data.push(new Pokemon(num, name, fastMove, chargeMove, pokemonHash.stamina, pokemonHash.attack, pokemonHash.defense, pokemonHash.type1, pokemonHash.type2));
+                data.push(
+                    new Pokemon(num, name, fastMove, chargeMove, pokemonHash.stamina, pokemonHash.attack, pokemonHash.defense, pokemonHash.type1, pokemonHash.type2));
             } else {
-                data.push(new Pokemon(num, name, fastMove, chargeMove, pokemonHash.stamina, pokemonHash.attack, pokemonHash.defense, pokemonHash.type1));
+                data.push(
+                    new Pokemon(num, name, fastMove, chargeMove, pokemonHash.stamina, pokemonHash.attack, pokemonHash.defense, pokemonHash.type1));
             }
             // data.push({number: num, name: name, fastMove: fastMove, chargeMove: chargeMove});
         }
@@ -75,6 +77,8 @@ list.map(function (pokemonNameHash) {
     //myDataSet.append([data['Num'], data['Name'], data['Fast Moves'], data['Charge Moves']]);
 });
 console.timeEnd("create data");
+
+// generateStaticPokemon();
 
 var exportTypes = Object.keys(types).map(function (v) { return types[v]; });
 exportTypes.sort(function (a, b) {
@@ -94,6 +98,25 @@ module.exports.getNextRefreshTime = function () {
     return moment(lastClientRefresh).add(CLIENT_REFRESH_VALUE, CLIENT_REFRESH_UNITS)
 };
 console.log("exported");
+
+function generateStaticPokemon() {
+    staticPokemon = [];
+    console.time("generating static pokemon");
+    list.map(function (pokemonNameHash) {
+        var num = pokemonNameHash.num;
+        var name = toProperCase(pokemonNameHash.name);
+        var pokemonHash = pokemonWithTypesStats[num - 1];
+        if (pokemonHash.type2) {
+            staticPokemon.push(
+                new Pokemon(num, name, undefined, undefined, pokemonHash.stamina, pokemonHash.attack, pokemonHash.defense, types[pokemonHash.type1], types[pokemonHash.type2]));
+        } else {
+            staticPokemon.push(new Pokemon(num, name, undefined, undefined, pokemonHash.stamina, pokemonHash.attack, pokemonHash.defense, types[pokemonHash.type1]));
+        }
+    });
+    fs.writeFile("json/staticPokemon.json", CircularJSON.stringify(staticPokemon), function() {
+        console.timeEnd("generating static pokemon");
+    });
+}
 
 function populateBaseStats() {
     let url = 'http://bulbapedia.bulbagarden.net/wiki/List_of_Pok%C3%A9mon_by_base_stats_(Generation_VI-present)';
@@ -225,8 +248,7 @@ function refreshCache(fromClient, callback = function (isRefreshing, nextRefresh
     if (!scrapping || moment().subtract(5, "minutes").isAfter(scrapping) || fromClient) {
         var refresh = false;
         if (fromClient) {
-            if (!lastClientRefresh ||
-                moment().subtract(CLIENT_REFRESH_VALUE, CLIENT_REFRESH_UNITS).isAfter(lastClientRefresh)) {
+            if (!lastClientRefresh || moment().subtract(CLIENT_REFRESH_VALUE, CLIENT_REFRESH_UNITS).isAfter(lastClientRefresh)) {
                 console.log("Client forced cache refresh: " + moment().tz('America/Los_Angeles').format("LLLL z"));
                 lastClientRefresh = moment();
                 refresh = true;
@@ -282,8 +304,7 @@ function isCachedValid(readCache, callback = function (movesCopy, isValid) {}) {
     }, function (callback) {
         fs.stat("json/cachedMoves.json", function (err, stats) {
             if (err) {
-                callback(null,
-                    {isValid: false, lastUpdatedTime: moment().subtract(7, "days"), nextUpdateTime: moment()});
+                callback(null, {isValid: false, lastUpdatedTime: moment().subtract(7, "days"), nextUpdateTime: moment()});
             } else {
                 var mtime = moment(stats.mtime);
                 callback(null, {
@@ -321,15 +342,14 @@ function scrapeMoves(callback = function (moves) {}) {
     var done = [];
     console.time("request loop");
     async.eachLimit(Object.keys(moveNames), limit, function (id, callback) {
-        process.nextTick(function() {
+        process.nextTick(function () {
             scrape(new Move(id, moveNames[id]), function (move) {
                 moves[id].load(move);
                 count++;
                 done.push(move.name);
                 console.log(count + " / " + Object.keys(moveNames).length);
                 if (Object.keys(moveNames).length - count < 5) {
-                    console.log(Object.keys(moveNames).map(function (v) { return moveNames[v]; }).filter(
-                        function (x) {return done.indexOf(x) < 0}));
+                    console.log(Object.keys(moveNames).map(function (v) { return moveNames[v]; }).filter(function (x) {return done.indexOf(x) < 0}));
                 }
                 callback();
             });
@@ -501,11 +521,11 @@ var dataTable;
 
 function toProperCase(str) {
     return str.replace(/\w\S*/g, function (txt) {return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
-};
+}
 
 function padLeft(str, value) {
     return String(value + str).slice(-value.length);
-};
+}
 
 function mapIds(hash) {
     return hash.match(/.{1,2}/g).filter(function (m) {return m !== '01'}).map(function (m) {

@@ -10,6 +10,10 @@ var fastHeaderLength = 9;
 var chargeHeaderLength = 9;
 var totalDpsHeaderLength = 5;
 
+function getCounterMatchupPokemon() {
+    return [];
+}
+
 function getTopHeader(index) {
     if (index < pokemonHeaderLength) {
         return $('#pokemon-header');

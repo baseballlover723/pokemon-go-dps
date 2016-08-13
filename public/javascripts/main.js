@@ -4,6 +4,10 @@
 // OffensiveRating = \frac{(pokemon.attack + 7) * (pokemon.stamina + 7) * (pokemon.defense + 7) * stabDps}{100,000}
 // AdjustedDPS = \frac{(pokemon.attack + 7) * stabDps}{2}
 var CALCULATE_CRIT = false;
+
+// TODO make route for different defending pokemon
+
+var typeModifiers = {};
 var inited = false;
 var staticPokemon = [];
 var selectedPokemon = [];
@@ -15,6 +19,19 @@ var pokemonHeaderLength = 7;
 var fastHeaderLength = 9;
 var chargeHeaderLength = 9;
 var totalDpsHeaderLength = 5;
+
+var types = {};
+
+populateStaticPokemon(function () {
+    makeSelectors();
+    // console.log(getCounterMatchupPokemon()[0].type1.getModifier(getCounterMatchupPokemon()[0].type1));
+    console.log("pokemon defenders: " + getCounterMatchupPokemon().map(function(poke) {return poke.name}).join(", "));
+    if (!types["dark"]) {
+        types["dark"] = generateDarkType(); // no dark type pokemon in gen 1
+    }
+    typeModifiers = calculateTypeModifiers();
+    console.log(typeModifiers);
+});
 
 function makePkmSelectionList(){
     var pkmbar = $('#pkmbar');
@@ -195,7 +212,18 @@ function addNewSelector(){
 }
 
 
-populateStaticPokemon(makeSelectors);
+
+// no dark type pokemon in gen 1
+function generateDarkType() {
+    var ghost = types["ghost"];
+    for (var type in ghost.weaknesses)  {
+        type = ghost.weaknesses[type];
+        if (type.name == "dark") {
+            type.__proto__ = Type.prototype; // some hacky shit to get types functions
+            return type;
+        }
+    }
+}
 
 function populateStaticPokemon(callback) {
     callback = callback || function () {};
@@ -206,8 +234,14 @@ function populateStaticPokemon(callback) {
                 pokemon = staticPokemonJson[pokemon];
                 pokemon = new Pokemon(pokemon);
                 pokemon.type1.__proto__ = Type.prototype; // some hacky shit to get types functions
+                if (!types[pokemon.type1.name]) {
+                    types[pokemon.type1.name] = pokemon.type1;
+                }
                 if (pokemon.type2) {
                     pokemon.type2.__proto__ = Type.prototype; // some hacky shit to get types functions
+                    if (!types[pokemon.type2.name]) {
+                        types[pokemon.type2.name] = pokemon.type2;
+                    }
                 }
                 staticPokemon.push(new Pokemon(pokemon));
             }
@@ -220,8 +254,35 @@ function populateStaticPokemon(callback) {
     })
 }
 
+// rename to getDefendingPokemon
 function getCounterMatchupPokemon() {
-    return [staticPokemon[0]];
+    return [staticPokemon[5], staticPokemon[19]];
+}
+
+// call everytime the defending pokemon list is changed
+function calculateTypeModifiers() {
+    var typeModifiers = {};
+    var defenders = getCounterMatchupPokemon();
+    for (var type in types) {
+        type = types[type];
+        var modifier = 1;
+        var count = 0;
+        for (var defender in  defenders) {
+            defender = defenders[defender];
+            modifier *= type.getModifier(defender.type1) * 20; // to deal with integers
+            count++;
+            if (defender.type2) {
+                modifier *= type.getModifier(defender.type2) * 20; // to deal with integers
+                count++;
+            }
+        }
+        typeModifiers[type.name] = modifier / Math.pow(20, count); // correction
+    }
+    return typeModifiers;
+}
+
+function getTypeModifier(typeModifiers, move) {
+    return typeModifiers[move.type.name];
 }
 
 function toProperCase(str) {
@@ -244,7 +305,9 @@ function calculateDPS(pokemon, stab) {
     var fm = pokemon.fastMove;
     var cm = pokemon.chargeMove;
     var fmDamage = stab ? pokemon.getSTABDamage(fm) : fm.damage;
+    fmDamage *= getTypeModifier(typeModifiers, fm);
     var cmDamage = stab ? pokemon.getSTABDamage(cm) : cm.damage;
+    cmDamage *= getTypeModifier(typeModifiers, cm);
     var critChance = CALCULATE_CRIT ? cm.critChance : 0;
     return ((cm.energyRequired * fmDamage / fm.energyGain) + (cmDamage * (1 + critChance / 2))) /
         ((cm.energyRequired * fm.duration / fm.energyGain) + cm.duration + 0.5);

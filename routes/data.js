@@ -29,9 +29,7 @@ var pokemonWithTypesStats = JSON.parse(fs.readFileSync("json/pokemonTypeStats.js
 var moveNames = JSON.parse(fs.readFileSync("json/moveNames.json"));
 
 // populatePokemonTypes();
-var types = {};
-
-populateTypes();
+var types = populateTypes();
 // populateBaseStats();
 var moves = {};
 
@@ -320,6 +318,7 @@ function isCachedValid(readCache, callback = function (movesCopy, isValid) {}) {
 }
 
 function populateTypes() {
+    var types = {};
     var json = fs.readFileSync('json/types.json');
     var typeStrs = JSON.parse(json);
     for (var typeName in typeStrs) {
@@ -334,6 +333,7 @@ function populateTypes() {
             type.strengths.push(types[strengthStr]);
         }
     }
+    return types;
 }
 
 function scrapeMoves(callback = function (moves) {}) {

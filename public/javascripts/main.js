@@ -35,6 +35,20 @@ function makePkmSelectionList(){
         if(pkm)lst.push(pkm);
     }
     selectedPokemon = lst;
+
+    if (selectors.length > 0) {
+    	var toggleAll = document.createElement('span');
+    	var btn = document.createElement('input');
+    	btn.id = 'mtoggle';
+        btn.setAttribute('type','checkbox');
+        btn.setAttribute('name', pkm.name + 'ONOFF');
+        btn.setAttribute('value', pkm.name);
+        $(btn).attr("checked","checked");
+        $(btn).change(massToggle);
+        $(toggleAll).text('Toggle All ');
+        $(toggleAll).prepend(btn);
+        $(pkmbar).append(toggleAll);
+    }
     //now adding checkboxes
     for (var i = 0; i < selectedPokemon.length; i++) {
         var pkm = selectedPokemon[i];
@@ -63,6 +77,26 @@ function makePkmSelectionList(){
     setToggledPokemon();
 }
 
+function massToggle(){
+	var lst = [];
+	mtg = $('#mtoggle');
+	//alert(mtg.attr('checked'));
+	var allon = mtg.prop('checked');
+	/*if (allon) {
+		mtg.attr('checked','unchecked');
+	}
+	else{
+		mtg.attr('checked','checked');
+	}*/
+    btns = document.getElementsByClassName('pkmchkbx');
+    //alert(allon);
+    for (var i = btns.length - 1; i >= 0; i--) {
+    	var btn = btns[i];
+    	if (allon) $(btn).prop('checked', true);
+    	else $(btn).prop('checked', false);
+    }
+}
+
 function setToggledPokemon(){
     
     var lst = [];
@@ -80,7 +114,9 @@ function setToggledPokemon(){
     }
     }
     toggledPokemon = lst;
-    
+    if (toggledPokemon.length > 0) {
+    	$('#mtoggle').prop('checked',true);
+    }
     /*var strr = '';
     for (var i = toggledPokemon.length - 1; i >= 0; i--) {
         strr = strr + toggledPokemon[i].name + ' ';
@@ -110,7 +146,7 @@ function addNewSelector(){
     var span2 = document.createElement('span');
     var inp1 = document.createElement('select');
     //inp1.setAttribute('multiple',"multiple");
-    $(inp1).css('width','300px');
+    $(inp1).css('width','125px');
     $(inp1).addClass('pkmSelect2');
     //var smt = document.createElement('input');
     //smt.type = "submit";
@@ -127,7 +163,9 @@ function addNewSelector(){
     var that = inp1;
     $(inp1).on("select2:select",(x => (function(event,tht){
         makePkmSelectionList();
-        if(tht == selectors[selectors.length - 1]) addNewSelector();
+        if(tht == selectors[selectors.length - 1] && selectors.length < 10) {
+        	addNewSelector();
+        }
     })(x,that)));
     /*$(inp1).on("select2:opening",(x => (function(event,tht){
         alert('here');
@@ -145,6 +183,7 @@ function addNewSelector(){
         }
         makePkmSelectionList();
     })(x,that)));
+    $(span2).css('margin-right','20px');
     $(span2).append(inp1);
     area.append(span2);
     selectors.push(inp1);

@@ -7,6 +7,7 @@ var CALCULATE_CRIT = false;
 var inited = false;
 var staticPokemon = [];
 var selectedPokemon = [];
+var toggledPokemon = [];
 
 var pokemonHeaderLength = 7;
 var fastHeaderLength = 9;
@@ -16,75 +17,104 @@ var totalDpsHeaderLength = 5;
 function makePkmSelectionList(){
     pkmbar = document.getElementById('pkmbar');
     pkmbar.innerHTML = '';
-    for (var i = 0; i<selectedPokemon.length; i++) {
-        pkm = selectedPokemon[i];
-        var temp = document.createElement('button');
-        $(temp).text(pkm.name);
-        $(temp).click(x => pkmRemove(x));
-        $(pkmbar).append(temp);
+    inp = $('#pkmselinp1');
+    var V = inp.val();
+    if(V === null) return true;
+    var namelst = V.toString().split(',');
+    //setting selected pokemon list
+    lst = [];
+    for (var i = 0; i < namelst.length; i++) {
+        var name = namelst[i];
+        var pkm = getPkmByName(name);
+        if(!pkm){
+            alert('invalid pokemon selected!');
+            return false;
+        }
+        lst.push(pkm);
     }
+    selectedPokemon = lst;
+    //now adding checkboxes
+    for (var i = 0; i < selectedPokemon.length; i++) {
+        var pkm = selectedPokemon[i];
+        var span = document.createElement('span');
+        var btn = document.createElement('input');
+        btn.setAttribute('type','checkbox');
+        btn.setAttribute('name', pkm.name + 'ONOFF');
+        btn.setAttribute('value', pkm.name);
+        btn.setAttribute('class', 'pkmchkbx');
+        var checked = false;
+        for (var j = 0; j < toggledPokemon.length; j++) {
+            var tpkm = toggledPokemon[j];
+            if (pkm.name === tpkm.name) {
+                checked = true;
+                break;
+            }
+        }
+        //if (checked) {
+            $(btn).attr("checked","checked");
+        //}
+        $(btn).change(setToggledPokemon);
+        $(span).text(pkm.name + ' ');
+        $(span).prepend(btn);
+        $(pkmbar).append(span);
+    }
+    setToggledPokemon();
+}
+
+function setToggledPokemon(){
+    var lst = [];
+    btns = document.getElementsByClassName('pkmchkbx');
+    for (var i = 0; i < btns.length; i++) {
+        var name = btns[i].value;
+        if (btns[i].checked) {
+        for (var i = selectedPokemon.length - 1; i >= 0; i--) {
+            var pkm = selectedPokemon[i];
+            if (pkm.name === name) {
+                lst.push(pkm);
+                break;
+            }
+        }
+    }
+    }
+    toggledPokemon = lst;
+    /*for (var i = toggledPokemon.length - 1; i >= 0; i--) {
+        alert(toggledPokemon[i].name);
+    }*/
+}
+
+function getPkmByName(name){
+    for (var i = staticPokemon.length - 1; i >= 0; i--) {
+        if(staticPokemon[i].name === name) return staticPokemon[i];
+    }
+    return null;
 }
 
 function makeSelectors(){
     var pkmbar = document.createElement('span');
     pkmbar.id = 'pkmbar';
-
     var area = $('#selection');
     var frm = document.createElement('form');
     frm.id = 'pkmfrm1';
-    //frm.setAttribute('onsubmit',"return pkmSelect();");
-    $(frm).submit(pkmSelect);
-    var inp1 = document.createElement('input');
-    inp1.setAttribute('list',"pkmlst");
-    inp1.name = "pkmSelection";
+    var inp1 = document.createElement('select');
+    inp1.setAttribute('multiple',"multiple");
+    $(inp1).css('width','300px');
     inp1.id = 'pkmselinp1';
-    var dl = document.createElement('datalist');
     var smt = document.createElement('input');
     smt.type = "submit";
-    dl.id="pkmlst";
     for (var i = 0; i < staticPokemon.length; i++) {
         var temp = document.createElement('option');
         pkm = staticPokemon[i];
         temp.value = pkm.name;
-        $(dl).append(temp);
+        $(temp).text(pkm.name);
+        $(inp1).append(temp);
     }
     $(frm).append(inp1);
-    $(frm).append(dl);
-    $(frm).append(smt);
-    area.append(pkmbar);
+    $(inp1).on('change',makePkmSelectionList);
     area.append(frm);
-    makePkmSelectionList();
+    area.append(pkmbar);
+    $(inp1).select2({placeholder: "Select Pokemon", allowClear: true});
 }
 
-function pkmRemove(pkm){
-    selectedPokemon.splice(selectedPokemon.indexOf(pkm),1);
-    makePkmSelectionList();
-}
-
-function pkmSelect(event){
-    event.preventDefault();
-    var inp1 = $('#pkmselinp1');
-    var name = inp1.val();
-    spkm = null;
-    for (var i = staticPokemon.length - 1; i >= 0; i--) {
-        var pkm = staticPokemon[i];
-        if(pkm.name === name){
-            spkm = pkm;
-            break;
-        }
-    }
-    if(!spkm){
-        alert('Error: invalid selection');
-        return false;
-    }
-    if(true)selectedPokemon.push(spkm);//!selectedPokemon.includes(spkm)
-    else {
-        alert('Error: invalid selection');
-        return false;
-    }
-    $('#pkmfrm1').trigger('reset');
-    makePkmSelectionList();
-}
 
 populateStaticPokemon(makeSelectors);
 

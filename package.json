@@ -23,6 +23,7 @@
     "morgan": "~1.7.0",
     "parse-duration": "^0.1.1",
     "request": "^2.74.0",
+    "select2": "^4.0.3",
     "serve-favicon": "~2.3.0",
     "sticky-table-headers": "^0.1.19"
   }

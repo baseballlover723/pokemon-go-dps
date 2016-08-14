@@ -72,6 +72,7 @@ function makePkmSelectionList(){
         $(btn).change(setToggledPokemon);
         $(span).text(pkm.name + ' ');
         $(span).prepend(btn);
+        $(span).css('margin-left','10px');
         pkmbar.append(span);
     }
     setToggledPokemon();
@@ -116,6 +117,9 @@ function setToggledPokemon(){
     toggledPokemon = lst;
     if (toggledPokemon.length > 0) {
     	$('#mtoggle').prop('checked',true);
+    }
+    else{
+    	$('#mtoggle').prop('checked',false);
     }
     /*var strr = '';
     for (var i = toggledPokemon.length - 1; i >= 0; i--) {

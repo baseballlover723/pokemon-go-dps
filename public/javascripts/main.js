@@ -5,34 +5,75 @@
 // AdjustedDPS = \frac{(pokemon.attack + 7) * stabDps}{2}
 var CALCULATE_CRIT = false;
 
-// TODO make route for different defending pokemon
-
+// TODO in the middle of updating query
+// TODO if jquery.param need to stop search=<<blank>>
+// consider set falsey values to undefined
+// TODO if other encode, how to encode object
+// TODO  merge with jared
+var dataTable;
 var typeModifiers = {};
 var inited = false;
 var staticPokemon = [];
-var selectedPokemon = [];
-var toggledPokemon = [];
-var selectors = [];
+var queryObject = {}; // {search : "", gym: int[id], toggleOff: int[index]}
+for (var key in jsVars.query) {
+    queryObject[key] = jsVars.query[key];
+}
 
 var pokemonHeaderLength = 7;
 var fastHeaderLength = 9;
 var chargeHeaderLength = 9;
 var totalDpsHeaderLength = 5;
 
+var DPS_COLUMNS = [];
+var end = pokemonHeaderLength + fastHeaderLength;
+for (var i = end - 3; i < end; i++) {
+    DPS_COLUMNS.push(i); // dps columns are the last 3 of fast move
+}
+end += chargeHeaderLength;
+for (var i = end - 3; i < end; i++) {
+    DPS_COLUMNS.push(i); // dps columns are the last 3 of charge move
+}
+end += totalDpsHeaderLength - 1;
+for (var i = end - 4; i < end; i++) {
+    DPS_COLUMNS.push(i); // dps columns are the first 4 of total dps
+}
+
 var types = {};
 
 populateStaticPokemon(function () {
     // makeSelectors();\
+    removeTempComboBox();
+    loadInitialComboBoxes();
     addDefenderComboBox();
-    // addDefenderComboBox();
-    console.log(getDefendingPokemon());
-    console.log("pokemon defenders: " + getDefendingPokemon().map(function (poke) {return poke.name}).join(", "));
     if (!types["dark"]) {
         types["dark"] = generateDarkType(); // no dark type pokemon in gen 1
     }
     // typeModifiers = calculateTypeModifiers();
-    console.log(JSON.stringify(typeModifiers));
 });
+
+function loadInitialComboBoxes() {
+    var initialPokemonIds = jsVars.query.gym.split(" ").map(function(id) {return parseInt(id)});
+    var toggledOffs = jsVars.query.toggleOff.split(" ").map(function(index) {return parseInt(index)});
+    if (toggledOffs.length == initialPokemonIds.length) {
+        $('#global-defender-toggle').prop("checked", false);
+    }
+
+    for (var index = 0; index < initialPokemonIds.length; index++) {
+        var id = initialPokemonIds[index];
+        var comboBox = addDefenderComboBox();
+        comboBox.val(id).trigger("change");
+
+        var toggledOff = toggledOffs.indexOf(index) >= 0;
+        if (toggledOff) {
+            $('.defender-toggle:last').prop("checked", false);
+        }
+    }
+    calculateTypeModifiers();
+}
+
+function removeTempComboBox() {
+    $('#temp-select').remove();
+}
 
 // I will call this function to get the list of currently toggled on pokemon objects
 function getDefendingPokemon() {
@@ -104,7 +145,7 @@ function addDefenderComboBox() {
     if ($('.defender-combo-box').length < 10) {
         var row = $('<div class="col-sm-2 col-md-2 col-lg-1"></div>');
         $('#defenders').append(row);
-        generateDefenderComboBox(row);
+        return generateDefenderComboBox(row);
     }
 }
 
@@ -136,15 +177,14 @@ function generateDefenderComboBox(parent) {
 
     comboBox.on("select2:unselecting", function (event) {
         var self = $(this);
-        setTimeout(function () {
-            comboBox.select2("destroy");
-            // console.log(this);
-            self.parent().remove();
-            if (!hasEmptyComboBox()) {
-                addDefenderComboBox();
-            }
-            calculateTypeModifiers();
-        }, 0);
+        comboBox.select2("destroy");
+        self.parent().remove();
+        console.log("removed");
+        if (!hasEmptyComboBox()) {
+            addDefenderComboBox();
+        }
+        calculateTypeModifiers();
+       event.preventDefault();
     });
 
     var toggle = $('<input type="checkbox" class="defender-toggle">');
@@ -191,176 +231,6 @@ function hasEmptyComboBox() {
     }
     return false;
 }
-
-/*
- function makePokemonSelectionList() {
- var pokemonBar = $('#toggle-bar');
- pokemonBar.empty(); // lets see if we can not empty the entire bar, consider the case where you have some toggled on and some off, you add a
- // pokemon and now everything is toggled on
- var defenderComboBox = $('.pokemonSelect2');
- var pokemonIdList = [];
- for (var i = 0; i < defenderComboBox.length; i++) {
- pokemonIdList.push(defenderComboBox[i].value);
- }
- console.log(pokemonIdList);
- lst = [];
- for (var id in pokemonIdList) {
- var id = pokemonIdList[id];
- var pokemon = staticPokemon[id - 1];
- if (pokemon) {
- lst.push(pokemon);
- } else {
- //alert('invalid pokemon selected!');
- //return false;
- }
- }
- selectedPokemon = lst;
-
- if (selectors.length > 0) {
- var toggleAll = document.createElement('span');
- var toggleButton = document.createElement('input');
- toggleButton.id = 'mtoggle';
- console.log(pokemon);
- toggleButton.setAttribute('type', 'checkbox');
- toggleButton.setAttribute('name', pokemon.name + 'ONOFF');
- toggleButton.setAttribute('value', pokemon.name);
- $(toggleButton).attr("checked", "checked");
- $(toggleButton).change(massToggle);
- $(toggleAll).text('Toggle All ');
- $(toggleAll).prepend(toggleButton);
- $(pokemonBar).append(toggleAll);
- }
- //now adding checkboxes
- for (var i = 0; i < selectedPokemon.length; i++) {
- var pkm = selectedPokemon[i];
- var span = document.createElement('span');
- var btn = document.createElement('input');
- btn.setAttribute('type', 'checkbox');
- btn.setAttribute('name', pkm.name + 'ONOFF');
- btn.setAttribute('value', pkm.name);
- btn.setAttribute('class', 'pkmchkbx');
- var checked = false;
- for (var j = 0; j < toggledPokemon.length; j++) {
- var tpkm = toggledPokemon[j];
- if (pkm.name === tpkm.name) {
- checked = true;
- break;
- }
- }
- //if (checked) {
- $(btn).attr("checked", "checked");
- //}
- $(btn).change(setToggledPokemon);
- $(span).text(pkm.name + ' ');
- $(span).prepend(btn);
- $(span).css('margin-left', '10px');
- pokemonBar.append(span);
- }
- setToggledPokemon();
- }
-
- function massToggle() {
- var lst = [];
- mtg = $('#mtoggle');
- //alert(mtg.attr('checked'));
- var allon = mtg.prop('checked');
- btns = document.getElementsByClassName('pkmchkbx');
- //alert(allon);
- for (var i = btns.length - 1; i >= 0; i--) {
- var btn = btns[i];
- if (allon) {
- $(btn).prop('checked', true);
- } else {
- $(btn).prop('checked', false);
- }
- }
- }
-
- function setToggledPokemon() {
-
- var lst = [];
- btns = document.getElementsByClassName('pkmchkbx');
- for (var i = 0; i < btns.length; i++) {
- var name = btns[i].value;
- if (btns[i].checked) {
- for (var j = selectedPokemon.length - 1; j >= 0; j--) {
- var pkm = selectedPokemon[j];
- if (pkm.name === name) {
- lst.push(pkm);
- break;
- }
- }
- }
- }
- toggledPokemon = lst;
- if (toggledPokemon.length > 0) {
- $('#mtoggle').prop('checked', true);
- } else {
- $('#mtoggle').prop('checked', false);
- }
- }
-
- function getPkmByName(name) {
- for (var i = staticPokemon.length - 1; i >= 0; i--) {
- if (staticPokemon[i].name === name) {
- return staticPokemon[i];
- }
- }
- return null;
- }
-
- function makeSelectors() {
- //var pokem-bar = document.createElement('span');
- //pokem-bar.id = 'pokem-bar';
- //var area = $('#defenders');
- //area.append(pokem-bar);
- addNewSelector();
- }
-
- function addNewSelector() {
- var area = $('#defenders');
- //var frm = document.createElement('form');
- //frm.id = 'pkmfrm1';
- var span2 = document.createElement('span');
- var inp1 = document.createElement('select');
- //inp1.setAttribute('multiple',"multiple");
- $(inp1).css('width', '125px');
- $(inp1).addClass('pokemonSelect2');
- //var smt = document.createElement('input');
- //smt.type = "submit";
- var temp = document.createElement('option');
- $(inp1).append(temp);
- for (var i = 0; i < staticPokemon.length; i++) {
- var temp = document.createElement('option');
- pkm = staticPokemon[i];
- temp.value = pkm.id;
- $(temp).text(pkm.name);
- $(inp1).append(temp);
- }
- //$(frm).append(inp1);
- var that = inp1;
- $(inp1).on("select2:select", (x => (function (event, tht) {
- makePokemonSelectionList();
- if (tht == selectors[selectors.length - 1] && selectors.length < 10) {
- addNewSelector();
- }
- })(x, that)));
- $(inp1).on("select2:unselecting", (x => (function (event, tht) {
- if (selectors.length > 1) {
- var pr = $(tht).parent();
- selectors.splice(selectors.indexOf(tht), 1);
- $(tht).select2('destroy');
- pr.remove();
- }
- makePokemonSelectionList();
- })(x, that)));
- $(span2).css('margin-right', '20px');
- $(span2).append(inp1);
- area.append(span2);
- selectors.push(inp1);
- $(inp1).select2({placeholder: "Select Pokemon", allowClear: true});
- }
- */
 
 // no dark type pokemon in gen 1
 function generateDarkType() {
@@ -422,13 +292,38 @@ function calculateTypeModifiers() {
         }
         typeModifiersCopy[type.name] = modifier / Math.pow(20, count); // correction
     }
-    console.log(typeModifiersCopy);
     typeModifiers = typeModifiersCopy;
     updateTypeModifierTableData();
+
+    // update url
+    var gym = [];
+    var comboBoxes = $('.defender-combo-box');
+    var toggles = $('.defender-toggle');
+    var toggleList = [];
+    for (var index = 0; index < comboBoxes.length; index++) {
+        var comboBox = $(comboBoxes[index]);
+        var toggle = $(toggles[index]);
+        var id = comboBox.val();
+        if (id) {
+            gym.push(id);
+            if (!toggle.prop("checked")) {
+                toggleList.push(index);
+            }
+        }
+    }
+
+    queryObject.gym = gym;
+    queryObject.toggleOff = toggleList;
+    updateQuery();
+
+    console.time("update typing");
+    dataTable.cells(null, DPS_COLUMNS).invalidate();
+    dataTable.draw();
+    console.timeEnd("update typing");
 }
 
-function getTypeModifier(typeModifiers, move) {
-    return typeModifiers[move.type.name];
+function getTypeModifier(move) {
+    return typeModifiers[move.type.name] || 1;
 }
 
 function toProperCase(str) {
@@ -451,9 +346,9 @@ function calculateDPS(pokemon, stab) {
     var fm = pokemon.fastMove;
     var cm = pokemon.chargeMove;
     var fmDamage = stab ? pokemon.getSTABDamage(fm) : fm.damage;
-    fmDamage *= getTypeModifier(typeModifiers, fm);
+    fmDamage *= getTypeModifier(fm);
     var cmDamage = stab ? pokemon.getSTABDamage(cm) : cm.damage;
-    cmDamage *= getTypeModifier(typeModifiers, cm);
+    cmDamage *= getTypeModifier(cm);
     var critChance = CALCULATE_CRIT ? cm.critChance : 0;
     return ((cm.energyRequired * fmDamage / fm.energyGain) + (cmDamage * (1 + critChance / 2))) /
         ((cm.energyRequired * fm.duration / fm.energyGain) + cm.duration + 0.5);
@@ -466,8 +361,11 @@ String.prototype.replaceAll = function (search, replacement) {
 $(document).ready(function () {
     $('#last-update-time').text(moment.tz(jsVars.lastUpdatedTime, moment.tz.guess()).format("LLLL z"));
     $('#next-update-time').text(moment.tz(jsVars.nextUpdateTime, moment.tz.guess()).format("LLLL z"));
+    $('#temp-select select').select2({
+        placeholder: "Loading", allowClear: true
+    });
 
-    var dataTable = $('#data-table').DataTable({
+    dataTable = $('#data-table').DataTable({
         ajax: {
             url: "/data", dataSrc: function (jsonStr) {
                 var pokemons = CircularJSON.parse(JSON.stringify(jsonStr)).data;
@@ -515,16 +413,19 @@ $(document).ready(function () {
         }, {
             title: "DPS", data: "fastMove", render: function (data, type, pokemon) {
                 var dps = data.damage / data.duration;
+                dps *= getTypeModifier(data);
                 return dps.toFixed(3);
             }
         }, {
             title: "STAB DPS", data: "fastMove", render: function (data, type, pokemon) {
                 var dps = pokemon.getSTABDamage(data) / data.duration;
+                dps *= getTypeModifier(data);
                 return dps.toFixed(3);
             }
         }, {
             title: "Adjusted DPS", data: "fastMove", render: function (data, type, pokemon) {
                 var dps = (pokemon.attack + 7) * pokemon.getSTABDamage(data) / data.duration / 2;
+                dps *= getTypeModifier(data);
                 return dps.toFixed(3);
             }
         }, {title: "Move Name", data: "chargeMove.name"}, {
@@ -542,6 +443,7 @@ $(document).ready(function () {
         }, {
             title: "DPS", data: "chargeMove", render: function (data, type, pokemon) {
                 var dps = data.damage / data.duration;
+                dps *= getTypeModifier(data);
                 if (CALCULATE_CRIT) {
                     dps *= (data.critChance / 2 + 1)
                 }
@@ -550,6 +452,7 @@ $(document).ready(function () {
         }, {
             title: "STAB DPS", data: "chargeMove", render: function (data, type, pokemon) {
                 var dps = pokemon.getSTABDamage(data) / data.duration;
+                dps *= getTypeModifier(data);
                 if (CALCULATE_CRIT) {
                     dps *= (data.critChance / 2 + 1)
                 }
@@ -558,6 +461,7 @@ $(document).ready(function () {
         }, {
             title: "Adjusted DPS", data: "chargeMove", render: function (data, type, pokemon) {
                 var dps = (pokemon.attack + 7) * pokemon.getSTABDamage(data) / (data.duration + 0.5) / 2;
+                dps *= getTypeModifier(data);
                 if (CALCULATE_CRIT) {
                     dps *= (data.critChance / 2 + 1)
                 }
@@ -634,7 +538,8 @@ $(document).ready(function () {
         header.append("<th id='charge-header' colspan='" + chargeHeaderLength + "' class='charge-move-highlight'>Charge Move</th>");
         header.append("<th id='total-dps-header' colspan='" + totalDpsHeaderLength + "'>Fast & Charge</th>");
         $('#data-table thead').prepend(header);
-        dataTable.search(jsVars.search).draw();
+        // dataTable.search(jsVars.search).draw();
+        dataTable.search(queryObject.search).draw();
         $('#data-table').stickyTableHeaders();
         inited = true;
     });
@@ -654,7 +559,8 @@ $(document).ready(function () {
 
     $("#data-table_filter input").on("keyup", function (event) {
         var search = dataTable.search();
-        window.history.replaceState("page1", "title", "?search=" + search.replaceAll("#", "%23"));
+        queryObject.search = search;
+        updateQuery();
     });
 
     dataTable.on('order.dt', function () {
@@ -699,44 +605,6 @@ $(document).ready(function () {
             }
         });
     }).draw();
-    // dataTable.on("responsive-resize", function (e, datatable, columns) {
-    //     var pokemonStart = 0;
-    //     var fastHeader = 3;
-    //     var chargeHeader = 10;
-    //     var totalDpsHeader = 18;
-    //
-    //     var pokemon = 0;
-    //     var fast = 0;
-    //     var charge = 0;
-    //     var total = 0;
-    //     for (var i in columns) {
-    //         if (i >= pokemonStart && i < fastHeader) {
-    //             if (columns[i]) {
-    //                 pokemon++;
-    //             }
-    //         } else if (i >= fastHeader && i < chargeHeader) {
-    //             if (columns[i]) {
-    //                 fast++;
-    //             }
-    //         } else if (i >= chargeHeader && i < totalDpsHeader) {
-    //             if (columns[i]) {
-    //                 charge++;
-    //             }
-    //         } else {
-    //             if (columns[i]) {
-    //                 total++;
-    //             }
-    //         }
-    //     }
-    //     $('#pokemon-header').attr("colspan", pokemon);
-    //     $('#fast-header').attr("colspan", fast);
-    //     $('#charge-header').attr("colspan", charge);
-    //     $('#total-dps-header').attr("colspan", total);
-    //     console.log([pokemon, fast, charge, total]);
-    //     console.log($('#charge-header').attr("colspan"));
-    //     console.log($('#total-dps-header').attr("colspan"));
-    //     console.log("resize");
-    // });
 });
 
 $('a.modal-trigger').on('click', function () {
@@ -761,6 +629,33 @@ $("#refresh").on("click", function () {
         $(location).attr('href', '/refresh');
     }
 });
+
+function updateQuery() {
+    console.log(queryObject);
+    var queryStr = encodeQueryData(queryObject);
+    window.history.replaceState("page1", "title", "?" + queryStr);
+}
+
+function encodeQueryData(data) {
+    // var ret = [];
+    // for (var d in data) {
+    //     if (data[d] && data[d].length > 0) {
+    //         ret.push(encodeURIComponent(d) + "=" + encodeURIComponent(data[d]));
+    //     }
+    // }
+    // return ret.join("&");
+    var arr = {};
+    for (var i in data) {
+        if (data[i] && data[i].length > 0) {
+            if (Array.isArray(data[i])) {
+                arr[i] = data[i].join(" ");
+            } else {
+                arr[i] = data[i];
+            }
+        }
+    }
+    return $.param(arr);
+}
 
 var closeAlert;
 function showAlert(message, alertType) {

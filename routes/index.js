@@ -7,8 +7,11 @@ var data = require('./data');
 /* GET home page. */
 router.get('/', function (req, res, next) {
     data.checkCache(function (lastUpdatedTime, nextUpdateTime) {
-        var search = req.query.search || "";
-        res.expose(search, "search");
+        req.query.search = req.query.search || "";
+        req.query.gym = req.query.gym || [];
+        req.query.toggleOff = req.query.toggleOff || [];
+        // res.expose(req.query.search || "", "search");
+        res.expose(req.query, "query");
         res.expose(lastUpdatedTime, "lastUpdatedTime");
         res.expose(nextUpdateTime, "nextUpdateTime");
         res.expose(data.getNextRefreshTime(), "nextClientRefreshTime");

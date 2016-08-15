@@ -14,7 +14,7 @@ var dataTable;
 var typeModifiers = {};
 var inited = false;
 var staticPokemon = [];
-var queryObject = {}; // {search : "", gym: int[id], toggleOff: int[index]}
+var queryObject = {}; // {search : "", gym: int[id], toggleComboBox: int[index]}
 for (var key in jsVars.query) {
     queryObject[key] = jsVars.query[key];
 }
@@ -42,18 +42,21 @@ var types = {};
 
 populateStaticPokemon(function () {
     // makeSelectors();\
-    removeTempComboBox();
-    loadInitialComboBoxes();
-    addDefenderComboBox();
     if (!types["dark"]) {
         types["dark"] = generateDarkType(); // no dark type pokemon in gen 1
     }
+    removeTempComboBox();
+    loadInitialComboBoxes();
+    addDefenderComboBox();
     // typeModifiers = calculateTypeModifiers();
 });
 
 function loadInitialComboBoxes() {
+    if (jsVars.query.gym == "") {
+        return;
+    }
     var initialPokemonIds = jsVars.query.gym.split(" ").map(function(id) {return parseInt(id)});
-    var toggledOffs = jsVars.query.toggleOff.split(" ").map(function(index) {return parseInt(index)});
+    var toggledOffs = jsVars.query.toggleOff == "" ? [] : jsVars.query.toggleOff.split(" ").map(function(index) {return parseInt(index)});
     if (toggledOffs.length == initialPokemonIds.length) {
         $('#global-defender-toggle').prop("checked", false);
     }
@@ -66,6 +69,7 @@ function loadInitialComboBoxes() {
         var toggledOff = toggledOffs.indexOf(index) >= 0;
         if (toggledOff) {
             $('.defender-toggle:last').prop("checked", false);
+            $('.select2-selection:last').addClass("toggled-off");
         }
     }
     calculateTypeModifiers();
@@ -151,7 +155,6 @@ function addDefenderComboBox() {
 
 function generateDefenderComboBox(parent) {
     var comboBox = $('<select class="defender-combo-box" style="width: 100%"></select>');
-    // console.log("generate combo box");
     parent.append(comboBox);
     comboBox.select2({
         placeholder: "Select Pokemon", allowClear: true, data: (function () {
@@ -163,8 +166,12 @@ function generateDefenderComboBox(parent) {
             return dataArray;
         }())
     });
+
+    if (!$('#global-defender-toggle').prop("checked")) {
+        toggleComboBox(comboBox, false);
+    }
+
     comboBox.on("select2:selecting", function (event) {
-        // console.log(event.params.args.data);
         var id = comboBox.val();
         if (!id) { // if this was empty before, add a new comboBox
             addDefenderComboBox();
@@ -172,30 +179,44 @@ function generateDefenderComboBox(parent) {
     });
 
     comboBox.on("select2:select", function (event) {
-        calculateTypeModifiers();
+        var toggledOff = comboBox.next().children().first().children().first().hasClass("toggled-off");
+        if (!toggledOff) {
+            calculateTypeModifiers();
+        }
     });
 
     comboBox.on("select2:unselecting", function (event) {
-        var self = $(this);
+        var toggledOff = comboBox.next().children().first().children().first().hasClass("toggled-off");
         comboBox.select2("destroy");
-        self.parent().remove();
-        console.log("removed");
+        comboBox.parent().remove();
         if (!hasEmptyComboBox()) {
             addDefenderComboBox();
         }
-        calculateTypeModifiers();
-       event.preventDefault();
+        if (!toggledOff) {
+            calculateTypeModifiers();
+        }
+        event.preventDefault();
     });
 
     var toggle = $('<input type="checkbox" class="defender-toggle">');
     toggle.prop("checked", $('#global-defender-toggle').prop("checked"));
     toggle.change(function () {
-        calculateTypeModifiers();
-        updateGlobalToggle();
+        toggleComboBox(comboBox);
     });
     parent.append("Include in Calc? &nbsp;");
     parent.append(toggle);
     return comboBox;
+}
+
+function toggleComboBox(comboBox, triggerUpdate) {
+    triggerUpdate = triggerUpdate == undefined ? true : triggerUpdate;
+    var renderedComboBox = comboBox.next().children().first().children().first();
+    renderedComboBox.toggleClass("toggled-off");
+
+    if (triggerUpdate) {
+        calculateTypeModifiers();
+        updateGlobalToggle();
+    }
 }
 
 function updateGlobalToggle() {
@@ -213,10 +234,17 @@ function updateGlobalToggle() {
 
 $('#global-defender-toggle').change(function () {
     var globalToggle = $('#global-defender-toggle');
+    var renderedComboBoxes = $('.select2-selection');
     var toggles = $('.defender-toggle');
+    var toggledOn = globalToggle.prop("checked");
     for (var index = 0; index < toggles.length; index++) {
         var toggle = $(toggles[index]);
-        toggle.prop("checked", globalToggle.prop("checked"));
+        toggle.prop("checked", toggledOn);
+        if (toggledOn) {
+            renderedComboBoxes.removeClass("toggled-off");
+        } else {
+            renderedComboBoxes.addClass("toggled-off");
+        }
     }
     calculateTypeModifiers();
 });
@@ -316,10 +344,10 @@ function calculateTypeModifiers() {
     queryObject.toggleOff = toggleList;
     updateQuery();
 
-    console.time("update typing");
+    console.time("update table");
     dataTable.cells(null, DPS_COLUMNS).invalidate();
     dataTable.draw();
-    console.timeEnd("update typing");
+    console.timeEnd("update table");
 }
 
 function getTypeModifier(move) {
@@ -614,7 +642,6 @@ $('a.modal-trigger').on('click', function () {
 });
 
 $("#refresh").on("click", function () {
-    console.log("clicked");
     if (moment().isBefore(jsVars.nextClientRefreshTime)) {
         var timeUntilRefresh = moment.preciseDiff(moment(jsVars.nextClientRefreshTime), moment());
         showAlert("This site has already been updated recently, you can update it again in <span id='refresh-time'>" + timeUntilRefresh + "</span>",
@@ -631,7 +658,6 @@ $("#refresh").on("click", function () {
 });
 
 function updateQuery() {
-    console.log(queryObject);
     var queryStr = encodeQueryData(queryObject);
     window.history.replaceState("page1", "title", "?" + queryStr);
 }

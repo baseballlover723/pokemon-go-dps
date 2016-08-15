@@ -86,3 +86,7 @@ img {
 .defender-toggle {
     margin-bottom: 10px;
 }
+
+#defenders .toggled-off {
+    background-color: lightGrey !important;
+}

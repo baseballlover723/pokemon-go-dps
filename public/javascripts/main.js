@@ -25,21 +25,32 @@ populateStaticPokemon(function () {
     // makeSelectors();\
     addDefenderComboBox();
     // addDefenderComboBox();
-    // console.log(getDefendingPokemon()[0].type1.getModifier(getDefendingPokemon()[0].type1));
+    console.log(getDefendingPokemon());
     console.log("pokemon defenders: " + getDefendingPokemon().map(function (poke) {return poke.name}).join(", "));
     if (!types["dark"]) {
         types["dark"] = generateDarkType(); // no dark type pokemon in gen 1
     }
-    typeModifiers = calculateTypeModifiers();
+    // typeModifiers = calculateTypeModifiers();
     console.log(JSON.stringify(typeModifiers));
 });
 
 // I will call this function to get the list of currently toggled on pokemon objects
 function getDefendingPokemon() {
-    return [staticPokemon[5], staticPokemon[19]];
+    var defendingPokemon = [];
+    var comboBoxes = $('.defender-combo-box');
+    for (var index=0; index < comboBoxes.length; index++) {
+        var comboBox = $(comboBoxes[index]);
+        // TODO check checkboxes
+        var id = comboBox.val();
+        if (id) {
+            defendingPokemon.push(staticPokemon[comboBox.val() - 1]);
+        }
+    }
+    return defendingPokemon;
+    // return [staticPokemon[5], staticPokemon[19]];
 }
 
-function setTypeModifierTableData() {
+function updateTypeModifierTableData() {
     var table = $('#typeModifierData');
     table.empty();
     //alert(JSON.stringify(typeModifiers));
@@ -99,8 +110,12 @@ function generateDefenderComboBox(parent) {
         if (!id) { // if this was empty before, add a new comboBox
             addDefenderComboBox();
         }
+    });
+
+    comboBox.on("select2:select", function(event) {
         calculateTypeModifiers();
     });
+
     comboBox.on("select2:unselecting", function (event) {
         var self = $(this);
         setTimeout(function () {
@@ -110,6 +125,7 @@ function generateDefenderComboBox(parent) {
             if (!hasEmptyComboBox()) {
                 addDefenderComboBox();
             }
+            calculateTypeModifiers();
         }, 0);
     });
     // $(inp1).on("select2:select", (x => (function (event, tht) {
@@ -350,7 +366,7 @@ function populateStaticPokemon(callback) {
 
 // call everytime the defending pokemon list is changed
 function calculateTypeModifiers() {
-    var typeModifiers = {};
+    var typeModifiersCopy = {}; // make a copy so that you don't get any weird errors if you try and calculate dps with it in the middle
     var defenders = getDefendingPokemon();
     for (var type in types) {
         type = types[type];
@@ -365,10 +381,11 @@ function calculateTypeModifiers() {
                 count++;
             }
         }
-        typeModifiers[type.name] = modifier / Math.pow(20, count); // correction
+        typeModifiersCopy[type.name] = modifier / Math.pow(20, count); // correction
     }
-    // console.log(typeModifiers);
-    return typeModifiers;
+    console.log(typeModifiersCopy);
+    typeModifiers = typeModifiersCopy;
+    updateTypeModifierTableData();
 }
 
 function getTypeModifier(typeModifiers, move) {

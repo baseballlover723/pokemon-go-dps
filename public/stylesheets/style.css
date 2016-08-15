@@ -36,6 +36,11 @@ img {
     text-align: center;
 }
 
+#gym-defender-header {
+    font-size: 16.5px;
+    margin: 5px 0;
+}
+
 .navbar-right {
     margin-right: 50px;
 }
@@ -70,5 +75,13 @@ img {
 }
 
 .btn-group {
+    margin-bottom: 10px;
+}
+
+.select2 {
+    width: 100%; !important;
+}
+
+.defender-toggle {
     margin-bottom: 10px;
 }

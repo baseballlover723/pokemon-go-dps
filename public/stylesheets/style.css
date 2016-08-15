@@ -17,6 +17,7 @@ th {
 
 img {
     margin: 3px 20px 8px 0;
+    max-width: 100%;
 }
 
 #data-table th {

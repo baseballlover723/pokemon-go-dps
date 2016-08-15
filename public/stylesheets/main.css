@@ -175,7 +175,8 @@ textarea {
     margin: 20px; 
     width: 250px; 
     text-align: left; 
-    float: right; 
+    /*float: right; 
+    margin-right: 90px;*/
     /*border: 2px outset gray;*/
 }
 
@@ -286,10 +287,12 @@ textarea {
     tr,
     img {
         page-break-inside: avoid;
+        /*max-width: 100%;*/
     }
 
     img {
-        max-width: 100% !important;
+        width: 50% !important;
+        display: inline;
     }
 
     p,

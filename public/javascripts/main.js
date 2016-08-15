@@ -53,7 +53,22 @@ function getDefendingPokemon() {
 function updateTypeModifierTableData() {
     var table = $('#typeModifierData');
     table.empty();
-    //alert(JSON.stringify(typeModifiers));
+    var toggledPokemon = getDefendingPokemon();
+    //alert(JSON.stringify(toggledPokemon));
+    if (toggledPokemon.length < 1) {
+    	$('#defendingPokemonListLabel').text('No Pokemon Selected');
+    	return;
+    }
+	var str = 'Calculated for: ';
+	for (var i = 0; i < toggledPokemon.length - 1; i++) {
+		str = str + toggledPokemon[i].name + ', '
+	}
+	if (toggledPokemon.length > 1) {
+		str = str + 'and ';
+	}
+	str = str + toggledPokemon[toggledPokemon.length - 1].name;
+	$('#defendingPokemonListLabel').text(str);
+
     var rows = [];
     var alternator = false;
     Object.keys(typeModifiers).forEach(function (type) {
@@ -66,7 +81,7 @@ function updateTypeModifierTableData() {
         var typeNameSpan = document.createElement('span');
         $(typeNameSpan).text(capitalize(type) + ': ');
         var newTypeModifier = document.createElement('span');
-        $(newTypeModifier).text(typeModifiers[type]);
+        $(newTypeModifier).text(parseFloat(typeModifiers[type]).toFixed(3));
         $(newTypeModifier).addClass('td-right');
         $(newTypeCell).append(typeNameSpan);
         $(newTypeCell).append(newTypeModifier);

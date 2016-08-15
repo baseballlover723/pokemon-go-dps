@@ -3,19 +3,20 @@ extends layout
 block content
     h3 <strong>THIS JUST IN, CRITICAL STRIKES ARE NOT IMPLEMENTED YET, all DPS and DPS related values now assume no critical strikes</strong>
     .row
-        .col-md-9.col-sm-6
+        .col-md-9.col-sm-8
             p Is my data wrong or did the game just have an update? Update this wiki and then <button id='refresh'>force this site to reload its data from the wiki.</button> (It takes a few minutes to update, limited to once per hour) <strong>PLEASE DO NOT RELOAD THE DATA</strong> unless you have made changes to the wiki. If this is pressed too much I will be forced to remove this button, and this website will only update once a day!
             p This is the equation for Fast & Charge DPS. It is the dps you would expect if you used your charge move as fast as possible, using your fast move when you couldn't use your charge move. fm is data from the fast move and cm is data from the charge move. Note you add 0.5 seconds for the charge move, since you have to hold for 0.5 seconds to activate it
             img(src='/images/equation.gif')
             img(src='/images/adjustedDps.gif')
             p.small-margin This is the equation for the Offensive Rating. Note it includes 7 IVs each for stamina, attack and defense. The theory behind this is that attack scales linearly with how much damage you do per hit, and DPS, and stamina and defense scale linearly with how long you live, increasing the amount of damage you can do due to living longer. <strong>Note this value is divided by 100,000</strong> to make it easier to visually compare against other Offensive Ratings, you shouldn't directly compare the Offensive Rating with any other stat, since the real offensive rating is 100,000 bigger than shown
             img(src='/images/offensiveRating.gif')
-        .col-md-3.col-sm-6
+        .col-md-3.col-sm-4
             p This site gets its data from <a href='http://bulbapedia.bulbagarden.net/'>http://bulbapedia.bulbagarden.net/</a>
             p Data last loaded at: <span id='last-update-time'>#{lastUpdatedTime.format("LLLL")} UTC</span>
             p Next data update at: <span id='next-update-time'>#{nextUpdateTime.format("LLLL")} UTC</span>
             span.container#typeSpan
                 h4 Pokemon Type Modifiers:
+                h5#defendingPokemonListLabel
                 table.table-striped
                     tbody#typeModifierData
                 br

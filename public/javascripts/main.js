@@ -24,8 +24,8 @@ var types = {};
 
 populateStaticPokemon(function () {
     makeSelectors();
-    // console.log(getCounterMatchupPokemon()[0].type1.getModifier(getCounterMatchupPokemon()[0].type1));
-    console.log("pokemon defenders: " + getCounterMatchupPokemon().map(function(poke) {return poke.name}).join(", "));
+    // console.log(getDefendingPokemon()[0].type1.getModifier(getDefendingPokemon()[0].type1));
+    console.log("pokemon defenders: " + getDefendingPokemon().map(function (poke) {return poke.name}).join(", "));
     if (!types["dark"]) {
         types["dark"] = generateDarkType(); // no dark type pokemon in gen 1
     }
@@ -33,45 +33,53 @@ populateStaticPokemon(function () {
     console.log(typeModifiers);
 });
 
-function makePkmSelectionList(){
-    var pkmbar = $('#pkmbar');
-    pkmbar.empty();
-    var sl2s = document.getElementsByClassName('pkmSelect2');
-    var namelst = [];
-    for (var i = 0; i < sl2s.length; i++) {
-        namelst.push(sl2s[i].value);
+// I will call this function to get the list of currently toggled on pokemon objects
+function getDefendingPokemon() {
+    return [staticPokemon[5], staticPokemon[19]];
+}
+
+function makePokemonSelectionList() {
+    var pokemonBar = $('#pokemon-bar');
+    pokemonBar.empty(); // lets see if we can not empty the entire bar, consider the case where you have some toggled on and some off, you add a pokemon and now everything is toggled on
+    var defenderComboBox = $('.pokemonSelect2');
+    var pokemonIdList = [];
+    for (var i = 0; i < defenderComboBox.length; i++) {
+        pokemonIdList.push(defenderComboBox[i].value);
     }
+    console.log(pokemonIdList);
     lst = [];
-    for (var i = 0; i < namelst.length; i++) {
-        var name = namelst[i];
-        var pkm = getPkmByName(name);
-        if(!pkm){
+    for (var id in pokemonIdList) {
+        var id = pokemonIdList[id];
+        var pokemon = staticPokemon[id-1];
+        if (pokemon) {
+            lst.push(pokemon);
+        } else {
             //alert('invalid pokemon selected!');
             //return false;
         }
-        if(pkm)lst.push(pkm);
     }
     selectedPokemon = lst;
 
     if (selectors.length > 0) {
-    	var toggleAll = document.createElement('span');
-    	var btn = document.createElement('input');
-    	btn.id = 'mtoggle';
-        btn.setAttribute('type','checkbox');
-        btn.setAttribute('name', pkm.name + 'ONOFF');
-        btn.setAttribute('value', pkm.name);
-        $(btn).attr("checked","checked");
-        $(btn).change(massToggle);
+        var toggleAll = document.createElement('span');
+        var toggleButton = document.createElement('input');
+        toggleButton.id = 'mtoggle';
+        console.log(pokemon);
+        toggleButton.setAttribute('type', 'checkbox');
+        toggleButton.setAttribute('name', pokemon.name + 'ONOFF');
+        toggleButton.setAttribute('value', pokemon.name);
+        $(toggleButton).attr("checked", "checked");
+        $(toggleButton).change(massToggle);
         $(toggleAll).text('Toggle All ');
-        $(toggleAll).prepend(btn);
-        $(pkmbar).append(toggleAll);
+        $(toggleAll).prepend(toggleButton);
+        $(pokemonBar).append(toggleAll);
     }
     //now adding checkboxes
     for (var i = 0; i < selectedPokemon.length; i++) {
         var pkm = selectedPokemon[i];
         var span = document.createElement('span');
         var btn = document.createElement('input');
-        btn.setAttribute('type','checkbox');
+        btn.setAttribute('type', 'checkbox');
         btn.setAttribute('name', pkm.name + 'ONOFF');
         btn.setAttribute('value', pkm.name);
         btn.setAttribute('class', 'pkmchkbx');
@@ -84,91 +92,95 @@ function makePkmSelectionList(){
             }
         }
         //if (checked) {
-            $(btn).attr("checked","checked");
+        $(btn).attr("checked", "checked");
         //}
         $(btn).change(setToggledPokemon);
         $(span).text(pkm.name + ' ');
         $(span).prepend(btn);
-        $(span).css('margin-left','10px');
-        pkmbar.append(span);
+        $(span).css('margin-left', '10px');
+        pokemonBar.append(span);
     }
     setToggledPokemon();
 }
 
-function massToggle(){
-	var lst = [];
-	mtg = $('#mtoggle');
-	//alert(mtg.attr('checked'));
-	var allon = mtg.prop('checked');
-	/*if (allon) {
-		mtg.attr('checked','unchecked');
-	}
-	else{
-		mtg.attr('checked','checked');
-	}*/
+function massToggle() {
+    var lst = [];
+    mtg = $('#mtoggle');
+    //alert(mtg.attr('checked'));
+    var allon = mtg.prop('checked');
+    /*if (allon) {
+     mtg.attr('checked','unchecked');
+     }
+     else{
+     mtg.attr('checked','checked');
+     }*/
     btns = document.getElementsByClassName('pkmchkbx');
     //alert(allon);
     for (var i = btns.length - 1; i >= 0; i--) {
-    	var btn = btns[i];
-    	if (allon) $(btn).prop('checked', true);
-    	else $(btn).prop('checked', false);
+        var btn = btns[i];
+        if (allon) {
+            $(btn).prop('checked', true);
+        } else {
+            $(btn).prop('checked', false);
+        }
     }
 }
 
-function setToggledPokemon(){
-    
+function setToggledPokemon() {
+
     var lst = [];
     btns = document.getElementsByClassName('pkmchkbx');
     for (var i = 0; i < btns.length; i++) {
         var name = btns[i].value;
         if (btns[i].checked) {
-        for (var j = selectedPokemon.length - 1; j >= 0; j--) {
-            var pkm = selectedPokemon[j];
-            if (pkm.name === name) {
-                lst.push(pkm);
-                break;
+            for (var j = selectedPokemon.length - 1; j >= 0; j--) {
+                var pkm = selectedPokemon[j];
+                if (pkm.name === name) {
+                    lst.push(pkm);
+                    break;
+                }
             }
         }
     }
-    }
     toggledPokemon = lst;
     if (toggledPokemon.length > 0) {
-    	$('#mtoggle').prop('checked',true);
-    }
-    else{
-    	$('#mtoggle').prop('checked',false);
+        $('#mtoggle').prop('checked', true);
+    } else {
+        $('#mtoggle').prop('checked', false);
     }
     /*var strr = '';
-    for (var i = toggledPokemon.length - 1; i >= 0; i--) {
-        strr = strr + toggledPokemon[i].name + ' ';
-    }
-    alert(strr);*/
+     for (var i = toggledPokemon.length - 1; i >= 0; i--) {
+     strr = strr + toggledPokemon[i].name + ' ';
+     }
+     alert(strr);*/
 }
 
-function getPkmByName(name){
+function getPkmByName(name) {
     for (var i = staticPokemon.length - 1; i >= 0; i--) {
-        if(staticPokemon[i].name === name) return staticPokemon[i];
+        if (staticPokemon[i].name === name) {
+            return staticPokemon[i];
+        }
     }
     return null;
 }
 
-function makeSelectors(){
-    //var pkmbar = document.createElement('span');
-    //pkmbar.id = 'pkmbar';
+function makeSelectors() {
+    //var pokem-bar = document.createElement('span');
+    //pokem-bar.id = 'pokem-bar';
     //var area = $('#selection');
-    //area.append(pkmbar);
+    //area.append(pokem-bar);
     addNewSelector();
 }
 
-function addNewSelector(){
+function addNewSelector() {
     var area = $('#selection');
     //var frm = document.createElement('form');
     //frm.id = 'pkmfrm1';
     var span2 = document.createElement('span');
     var inp1 = document.createElement('select');
     //inp1.setAttribute('multiple',"multiple");
-    $(inp1).css('width','125px');
-    $(inp1).addClass('pkmSelect2');
+    $(inp1).css('width', '125px');
+    $(inp1).addClass('pokemonSelect2');
     //var smt = document.createElement('input');
     //smt.type = "submit";
     var temp = document.createElement('option');
@@ -176,47 +188,45 @@ function addNewSelector(){
     for (var i = 0; i < staticPokemon.length; i++) {
         var temp = document.createElement('option');
         pkm = staticPokemon[i];
-        temp.value = pkm.name;
+        temp.value = pkm.id;
         $(temp).text(pkm.name);
         $(inp1).append(temp);
     }
     //$(frm).append(inp1);
     var that = inp1;
-    $(inp1).on("select2:select",(x => (function(event,tht){
-        makePkmSelectionList();
-        if(tht == selectors[selectors.length - 1] && selectors.length < 10) {
-        	addNewSelector();
+    $(inp1).on("select2:select", (x => (function (event, tht) {
+        makePokemonSelectionList();
+        if (tht == selectors[selectors.length - 1] && selectors.length < 10) {
+            addNewSelector();
         }
-    })(x,that)));
+    })(x, that)));
     /*$(inp1).on("select2:opening",(x => (function(event,tht){
-        alert('here');
-        if (hackishBooleanForGettingSelectorsToWork) {
-            hackishBooleanForGettingSelectorsToWork = false;
-            event.preventDefault();
-        }
-    })(x,that)));*/
-    $(inp1).on("select2:unselecting",(x => (function(event,tht){
-        if(selectors.length > 1) {
+     alert('here');
+     if (hackishBooleanForGettingSelectorsToWork) {
+     hackishBooleanForGettingSelectorsToWork = false;
+     event.preventDefault();
+     }
+     })(x,that)));*/
+    $(inp1).on("select2:unselecting", (x => (function (event, tht) {
+        if (selectors.length > 1) {
             var pr = $(tht).parent();
-            selectors.splice(selectors.indexOf(tht),1);
+            selectors.splice(selectors.indexOf(tht), 1);
             $(tht).select2('destroy');
             pr.remove();
         }
-        makePkmSelectionList();
-    })(x,that)));
-    $(span2).css('margin-right','20px');
+        makePokemonSelectionList();
+    })(x, that)));
+    $(span2).css('margin-right', '20px');
     $(span2).append(inp1);
     area.append(span2);
     selectors.push(inp1);
     $(inp1).select2({placeholder: "Select Pokemon", allowClear: true});
 }
 
-
-
 // no dark type pokemon in gen 1
 function generateDarkType() {
     var ghost = types["ghost"];
-    for (var type in ghost.weaknesses)  {
+    for (var type in ghost.weaknesses) {
         type = ghost.weaknesses[type];
         if (type.name == "dark") {
             type.__proto__ = Type.prototype; // some hacky shit to get types functions
@@ -254,15 +264,10 @@ function populateStaticPokemon(callback) {
     })
 }
 
-// rename to getDefendingPokemon
-function getCounterMatchupPokemon() {
-    return [staticPokemon[5], staticPokemon[19]];
-}
-
 // call everytime the defending pokemon list is changed
 function calculateTypeModifiers() {
     var typeModifiers = {};
-    var defenders = getCounterMatchupPokemon();
+    var defenders = getDefendingPokemon();
     for (var type in types) {
         type = types[type];
         var modifier = 1;

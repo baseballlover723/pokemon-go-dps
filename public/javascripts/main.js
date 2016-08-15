@@ -13,7 +13,6 @@ var staticPokemon = [];
 var selectedPokemon = [];
 var toggledPokemon = [];
 var selectors = [];
-var hackishBooleanForGettingSelectorsToWork = false;
 
 var pokemonHeaderLength = 7;
 var fastHeaderLength = 9;
@@ -21,6 +20,7 @@ var chargeHeaderLength = 9;
 var totalDpsHeaderLength = 5;
 
 var types = {};
+
 populateStaticPokemon(function () {
     // makeSelectors();\
     addDefenderComboBox();
@@ -37,6 +37,38 @@ populateStaticPokemon(function () {
 // I will call this function to get the list of currently toggled on pokemon objects
 function getDefendingPokemon() {
     return [staticPokemon[5], staticPokemon[19]];
+}
+
+function setTypeModifierTableData() {
+    var table = $('#typeModifierData');
+    table.empty();
+    //alert(JSON.stringify(typeModifiers));
+    var rows = [];
+    var alternator = false;
+    Object.keys(typeModifiers).forEach(function (type) {
+        alternator = !alternator;
+        if (alternator) {
+            rows.push(document.createElement('tr'));
+        }
+        var newRow = rows[rows.length - 1];
+        var newTypeCell = document.createElement('td');
+        var typeNameSpan = document.createElement('span');
+        $(typeNameSpan).text(capitalize(type) + ': ');
+        var newTypeModifier = document.createElement('span');
+        $(newTypeModifier).text(typeModifiers[type]);
+        $(newTypeModifier).addClass('td-right');
+        $(newTypeCell).append(typeNameSpan);
+        $(newTypeCell).append(newTypeModifier);
+        $(newTypeCell).addClass('typeRow');
+        //$(newTypeModifier).text(typeModifiers[type]);
+        $(newRow).append(newTypeCell);
+
+        //$(newRow).append(newTypeModifier);
+        //table.append(newRow);
+    });
+    for (var i = 0; i < rows.length; i++) {
+        table.append(rows[i]);
+    }
 }
 
 function addDefenderComboBox() {
@@ -98,7 +130,7 @@ function hasEmptyComboBox() {
     var comboBoxes = $('.defender-combo-box');
     for (var index = 0; index < comboBoxes.length; index++) {
         var comboBox = $(comboBoxes[index]);
-        if (!comboBox.val())  {
+        if (!comboBox.val()) {
             return true;
         }
     }
@@ -106,174 +138,174 @@ function hasEmptyComboBox() {
 }
 
 /*
- function makePokemonSelectionList() {
- var pokemonBar = $('#toggle-bar');
- pokemonBar.empty(); // lets see if we can not empty the entire bar, consider the case where you have some toggled on and some off, you add a
- // pokemon and now everything is toggled on
- var defenderComboBox = $('.pokemonSelect2');
- var pokemonIdList = [];
- for (var i = 0; i < defenderComboBox.length; i++) {
- pokemonIdList.push(defenderComboBox[i].value);
- }
- console.log(pokemonIdList);
- lst = [];
- for (var id in pokemonIdList) {
- var id = pokemonIdList[id];
- var pokemon = staticPokemon[id - 1];
- if (pokemon) {
- lst.push(pokemon);
- } else {
- //alert('invalid pokemon selected!');
- //return false;
- }
- }
- selectedPokemon = lst;
+function makePokemonSelectionList() {
+    var pokemonBar = $('#toggle-bar');
+    pokemonBar.empty(); // lets see if we can not empty the entire bar, consider the case where you have some toggled on and some off, you add a
+    // pokemon and now everything is toggled on
+    var defenderComboBox = $('.pokemonSelect2');
+    var pokemonIdList = [];
+    for (var i = 0; i < defenderComboBox.length; i++) {
+        pokemonIdList.push(defenderComboBox[i].value);
+    }
+    console.log(pokemonIdList);
+    lst = [];
+    for (var id in pokemonIdList) {
+        var id = pokemonIdList[id];
+        var pokemon = staticPokemon[id - 1];
+        if (pokemon) {
+            lst.push(pokemon);
+        } else {
+            //alert('invalid pokemon selected!');
+            //return false;
+        }
+    }
+    selectedPokemon = lst;
 
- if (selectors.length > 0) {
- var toggleAll = document.createElement('span');
- var toggleButton = document.createElement('input');
- toggleButton.id = 'mtoggle';
- console.log(pokemon);
- toggleButton.setAttribute('type', 'checkbox');
- toggleButton.setAttribute('name', pokemon.name + 'ONOFF');
- toggleButton.setAttribute('value', pokemon.name);
- $(toggleButton).attr("checked", "checked");
- $(toggleButton).change(massToggle);
- $(toggleAll).text('Toggle All ');
- $(toggleAll).prepend(toggleButton);
- $(pokemonBar).append(toggleAll);
- }
- //now adding checkboxes
- for (var i = 0; i < selectedPokemon.length; i++) {
- var pkm = selectedPokemon[i];
- var span = document.createElement('span');
- var btn = document.createElement('input');
- btn.setAttribute('type', 'checkbox');
- btn.setAttribute('name', pkm.name + 'ONOFF');
- btn.setAttribute('value', pkm.name);
- btn.setAttribute('class', 'pkmchkbx');
- var checked = false;
- for (var j = 0; j < toggledPokemon.length; j++) {
- var tpkm = toggledPokemon[j];
- if (pkm.name === tpkm.name) {
- checked = true;
- break;
- }
- }
- //if (checked) {
- $(btn).attr("checked", "checked");
- //}
- $(btn).change(setToggledPokemon);
- $(span).text(pkm.name + ' ');
- $(span).prepend(btn);
- $(span).css('margin-left', '10px');
- pokemonBar.append(span);
- }
- setToggledPokemon();
- }
+    if (selectors.length > 0) {
+        var toggleAll = document.createElement('span');
+        var toggleButton = document.createElement('input');
+        toggleButton.id = 'mtoggle';
+        console.log(pokemon);
+        toggleButton.setAttribute('type', 'checkbox');
+        toggleButton.setAttribute('name', pokemon.name + 'ONOFF');
+        toggleButton.setAttribute('value', pokemon.name);
+        $(toggleButton).attr("checked", "checked");
+        $(toggleButton).change(massToggle);
+        $(toggleAll).text('Toggle All ');
+        $(toggleAll).prepend(toggleButton);
+        $(pokemonBar).append(toggleAll);
+    }
+    //now adding checkboxes
+    for (var i = 0; i < selectedPokemon.length; i++) {
+        var pkm = selectedPokemon[i];
+        var span = document.createElement('span');
+        var btn = document.createElement('input');
+        btn.setAttribute('type', 'checkbox');
+        btn.setAttribute('name', pkm.name + 'ONOFF');
+        btn.setAttribute('value', pkm.name);
+        btn.setAttribute('class', 'pkmchkbx');
+        var checked = false;
+        for (var j = 0; j < toggledPokemon.length; j++) {
+            var tpkm = toggledPokemon[j];
+            if (pkm.name === tpkm.name) {
+                checked = true;
+                break;
+            }
+        }
+        //if (checked) {
+        $(btn).attr("checked", "checked");
+        //}
+        $(btn).change(setToggledPokemon);
+        $(span).text(pkm.name + ' ');
+        $(span).prepend(btn);
+        $(span).css('margin-left', '10px');
+        pokemonBar.append(span);
+    }
+    setToggledPokemon();
+}
 
- function massToggle() {
- var lst = [];
- mtg = $('#mtoggle');
- //alert(mtg.attr('checked'));
- var allon = mtg.prop('checked');
- btns = document.getElementsByClassName('pkmchkbx');
- //alert(allon);
- for (var i = btns.length - 1; i >= 0; i--) {
- var btn = btns[i];
- if (allon) {
- $(btn).prop('checked', true);
- } else {
- $(btn).prop('checked', false);
- }
- }
- }
+function massToggle() {
+    var lst = [];
+    mtg = $('#mtoggle');
+    //alert(mtg.attr('checked'));
+    var allon = mtg.prop('checked');
+    btns = document.getElementsByClassName('pkmchkbx');
+    //alert(allon);
+    for (var i = btns.length - 1; i >= 0; i--) {
+        var btn = btns[i];
+        if (allon) {
+            $(btn).prop('checked', true);
+        } else {
+            $(btn).prop('checked', false);
+        }
+    }
+}
 
- function setToggledPokemon() {
+function setToggledPokemon() {
 
- var lst = [];
- btns = document.getElementsByClassName('pkmchkbx');
- for (var i = 0; i < btns.length; i++) {
- var name = btns[i].value;
- if (btns[i].checked) {
- for (var j = selectedPokemon.length - 1; j >= 0; j--) {
- var pkm = selectedPokemon[j];
- if (pkm.name === name) {
- lst.push(pkm);
- break;
- }
- }
- }
- }
- toggledPokemon = lst;
- if (toggledPokemon.length > 0) {
- $('#mtoggle').prop('checked', true);
- } else {
- $('#mtoggle').prop('checked', false);
- }
- }
+    var lst = [];
+    btns = document.getElementsByClassName('pkmchkbx');
+    for (var i = 0; i < btns.length; i++) {
+        var name = btns[i].value;
+        if (btns[i].checked) {
+            for (var j = selectedPokemon.length - 1; j >= 0; j--) {
+                var pkm = selectedPokemon[j];
+                if (pkm.name === name) {
+                    lst.push(pkm);
+                    break;
+                }
+            }
+        }
+    }
+    toggledPokemon = lst;
+    if (toggledPokemon.length > 0) {
+        $('#mtoggle').prop('checked', true);
+    } else {
+        $('#mtoggle').prop('checked', false);
+    }
+}
 
- function getPkmByName(name) {
- for (var i = staticPokemon.length - 1; i >= 0; i--) {
- if (staticPokemon[i].name === name) {
- return staticPokemon[i];
- }
- }
- return null;
- }
+function getPkmByName(name) {
+    for (var i = staticPokemon.length - 1; i >= 0; i--) {
+        if (staticPokemon[i].name === name) {
+            return staticPokemon[i];
+        }
+    }
+    return null;
+}
 
- function makeSelectors() {
- //var pokem-bar = document.createElement('span');
- //pokem-bar.id = 'pokem-bar';
- //var area = $('#defenders');
- //area.append(pokem-bar);
- addNewSelector();
- }
+function makeSelectors() {
+    //var pokem-bar = document.createElement('span');
+    //pokem-bar.id = 'pokem-bar';
+    //var area = $('#defenders');
+    //area.append(pokem-bar);
+    addNewSelector();
+}
 
- function addNewSelector() {
- var area = $('#defenders');
- //var frm = document.createElement('form');
- //frm.id = 'pkmfrm1';
- var span2 = document.createElement('span');
- var inp1 = document.createElement('select');
- //inp1.setAttribute('multiple',"multiple");
- $(inp1).css('width', '125px');
- $(inp1).addClass('pokemonSelect2');
- //var smt = document.createElement('input');
- //smt.type = "submit";
- var temp = document.createElement('option');
- $(inp1).append(temp);
- for (var i = 0; i < staticPokemon.length; i++) {
- var temp = document.createElement('option');
- pkm = staticPokemon[i];
- temp.value = pkm.id;
- $(temp).text(pkm.name);
- $(inp1).append(temp);
- }
- //$(frm).append(inp1);
- var that = inp1;
- $(inp1).on("select2:select", (x => (function (event, tht) {
- makePokemonSelectionList();
- if (tht == selectors[selectors.length - 1] && selectors.length < 10) {
- addNewSelector();
- }
- })(x, that)));
- $(inp1).on("select2:unselecting", (x => (function (event, tht) {
- if (selectors.length > 1) {
- var pr = $(tht).parent();
- selectors.splice(selectors.indexOf(tht), 1);
- $(tht).select2('destroy');
- pr.remove();
- }
- makePokemonSelectionList();
- })(x, that)));
- $(span2).css('margin-right', '20px');
- $(span2).append(inp1);
- area.append(span2);
- selectors.push(inp1);
- $(inp1).select2({placeholder: "Select Pokemon", allowClear: true});
- }
- */
+function addNewSelector() {
+    var area = $('#defenders');
+    //var frm = document.createElement('form');
+    //frm.id = 'pkmfrm1';
+    var span2 = document.createElement('span');
+    var inp1 = document.createElement('select');
+    //inp1.setAttribute('multiple',"multiple");
+    $(inp1).css('width', '125px');
+    $(inp1).addClass('pokemonSelect2');
+    //var smt = document.createElement('input');
+    //smt.type = "submit";
+    var temp = document.createElement('option');
+    $(inp1).append(temp);
+    for (var i = 0; i < staticPokemon.length; i++) {
+        var temp = document.createElement('option');
+        pkm = staticPokemon[i];
+        temp.value = pkm.id;
+        $(temp).text(pkm.name);
+        $(inp1).append(temp);
+    }
+    //$(frm).append(inp1);
+    var that = inp1;
+    $(inp1).on("select2:select", (x => (function (event, tht) {
+        makePokemonSelectionList();
+        if (tht == selectors[selectors.length - 1] && selectors.length < 10) {
+            addNewSelector();
+        }
+    })(x, that)));
+    $(inp1).on("select2:unselecting", (x => (function (event, tht) {
+        if (selectors.length > 1) {
+            var pr = $(tht).parent();
+            selectors.splice(selectors.indexOf(tht), 1);
+            $(tht).select2('destroy');
+            pr.remove();
+        }
+        makePokemonSelectionList();
+    })(x, that)));
+    $(span2).css('margin-right', '20px');
+    $(span2).append(inp1);
+    area.append(span2);
+    selectors.push(inp1);
+    $(inp1).select2({placeholder: "Select Pokemon", allowClear: true});
+}
+*/
 
 // no dark type pokemon in gen 1
 function generateDarkType() {

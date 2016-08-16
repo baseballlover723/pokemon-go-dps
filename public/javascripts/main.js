@@ -5,11 +5,8 @@
 // AdjustedDPS = \frac{(pokemon.attack + 7) * stabDps}{2}
 var CALCULATE_CRIT = false;
 
-// TODO in the middle of updating query
-// TODO if jquery.param need to stop search=<<blank>>
-// consider set falsey values to undefined
-// TODO if other encode, how to encode object
-// TODO  merge with jared
+// TODO make jared table a little smaller
+
 var dataTable;
 var typeModifiers = {};
 var inited = false;
@@ -48,7 +45,7 @@ populateStaticPokemon(function () {
     removeTempComboBox();
     loadInitialComboBoxes();
     addDefenderComboBox();
-    // typeModifiers = calculateTypeModifiers();
+    calculateTypeModifiers();
 });
 
 function loadInitialComboBoxes() {
@@ -103,18 +100,19 @@ function updateTypeModifierTableData() {
     table.empty();
     var toggledPokemon = getDefendingPokemon();
     //alert(JSON.stringify(toggledPokemon));
+    var str = "";
     if (toggledPokemon.length < 1) {
-    	$('#defendingPokemonListLabel').text('No Pokemon Selected');
-    	return;
+        str = 'No Pokemon Selected';
+    } else {
+        str = 'Calculated for: ';
+        for (var i = 0; i < toggledPokemon.length - 1; i++) {
+            str = str + toggledPokemon[i].name + ', '
+        }
+        if (toggledPokemon.length > 1) {
+            str = str + 'and ';
+        }
+        str = str + toggledPokemon[toggledPokemon.length - 1].name;
     }
-	var str = 'Calculated for: ';
-	for (var i = 0; i < toggledPokemon.length - 1; i++) {
-		str = str + toggledPokemon[i].name + ', '
-	}
-	if (toggledPokemon.length > 1) {
-		str = str + 'and ';
-	}
-	str = str + toggledPokemon[toggledPokemon.length - 1].name;
 	$('#defendingPokemonListLabel').text(str);
 
     var rows = [];

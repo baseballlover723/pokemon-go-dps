@@ -518,7 +518,7 @@ $(document).ready(function () {
         search: {
             regex: true, smart: false, caseInsensitive: true
         }, // responsive: true, // paging: false,
-        dom: "<'row'<'col-sm-12'B>><'row'<'col-sm-6'f><'col-sm-6'l>>" + "<'row'<'col-sm-12'tr>>" + "<'row'<'col-sm-5'i><'col-sm-7'p>>",
+        dom: "<'row'<'col-xs-12'B>><'row'<'col-xs-6'f><'col-xs-6'l>>" + "<'row'<'col-sm-12'tr>>" + "<'row'<'col-sm-5'i><'col-sm-7'p>>",
         columnDefs: [{
             //     targets: 0, width: "2%"
             // }, {

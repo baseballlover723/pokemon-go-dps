@@ -6,7 +6,8 @@
     "start": "node ./bin/www"
   },
   "engines": {
-    "node": "6.2.1"
+    "node": "6.3.1",
+    "npm": "3.10.7"
   },
   "dependencies": {
     "async": "^2.0.1",
@@ -23,6 +24,7 @@
     "morgan": "~1.7.0",
     "parse-duration": "^0.1.1",
     "request": "^2.74.0",
+    "select2": "^4.0.3",
     "serve-favicon": "~2.3.0",
     "sticky-table-headers": "^0.1.19"
   }

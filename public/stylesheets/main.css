@@ -156,6 +156,31 @@ textarea {
 }
 
 /*
+ * for the td elements in the pokemon type modifier table;
+ */
+
+.typeRow {
+    padding-left: 5px;
+    padding-right: 5px;
+    padding-top: 3px;
+    padding-bottom: 2px;
+    border: 1px solid black;
+}
+.td-right {
+    margin-left: 15px;
+    float: right;
+}
+
+#typeSpan {
+    margin: 20px; 
+    width: 250px; 
+    text-align: left; 
+    /*float: right; 
+    margin-right: 90px;*/
+    /*border: 2px outset gray;*/
+}
+
+/*
  * Hide visually and from screen readers, but maintain layout
  */
 
@@ -262,10 +287,12 @@ textarea {
     tr,
     img {
         page-break-inside: avoid;
+        /*max-width: 100%;*/
     }
 
     img {
-        max-width: 100% !important;
+        width: 50% !important;
+        display: inline;
     }
 
     p,

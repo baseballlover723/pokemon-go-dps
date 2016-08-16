@@ -4,9 +4,7 @@
 // OffensiveRating = \frac{(pokemon.attack + 7) * (pokemon.stamina + 7) * (pokemon.defense + 7) * stabDps}{100,000}
 // AdjustedDPS = \frac{(pokemon.attack + 7) * stabDps}{2}
 var CALCULATE_CRIT = false;
-
-// TODO make jared table a little smaller
-
+0.5974
 var dataTable;
 var typeModifiers = {};
 var inited = false;

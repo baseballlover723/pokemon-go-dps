@@ -316,7 +316,7 @@ function calculateTypeModifiers(draw) {
     if (draw == undefined) {
         draw = true;
     }
-    console.time("calc type mod");
+    // console.time("calc type mod");
     var typeModifiersCopy = {}; // make a copy so that you don't get any weird errors if you try and calculate dps with it in the middle
     var defenders = getDefendingPokemon();
     for (var type in types) {
@@ -364,7 +364,7 @@ function calculateTypeModifiers(draw) {
         dataTable.draw();
         console.timeEnd("update table");
     }
-    console.timeEnd("calc type mod");
+    // console.timeEnd("calc type mod");
 }
 
 function getTypeModifier(move) {

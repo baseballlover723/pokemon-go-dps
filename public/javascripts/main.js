@@ -359,6 +359,9 @@ function calculateTypeModifiers(draw) {
     updateQuery();
 
     if (draw) {
+        if (typeof ga !== 'undefined' && defenders.length > 0) {
+            ga('send', 'event', 'Gym Defender', "Calculating for: " + defenders.map(function(defender) {return defender.name}).join(", "));
+        }
         console.time("update table");
         dataTable.cells(null, DPS_COLUMNS).invalidate();
         dataTable.draw();

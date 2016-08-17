@@ -20,6 +20,20 @@ img {
     max-width: 100%;
 }
 
+input[type=range] {
+    display: inline-block;
+    vertical-align: middle;
+    margin: 5px;
+}
+
+#slider {
+    width: 75%;
+}
+
+#typeSpan {
+    text-align: left;
+}
+
 #data-table th {
     border: 1px solid #ddd;
     border-collapse: collapse;
@@ -70,7 +84,7 @@ img {
     background-color: #e3f2ea;
 }
 
-.buttons-columnVisibility, #data-table_wrapper .btn{
+.buttons-columnVisibility, #data-table_wrapper .btn {
     padding: 6px 5.5px;
     font-size: 9.5pt;
 }
@@ -80,7 +94,21 @@ img {
 }
 
 .select2 {
-    width: 100%; !important;
+    width: 100%;
+!important;
+}
+
+.typeRow {
+    padding-left: 5px;
+    padding-right: 5px;
+    padding-top: 3px;
+    padding-bottom: 2px;
+    border: 1px solid black;
+}
+
+.td-right {
+    margin-left: 15px;
+    float: right;
 }
 
 .defender-toggle {

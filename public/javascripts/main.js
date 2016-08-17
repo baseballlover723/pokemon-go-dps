@@ -34,6 +34,21 @@ for (var i = end - 4; i < end; i++) {
 
 var types = {};
 
+$('#slider').on("input", function() {
+    var slider = $('#slider');
+    $('#slider-value').text(slider.val());
+    SUPER_EFFECTIVE = slider.val();
+    NOT_EVFFECTIVE = 1 / SUPER_EFFECTIVE;
+    calculateTypeModifiers(false);
+});
+
+$('#slider').on("change", function() {
+    if (typeof ga !== 'undefined') {
+        ga('send', 'event', 'Super Effective Modifier', "Changed Value to " + $('#slider').val());
+    }
+    calculateTypeModifiers();
+});
+
 populateStaticPokemon(function () {
     // makeSelectors();\
     if (!types["dark"]) {
@@ -297,7 +312,11 @@ function populateStaticPokemon(callback) {
 }
 
 // call everytime the defending pokemon list is changed
-function calculateTypeModifiers() {
+function calculateTypeModifiers(draw) {
+    if (draw == undefined) {
+        draw = true;
+    }
+    console.time("calc type mod");
     var typeModifiersCopy = {}; // make a copy so that you don't get any weird errors if you try and calculate dps with it in the middle
     var defenders = getDefendingPokemon();
     for (var type in types) {
@@ -339,10 +358,13 @@ function calculateTypeModifiers() {
     queryObject.toggleOff = toggleList;
     updateQuery();
 
-    console.time("update table");
-    dataTable.cells(null, DPS_COLUMNS).invalidate();
-    dataTable.draw();
-    console.timeEnd("update table");
+    if (draw) {
+        console.time("update table");
+        dataTable.cells(null, DPS_COLUMNS).invalidate();
+        dataTable.draw();
+        console.timeEnd("update table");
+    }
+    console.timeEnd("calc type mod");
 }
 
 function getTypeModifier(move) {

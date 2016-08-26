@@ -16,7 +16,7 @@ for (var key in jsVars.query) {
 var pokemonHeaderLength = 7;
 var fastHeaderLength = 9;
 var chargeHeaderLength = 9;
-var totalDpsHeaderLength = 5;
+var totalDpsHeaderLength = 6;
 
 var DPS_COLUMNS = [];
 var end = pokemonHeaderLength + fastHeaderLength;
@@ -245,6 +245,13 @@ $(document).ready(function () {
                 return calculateDPS(pokemon, true).toFixed(3);
             }
         }, {
+            title: "Duration", data: null, render: function(data,type,pokemon) {
+                var fm = pokemon.fastMove;
+                var cm = pokemon.chargeMove;
+                var duration = ((cm.energyRequired * fm.duration / fm.energyGain) + cm.duration + 0.5);
+                return duration.toFixed(3);
+            }
+        }, {
             title: "Adjusted DPS", data: null, render: function (data, type, pokemon) {
                 var dps = (pokemon.attack + 7) * calculateDPS(pokemon, true) / 2;
                 return dps.toFixed(3);
@@ -260,7 +267,7 @@ $(document).ready(function () {
         autoWidth: true,
         pageLength: 50,
         order: [[pokemonHeaderLength + fastHeaderLength + chargeHeaderLength + totalDpsHeaderLength - 2, "desc"]],
-        buttons: [{text: "Visibility Options"}, 'columnsToggle'],
+        buttons: [{text: "Export to Excel", extend: "excel"}, {text: "Visibility Options"}, 'columnsToggle'],
         search: {
             regex: true, smart: false, caseInsensitive: true
         }, // responsive: true, // paging: false,

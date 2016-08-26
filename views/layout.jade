@@ -26,7 +26,7 @@ html.no-js(lang='')
     // Place favicon.ico in the root directory
     link(rel='stylesheet', href='/stylesheets/normalize.css')
     link(rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous")
-    link(rel='stylesheet', href='https://cdn.datatables.net/v/bs/dt-1.10.12/b-1.2.2/b-colvis-1.2.2/datatables.min.css')
+    link(rel='stylesheet', href='https://cdn.datatables.net/v/bs/jszip-2.5.0/dt-1.10.12/b-1.2.2/b-colvis-1.2.2/b-html5-1.2.2/datatables.min.css')
     link(rel='stylesheet', href='https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css')
     link(rel='stylesheet', href='/stylesheets/main.css')
     link(rel='stylesheet', href='/stylesheets/style.css')
@@ -88,6 +88,7 @@ body
               li <s>Factor in STAB</s> Completed: 8/1/2016
               li <s>Factor in base stats</s> Completed: 8/6/2016
               li <s>Add a tab to calculate DPS against specific Pokémon</s> Completed: 8/15/2016
+              li Rework UI (Estimated competition: 8/28/2016)
               li Button to toggle inclusion of legendary pokemon (Estimated completion: On Hold)
               li Add gym defense (Estimated completion: On Hold)
               li Add gym defense with dodging assumption (Estimated Completion: On Hold)
@@ -130,6 +131,10 @@ body
             ul
               li You can now change the super effective and not very effective modifiers
               li Added a description on how to use the gym defenders feature.
+          p 8/25/2016:
+            ul
+              li Now you can export the table to excel
+              li added duration, which is how long it takes to do 1 iteration of quick and charge moves
         .modal-footer
           button.btn.btn-default(type='button', data-dismiss='modal') Close
   #disclaimer.modal.fade(role='dialog')
@@ -160,7 +165,7 @@ body
   script(src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous")
   script.
     window.jQuery || document.write('<script src="/javascripts/vendor/jquery-1.12.0.min.js"><\\/script>')
-  script(src='https://cdn.datatables.net/v/bs/dt-1.10.12/b-1.2.2/b-colvis-1.2.2/datatables.min.js')
+  script(src='https://cdn.datatables.net/v/bs/jszip-2.5.0/dt-1.10.12/b-1.2.2/b-colvis-1.2.2/b-html5-1.2.2/datatables.min.js')
   script(src='https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js')
   script(src='https://cdnjs.cloudflare.com/ajax/libs/async/2.0.1/async.min.js')
   script(src='/javascripts/plugins.js')

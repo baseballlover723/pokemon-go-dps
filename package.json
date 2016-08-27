@@ -22,9 +22,11 @@
     "moment": "^2.14.1",
     "moment-timezone": "^0.5.5",
     "morgan": "~1.7.0",
+    "mysql": "^2.11.1",
     "parse-duration": "^0.1.1",
     "request": "^2.74.0",
     "select2": "^4.0.3",
+    "sequelize": "^3.24.1",
     "serve-favicon": "~2.3.0",
     "sticky-table-headers": "^0.1.19"
   }

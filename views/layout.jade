@@ -55,6 +55,8 @@ body
       #bs-example-navbar-collapse-1.collapse.navbar-collapse
         ul.nav.navbar-nav.navbar-right
           li
+            a.modal-trigger(herf='#' data-toggle='modal', data-target='#contribute') Want To Contribute?
+          li
             a.modal-trigger(herf='#' data-toggle='modal', data-target='#todo-list') TODO List
           li
             a.modal-trigger(herf='#' data-toggle='modal', data-target='#change-log') Change Log
@@ -74,6 +76,18 @@ body
             ul.dropdown-menu
               li
                 a(href="https://github.com/hoffmaj2") Jared's Github
+  #contribute.modal.fade(role='dialog')
+    .modal-dialog.modal-lg
+      .modal-content
+        .modal-header
+          button.close(type='button', data-dismiss='modal') ×
+          h4.modal-title Want To Contribute?
+        .modal-body
+          p Want to contribute and make this site even better? Check out the source code at <a href="https://github.com/baseballlover723/pokemon-go-dps">https://github.com/baseballlover723/pokemon-go-dps</a>.
+          p Specifics on how you can help this website grow are in the README.
+          p If you aren't familiar with Javascript, then it will probably be difficult (not impossible) for you to contribute this way. Don't worry too much if you can't program, let me know if you have an idea or metric you want to see on this site by sending me at email at <a href='mailto:baseballlover723@gmail.com?subject=Pokémon%20GO%20DPS%20Optimizer%20Feedback'>baseballlover723@gmail.com</a>! I'll let you know if I can implement your idea or metric.
+        .modal-footer
+          button.btn.btn-default(type='button', data-dismiss='modal') Close
   #todo-list.modal.fade(role='dialog')
     .modal-dialog.modal-lg
       .modal-content

@@ -231,7 +231,7 @@
     "num": 39,
     "name": "JIGGLYPUFF",
     "quickMoves": "de01ee01",
-    "cinematicMoves": "54830158"
+    "cinematicMoves": "54830156"
   },
   {
     "num": 40,
@@ -296,13 +296,13 @@
   {
     "num": 50,
     "name": "DIGLETT",
-    "quickMoves": "d801dc01",
+    "quickMoves": "dc01e901",
     "cinematicMoves": "1a603f"
   },
   {
     "num": 51,
     "name": "DUGTRIO",
-    "quickMoves": "cb01d801",
+    "quickMoves": "cb01e901",
     "cinematicMoves": "1f6020"
   },
   {
@@ -446,13 +446,13 @@
   {
     "num": 75,
     "name": "GRAVELER",
-    "quickMoves": "e301d801",
+    "quickMoves": "e301e901",
     "cinematicMoves": "1a2040"
   },
   {
     "num": 76,
     "name": "GOLEM",
-    "quickMoves": "e301d801",
+    "quickMoves": "e301e901",
     "cinematicMoves": "203e1f"
   },
   {
@@ -512,7 +512,7 @@
   {
     "num": 86,
     "name": "SEEL",
-    "quickMoves": "d901e601",
+    "quickMoves": "d401d901",
     "cinematicMoves": "396f3a"
   },
   {
@@ -524,13 +524,13 @@
   {
     "num": 88,
     "name": "GRIMER",
-    "quickMoves": "e101e901",
+    "quickMoves": "e001e901",
     "cinematicMoves": "12605a"
   },
   {
     "num": 89,
     "name": "MUK",
-    "quickMoves": "e101e001",
+    "quickMoves": "d401e001",
     "cinematicMoves": "105c5b"
   },
   {
@@ -561,7 +561,7 @@
     "num": 94,
     "name": "GENGAR",
     "quickMoves": "cb01d501",
-    "cinematicMoves": "46105b"
+    "cinematicMoves": "46105a"
   },
   {
     "num": 95,
@@ -633,7 +633,7 @@
     "num": 106,
     "name": "HITMONLEE",
     "quickMoves": "cf01f101",
-    "cinematicMoves": "7f3820"
+    "cinematicMoves": "7b3820"
   },
   {
     "num": 107,
@@ -650,13 +650,13 @@
   {
     "num": 109,
     "name": "KOFFING",
-    "quickMoves": "e101dd01",
+    "quickMoves": "dd01",
     "cinematicMoves": "125a10"
   },
   {
     "num": 110,
     "name": "WEEZING",
-    "quickMoves": "e101dd01",
+    "quickMoves": "dd01",
     "cinematicMoves": "5a4610"
   },
   {
@@ -675,7 +675,7 @@
     "num": 113,
     "name": "CHANSEY",
     "quickMoves": "de01ea01",
-    "cinematicMoves": "6c1e56"
+    "cinematicMoves": "6c0e56"
   },
   {
     "num": 114,
@@ -716,14 +716,14 @@
   {
     "num": 120,
     "name": "STARYU",
-    "quickMoves": "db01e601",
+    "quickMoves": "dd01e601",
     "cinematicMoves": "7d3541"
   },
   {
     "num": 121,
     "name": "STARMIE",
-    "quickMoves": "db01e601",
-    "cinematicMoves": "6b411e"
+    "quickMoves": "dd01e601",
+    "cinematicMoves": "6b416c"
   },
   {
     "num": 122,
@@ -776,7 +776,7 @@
   {
     "num": 130,
     "name": "GYARADOS",
-    "quickMoves": "cc01ca01",
+    "quickMoves": "ca01",
     "cinematicMoves": "6b5052"
   },
   {
@@ -818,7 +818,7 @@
   {
     "num": 137,
     "name": "PORYGON",
-    "quickMoves": "db01dd01",
+    "quickMoves": "ea01dd01",
     "cinematicMoves": "1e6323"
   },
   {
@@ -830,7 +830,7 @@
   {
     "num": 139,
     "name": "OMASTAR",
-    "quickMoves": "e301e601",
+    "quickMoves": "d801e601",
     "cinematicMoves": "3e6b40"
   },
   {
@@ -903,6 +903,6 @@
     "num": 151,
     "name": "MEW",
     "quickMoves": "de01",
-    "cinematicMoves": "7a1f6c524e5767740e"
+    "cinematicMoves": "281f6c524e67740e"
   }
 ]

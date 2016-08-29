@@ -102,44 +102,45 @@ body
           button.close(type='button', data-dismiss='modal') ×
           h4.modal-title Change Log
         .modal-body
+          p 8/28/2016:
+            ul
+              li Updated some movesets that Niantic changed recently (in the future removed movesets will be marked and displayed).
+              li Made the most recent changes be at the top of this list instead of the bottom.
+          p 8/25/2016:
+            ul
+              li Now you can export the table to excel.
+              li Added duration, which is how long it takes to do 1 iteration of quick and charge moves.
+          p 8/16/2016:
+            ul
+              li You can now change the super effective and not very effective modifiers.
+              li Added a description on how to use the gym defenders feature.
+          p 8/15/2016:
+            ul
+              li Implemented counter matchups to gym defender(s).
+          p 8/10/2016:
+            ul
+              li Made the rank column unsortable, evidently this is a popular column to sort, and it doesn't do anything.
+          p 8/9/2016:
+            ul
+              li Updated the offensive rating to also take into account defense.
+              li Added a column for total stats.
+              li Puts estimated completion dates for the TODO list.
+              li Second Update: Removed crit from DPS equations since it isn't implemented yet.
+          p 8/7/2016:
+            ul
+              li Forgot to update the offensive rating for the fast and charge move.
+              li Second update: added EPS.
+              li Third update: added Adjusted DPS.
+          p 8/6/2016:
+            ul
+              li Added STAB Offensive Rating, which takes into account the pokemon's base stats.
+              li Added Column visibility options, since the table is getting hard to fit on one screen.
+              li Changed my header library so now if should line up with the table correctly once you scroll down now.
           p 8/5/2016:
             ul
               li Added support for searching from the url, now you can share your searches with your friends or enemies, I'm not too picky.
-              li Made the rank column show the global ranking of the row in the current sort
-          p 8/6/2016:
-            ul
-              li Added STAB Offensive Rating, which takes into account the pokemon's base stats
-              li Added Column visibility options, since the table is getting hard to fit on one screen
-              li Changed my header library so now if should line up with the table correctly once you scroll down now
-          p 8/7/2016:
-            ul
-              li forgot to update the offensive rating for the fast and charge move.
-              li Second update: added EPS
-              li Third update: added Adjusted DPS
-          p 8/9/2016:
-            ul
-              li Updated the offensive rating to also take into account defense
-              li Added a column for total stats
-              li Puts estimated completion dates for the TODO list
-              li Second Update: Removed crit from DPS equations since it isn't implemented yet
-          p 8/10/2016:
-            ul
-              li Made the rank column unsortable, evidently this is a popular column to sort, and it doesn't do anything
-          p 8/15/2016:
-            ul
-              li Implemented counter matchups to gym defender(s)
-          p 8/16/2016:
-            ul
-              li You can now change the super effective and not very effective modifiers
-              li Added a description on how to use the gym defenders feature.
-          p 8/25/2016:
-            ul
-              li Now you can export the table to excel
-              li added duration, which is how long it takes to do 1 iteration of quick and charge moves
-          p 8/28/2016:
-            ul
-              li updated some movesets that Niantic changed recently (in the future removed movesets will be marked and displayed),
-        .modal-footer
+              li Made the rank column show the global ranking of the row in the current sort.
+      .modal-footer
           button.btn.btn-default(type='button', data-dismiss='modal') Close
   #disclaimer.modal.fade(role='dialog')
     .modal-dialog.modal-lg

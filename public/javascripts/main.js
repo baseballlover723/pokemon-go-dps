@@ -3,9 +3,7 @@
 // fm.duration + cm.duration + 0.5} offensive power rating at 10pt with 150 resolution OffensivePowerRating =
 // OffensiveRating = \frac{(pokemon.attack + 7) * (pokemon.stamina + 7) * (pokemon.defense + 7) * stabDps}{100,000}
 // AdjustedDPS = \frac{(pokemon.attack + 7) * stabDps}{2}
-var CALCULATE_CRIT = false;
 var dataTable;
-var typeModifiers = {};
 var inited = false;
 var staticPokemon = [];
 var queryObject = {}; // {search : "", gym: int[id], toggleComboBox: int[index]}
@@ -16,9 +14,9 @@ for (var key in jsVars.query) {
 var pokemonHeaderLength = 7;
 var fastHeaderLength = 9;
 var chargeHeaderLength = 9;
-var totalDpsHeaderLength = 6;
+var totalDpsHeaderLength = 7;
 
-var DPS_COLUMNS = [];
+var DPS_COLUMNS = []; // these are the columns that need to be recalculated after adjusting the calculating types
 var end = pokemonHeaderLength + fastHeaderLength;
 for (var i = end - 3; i < end; i++) {
     DPS_COLUMNS.push(i); // dps columns are the last 3 of fast move
@@ -27,9 +25,9 @@ end += chargeHeaderLength;
 for (var i = end - 3; i < end; i++) {
     DPS_COLUMNS.push(i); // dps columns are the last 3 of charge move
 }
-end += totalDpsHeaderLength - 1;
-for (var i = end - 4; i < end; i++) {
-    DPS_COLUMNS.push(i); // dps columns are the first 4 of total dps
+// end += totalDpsHeaderLength - 1;
+for (var i = end; i < end + totalDpsHeaderLength - 1; i++) {
+    DPS_COLUMNS.push(i); // dps columns are all of the total columns
 }
 
 var types = {};
@@ -56,15 +54,15 @@ $("#refresh").on("click", function () {
     }
 });
 
-$('#slider').on("input", function() {
+$('#slider').on("input", function () {
     var slider = $('#slider');
     $('#slider-value').text(slider.val());
     SUPER_EFFECTIVE = slider.val();
-    NOT_EVFFECTIVE = 1 / SUPER_EFFECTIVE;
+    NOT_EFFECTIVE = 1 / SUPER_EFFECTIVE;
     calculateTypeModifiers(false);
 });
 
-$('#slider').on("change", function() {
+$('#slider').on("change", function () {
     if (typeof ga !== 'undefined') {
         ga('send', 'event', 'Super Effective Modifier', "Changed Value to " + $('#slider').val());
     }
@@ -76,6 +74,11 @@ populateStaticPokemon(function () {
     if (!types["dark"]) {
         types["dark"] = generateDarkType(); // no dark type pokemon in gen 1
     }
+    for (var type in types) {
+        type = types[type];
+        Type.typeModifiers[type.name] = 1;
+    }
+
     removeTempComboBox();
     loadInitialComboBoxes();
     addDefenderComboBox();
@@ -111,18 +114,6 @@ function getTopHeader(index) {
     }
 }
 
-function calculateDPS(pokemon, stab) {
-    var fm = pokemon.fastMove;
-    var cm = pokemon.chargeMove;
-    var fmDamage = stab ? pokemon.getSTABDamage(fm) : fm.damage;
-    fmDamage *= getTypeModifier(fm);
-    var cmDamage = stab ? pokemon.getSTABDamage(cm) : cm.damage;
-    cmDamage *= getTypeModifier(cm);
-    var critChance = CALCULATE_CRIT ? cm.critChance : 0;
-    return ((cm.energyRequired * fmDamage / fm.energyGain) + (cmDamage * (1 + critChance / 2))) /
-        ((cm.energyRequired * fm.duration / fm.energyGain) + cm.duration + 0.5);
-}
-
 String.prototype.replaceAll = function (search, replacement) {
     var target = this;
     return target.replace(new RegExp(search, 'g'), replacement);
@@ -139,7 +130,17 @@ $(document).ready(function () {
             url: "/data", dataSrc: function (jsonStr) {
                 var pokemons = CircularJSON.parse(JSON.stringify(jsonStr)).data;
                 for (var index in pokemons) {
-                    pokemons[index] = new Pokemon(pokemons[index]);
+                    var pokemon = pokemons[index];
+                    // hacky shit to get the right prototypes (and instance functions) from json
+                    pokemon.__proto__ = Pokemon.prototype;
+                    pokemon.fastMove.__proto__ = Move.prototype;
+                    pokemon.fastMove.type.__proto__ = Type.prototype;
+                    pokemon.chargeMove.__proto__ = Move.prototype;
+                    pokemon.chargeMove.type.__proto__ = Type.prototype;
+                    pokemon.type1.__proto__ = Type.prototype;
+                    if (pokemon.type2) {
+                        pokemon.type2.__proto__ = Type.prototype;
+                    }
                 }
                 return pokemons;
             }
@@ -181,21 +182,19 @@ $(document).ready(function () {
             }
         }, {
             title: "DPS", data: "fastMove", render: function (data, type, pokemon) {
-                var dps = data.damage / data.duration;
-                dps *= getTypeModifier(data);
+                var dps = pokemon.calculateFastMoveDPS({stab: false});
                 return dps.toFixed(3);
             }
         }, {
             title: "STAB DPS", data: "fastMove", render: function (data, type, pokemon) {
-                var dps = pokemon.getSTABDamage(data) / data.duration;
-                dps *= getTypeModifier(data);
+                var dps = pokemon.calculateFastMoveDPS({stab: true});
                 return dps.toFixed(3);
             }
         }, {
             title: "Adjusted DPS", data: "fastMove", render: function (data, type, pokemon) {
-                var dps = (pokemon.attack + 7) * pokemon.getSTABDamage(data) / data.duration / 2;
-                dps *= getTypeModifier(data);
-                return dps.toFixed(3);
+                var dps = pokemon.calculateFastMoveDPS({stab: true});
+                dps *= (pokemon.attack + 7) / 2;
+                return dps.toFixed(1);
             }
         }, {title: "Move Name", data: "chargeMove.name"}, {
             title: "Type", data: "chargeMove.type.name", render: function (data, type, pokemon) {
@@ -211,54 +210,46 @@ $(document).ready(function () {
             }
         }, {
             title: "DPS", data: "chargeMove", render: function (data, type, pokemon) {
-                var dps = data.damage / data.duration;
-                dps *= getTypeModifier(data);
-                if (CALCULATE_CRIT) {
-                    dps *= (data.critChance / 2 + 1)
-                }
+                var dps = pokemon.calculateChargeMoveDPS({stab: false});
                 return dps.toFixed(3);
             }
         }, {
             title: "STAB DPS", data: "chargeMove", render: function (data, type, pokemon) {
-                var dps = pokemon.getSTABDamage(data) / data.duration;
-                dps *= getTypeModifier(data);
-                if (CALCULATE_CRIT) {
-                    dps *= (data.critChance / 2 + 1)
-                }
+                var dps = pokemon.calculateChargeMoveDPS({stab: true});
                 return dps.toFixed(3);
             }
         }, {
             title: "Adjusted DPS", data: "chargeMove", render: function (data, type, pokemon) {
-                var dps = (pokemon.attack + 7) * pokemon.getSTABDamage(data) / (data.duration + 0.5) / 2;
-                dps *= getTypeModifier(data);
-                if (CALCULATE_CRIT) {
-                    dps *= (data.critChance / 2 + 1)
-                }
-                return dps.toFixed(3);
+                var dps = pokemon.calculateChargeMoveDPS({stab: true, chargeDelay: true});
+                dps *= (pokemon.attack + 7) / 2;
+                return dps.toFixed(1);
             }
         }, {
             title: "DPS", data: null, render: function (data, type, pokemon) {
-                return calculateDPS(pokemon, false).toFixed(3);
+                return pokemon.calculateDPS({stab: false}).toFixed(3);
             }
         }, {
             title: "STAB DPS", data: null, render: function (data, type, pokemon) {
-                return calculateDPS(pokemon, true).toFixed(3);
+                return pokemon.calculateDPS({stab: true}).toFixed(3);
             }
         }, {
-            title: "Duration", data: null, render: function(data,type,pokemon) {
-                var fm = pokemon.fastMove;
-                var cm = pokemon.chargeMove;
-                var duration = ((cm.energyRequired * fm.duration / fm.energyGain) + cm.duration + 0.5);
+            title: "Charge Damage %", data: null, render: function (data, type, pokemon) {
+                var percent = pokemon.calculateChargeMoveDamagePercent({stab: true});
+                return percent.toFixed(2) + "%";
+            }
+        }, {
+            title: "Duration", data: null, render: function (data, type, pokemon) {
+                var duration = pokemon.calculateCycleDuration();
                 return duration.toFixed(3);
             }
         }, {
             title: "Adjusted DPS", data: null, render: function (data, type, pokemon) {
-                var dps = (pokemon.attack + 7) * calculateDPS(pokemon, true) / 2;
-                return dps.toFixed(3);
+                var dps = (pokemon.attack + 7) * pokemon.calculateDPS({stab: true}) / 2;
+                return dps.toFixed(1);
             }
         }, {
             title: "STAB Offensive Rating", data: null, render: function (data, type, pokemon) {
-                var dps = (pokemon.attack + 7) * (pokemon.stamina + 7) * (pokemon.defense + 7) * calculateDPS(pokemon, true) / 100 / 1000;
+                var dps = (pokemon.attack + 7) * (pokemon.stamina + 7) * (pokemon.defense + 7) * pokemon.calculateDPS({stab: true}) / 100 / 1000;
                 return dps.toFixed(1);
             }
         }, {
@@ -323,8 +314,17 @@ $(document).ready(function () {
     dataTable.on('buttons-action', function (e, buttonApi, dataTable, node, config) {
         var adjustment = node.hasClass("active") ? 1 : -1;
         var col = config.columns;
-        var header = getTopHeader(col);
-        header.attr('colspan', parseInt(header.attr('colspan')) + adjustment);
+        if (col !== undefined) {
+            var header = getTopHeader(col);
+            header.attr('colspan', parseInt(header.attr('colspan')) + adjustment);
+            if (typeof ga !== 'undefined') {
+                ga('send', 'event', 'Column Visibility',
+                    header.text() + " " + node.text() + " visibility toggled " + (node.hasClass("active") ? "off" : "on"));
+            }
+
+        } else {
+            ga('send', 'event', 'Excel Export', "Excel exported");
+        }
     });
 
     $("#data-table_filter input").on("keypress", function (event) {
@@ -441,24 +441,11 @@ function calculateTypeModifiers(draw) {
         draw = true;
     }
     // console.time("calc type mod");
-    var typeModifiersCopy = {}; // make a copy so that you don't get any weird errors if you try and calculate dps with it in the middle
     var defenders = getDefendingPokemon();
     for (var type in types) {
         type = types[type];
-        var modifier = 1;
-        var count = 0;
-        for (var defender in  defenders) {
-            defender = defenders[defender];
-            modifier *= type.getModifier(defender.type1) * 20; // to deal with integers
-            count++;
-            if (defender.type2) {
-                modifier *= type.getModifier(defender.type2) * 20; // to deal with integers
-                count++;
-            }
-        }
-        typeModifiersCopy[type.name] = modifier / Math.pow(20, count); // correction
+        type.calculateModifier(defenders);
     }
-    typeModifiers = typeModifiersCopy;
     updateTypeModifierTableData();
 
     // update url
@@ -484,7 +471,7 @@ function calculateTypeModifiers(draw) {
 
     if (draw) {
         if (typeof ga !== 'undefined' && defenders.length > 0) {
-            ga('send', 'event', 'Gym Defender', "Calculating for: " + defenders.map(function(defender) {return defender.name}).join(", "));
+            ga('send', 'event', 'Gym Defender', "Calculating for: " + defenders.map(function (defender) {return defender.name}).join(", "));
         }
         console.time("update table");
         dataTable.cells(null, DPS_COLUMNS).invalidate();
@@ -494,16 +481,12 @@ function calculateTypeModifiers(draw) {
     // console.timeEnd("calc type mod");
 }
 
-function getTypeModifier(move) {
-    return typeModifiers[move.type.name] || 1;
-}
-
 function loadInitialComboBoxes() {
     if (jsVars.query.gym == "") {
         return;
     }
-    var initialPokemonIds = jsVars.query.gym.split(" ").map(function(id) {return parseInt(id)});
-    var toggledOffs = jsVars.query.toggleOff == "" ? [] : jsVars.query.toggleOff.split(" ").map(function(index) {return parseInt(index)});
+    var initialPokemonIds = jsVars.query.gym.split(" ").map(function (id) {return parseInt(id)});
+    var toggledOffs = jsVars.query.toggleOff == "" ? [] : jsVars.query.toggleOff.split(" ").map(function (index) {return parseInt(index)});
     if (toggledOffs.length == initialPokemonIds.length) {
         $('#global-defender-toggle').prop("checked", false);
     }
@@ -567,7 +550,8 @@ function updateTypeModifierTableData() {
 
     var rows = [];
     var alternator = false;
-    Object.keys(typeModifiers).forEach(function (type) {
+    Object.keys(types).forEach(function (type) {
+        type = types[type];
         alternator = !alternator;
         if (alternator) {
             rows.push(document.createElement('tr'));
@@ -575,9 +559,9 @@ function updateTypeModifierTableData() {
         var newRow = rows[rows.length - 1];
         var newTypeCell = document.createElement('td');
         var typeNameSpan = document.createElement('span');
-        $(typeNameSpan).text(capitalize(type) + ': ');
+        $(typeNameSpan).text(capitalize(type.name) + ': ');
         var newTypeModifier = document.createElement('span');
-        $(newTypeModifier).text(parseFloat(typeModifiers[type]).toFixed(3));
+        $(newTypeModifier).text(type.getModifierAgainstDefenders().toFixed(3));
         $(newTypeModifier).addClass('td-right');
         $(newTypeCell).append(typeNameSpan);
         $(newTypeCell).append(newTypeModifier);

@@ -85,8 +85,8 @@ input[type=range] {
 }
 
 .buttons-columnVisibility, #data-table_wrapper .btn {
-    padding: 6px 5.5px;
-    font-size: 9.0pt;
+    padding: 6px 8px;
+    /*font-size: 9.0pt;*/
 }
 
 .btn-group {

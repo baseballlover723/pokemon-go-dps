@@ -102,9 +102,11 @@ body
               li <s>Factor in STAB</s> Completed: 8/1/2016
               li <s>Factor in base stats</s> Completed: 8/6/2016
               li <s>Add a tab to calculate DPS against specific Pokémon</s> Completed: 8/15/2016
-              li Convert backend to use a database rather than json files (Estimated competition: Thursday 9/1/2016)
-              li Rework UI (Estimated competition: Monday 9/5/2016)
+              li Rework UI (Estimated competition: Sunday 9/11/2016)
+              li When calculating gym counters, consider the average typed damage that each pokemon inflicts. (Consider how resistance your attacker is to each gym defenders moveset damage distribution) (Estimated completion: On Hold)
+              li Let you choose gym defenders moves (Estimated completion: On Hold)
               li Button to toggle inclusion of legendary pokemon (Estimated completion: On Hold)
+              li Convert backend to use a database rather than json files (Estimated competition: On Hold)
               li Add gym defense (Estimated completion: On Hold)
               li Add gym defense with dodging assumption (Estimated Completion: On Hold)
         .modal-footer
@@ -116,6 +118,11 @@ body
           button.close(type='button', data-dismiss='modal') ×
           h4.modal-title Change Log
         .modal-body
+          p 9/5/2016:
+            ul
+              li Sorry about not many updates lately, getting busy with school
+              li Now if using your charge move is suboptimal, it won't calculate its dps with it and its charge move damage percentage will be 0%.
+              li Added charge move damage percentage. Higher charge percentages show the percentage of damage that is done by the charge move in a rotation. In general, large charge damage percentages are movesets that are more susceptible to overkilling targets and wasting dps
           p 8/28/2016:
             ul
               li Updated some movesets that Niantic changed recently (in the future removed movesets will be marked and displayed).
@@ -154,8 +161,8 @@ body
             ul
               li Added support for searching from the url, now you can share your searches with your friends or enemies, I'm not too picky.
               li Made the rank column show the global ranking of the row in the current sort.
-      .modal-footer
-          button.btn.btn-default(type='button', data-dismiss='modal') Close
+        .modal-footer
+            button.btn.btn-default(type='button', data-dismiss='modal') Close
   #disclaimer.modal.fade(role='dialog')
     .modal-dialog.modal-lg
       .modal-content

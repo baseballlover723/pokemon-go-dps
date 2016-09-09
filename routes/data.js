@@ -8,6 +8,7 @@ var moment = require('moment-timezone');
 var Pokemon = require('./../lib/pokemon');
 var Move = require('./../lib/move');
 var Type = require('./../lib/type');
+require("./../lib/loadGameMaster");
 
 var LIMIT_VALUE = 24;
 var LIMIT_UNITS = "hours";

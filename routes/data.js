@@ -515,7 +515,7 @@ function convertToUrl(move) {
         name = name.replaceAll(" Blastoise", "");
     } else if (move.id == 136 || move.id == 137) { // wrap
         name = name.split(" ")[0];
-    } else if (move.id == 233 || move.id == 196) {
+    } else if (move.id == 233) {
         name = name.replace(" ", "-");
     }
     return name.replaceAll(" ", "_") + "_(move)";

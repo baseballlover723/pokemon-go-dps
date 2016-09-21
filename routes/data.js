@@ -41,7 +41,11 @@ for (var id in moveNames) {
 
 isCachedValid(true, function (movesCopy, isValid) {
     for (var id in movesCopy) {
-        moves[id].load(movesCopy[id]);
+        if (moves[id] == undefined) {
+            moves[id] = movesCopy[id];
+        } else {
+            moves[id].load(movesCopy[id]);
+        }
     }
     if (isValid) {
         fixLoadingMoves(moves);
@@ -369,13 +373,14 @@ function writeCachedMoves(moves, callback = function () {}) {
 
 function fixLoadingMoves(moves) {
     var loadingMoves = [];
-    for (var id in moves) {
+    for (var id in moveNames) {
         var move = moves[id];
-        if (move.hasAnyLoading()) {
+        if (move == undefined || move.hasAnyLoading()) {
             loadingMoves.push(move);
         }
     }
     if (loadingMoves.length > 0) {
+        var limit = 5;
         console.log("reloading these moves: " + loadingMoves.map(function (move) {return move.name}));
         console.time("reloading loop");
         async.eachLimit(loadingMoves, limit, function (move, callback) {
@@ -493,13 +498,24 @@ function parseCritChance(row) {
 // "137": "Wrap Pink",
 // "233": "Mud Slap", -> Mud-Slap
 
+// before 200 is Legacy quick moves
+// before 13 is Legacy charge moves
+
 function convertToUrl(move) {
     var name = move.name;
+
+    // legacy moves
+    if (move.id < 13 || (move.id < 200 && move.id > 137)) {
+        console.log("replaced name " + move.name);
+        name = name.replace(" (Legacy)", "");
+        console.log(name);
+    }
+
     if (move.id == 134 || move.id == 135 || move.id == 232) { // blastoise
         name = name.replaceAll(" Blastoise", "");
     } else if (move.id == 136 || move.id == 137) { // wrap
         name = name.split(" ")[0];
-    } else if (move.id == 233) {
+    } else if (move.id == 233 || move.id == 196) {
         name = name.replace(" ", "-");
     }
     return name.replaceAll(" ", "_") + "_(move)";

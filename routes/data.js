@@ -153,6 +153,10 @@ function populateBaseStats() {
                 data = data.next().next();
                 var name = data.text().trim();
 
+                if (name.includes("Mega") || name.includes("mega")) {
+                    return;
+                }
+
                 data = data.next();
                 var hp = parseInt(data.text());
 
@@ -176,6 +180,10 @@ function populateBaseStats() {
                 pokemon.stamina = calculateStamina(hp);
                 pokemon.attack = calculateAttack(attack, spAttack, speed);
                 pokemon.defense = calculateDefense(defense, spDefense, speed);
+                if (number == 131) { // lapras exeception
+                    pokemon.attack = oldCalculateAttack(attack, spAttack, speed);
+                    pokemon.defense = oldCalculateDefense(defense, spDefense, speed);
+                }
                 // var titleText = data.text();
                 // if (titleText == "Pokémon GO") {
                 //     parseMove($, move, data.parent());
@@ -184,6 +192,7 @@ function populateBaseStats() {
                 // }
             });
             fs.writeFile("json/pokemonTypeStats.json", JSON.stringify(pokemonWithTypesStats), function () {
+                console.timeEnd("base stats request");
                 console.log("wrote file");
             });
             if (!c.html()) {
@@ -194,9 +203,11 @@ function populateBaseStats() {
         } else {
             if (error.Error == "ESOCKETTIMEDOUT") {
                 console.log("base stats request: timed out");
+                console.timeEnd("base stats request");
             } else {
                 console.log("error scraping base stats");
                 console.log(error);
+                console.timeEnd("base stats request");
             }
         }
     });
@@ -206,13 +217,28 @@ function calculateStamina(hp) {
     return hp * 2;
 }
 
-function calculateAttack(attack, spAttack, speed) {
+function oldCalculateAttack(attack, spAttack, speed) {
     return 2 * Math.round(Math.sqrt(attack) * Math.sqrt(spAttack) + Math.sqrt(speed));
 }
 
-function calculateDefense(defense, spDefense, speed) {
+function oldCalculateDefense(defense, spDefense, speed) {
     return 2 * Math.round(Math.sqrt(defense) * Math.sqrt(spDefense) + Math.sqrt(speed));
 }
+
+function calculateAttack(attack, spAttack, speed) {
+    var higher = Math.max(attack, spAttack);
+    var lower = Math.min(attack, spAttack);
+    var atk = Math.round(2 * (7 * higher / 8 + lower / 8));
+    return Math.round(atk * 0.85 + (atk * speed / 500));
+}
+
+function calculateDefense(defense, spDefense, speed) {
+    var higher = Math.max(defense, spDefense);
+    var lower = Math.min(defense, spDefense);
+    var def = Math.round(2 * (7 * higher / 8 + lower / 8));
+    return Math.round(def * 0.85 + (def * speed / 500));
+}
+
 
 function populatePokemonTypes(callback = function () {}) {
     var limit = 10;

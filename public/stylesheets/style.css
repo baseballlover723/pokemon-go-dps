@@ -118,3 +118,9 @@ input[type=range] {
 #defenders .toggled-off {
     background-color: lightGrey !important;
 }
+
+.deprecation-notice {
+    font-size: 30px;
+    text-decoration: underline;
+    font-weight: bold;
+}

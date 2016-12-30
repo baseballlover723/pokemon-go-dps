@@ -17,18 +17,26 @@ var chargeHeaderLength = 9;
 var totalDpsHeaderLength = 7;
 
 var DPS_COLUMNS = []; // these are the columns that need to be recalculated after adjusting the calculating types
+var CHARGE_DELAY_COLUMNS = [];
+
 var end = pokemonHeaderLength + fastHeaderLength;
 for (var i = end - 3; i < end; i++) {
     DPS_COLUMNS.push(i); // dps columns are the last 3 of fast move
 }
+
+CHARGE_DELAY_COLUMNS.push(end + 3); // duration column is 4 past the start of the charge columns
 end += chargeHeaderLength;
+
 for (var i = end - 3; i < end; i++) {
     DPS_COLUMNS.push(i); // dps columns are the last 3 of charge move
+    CHARGE_DELAY_COLUMNS.push(i); // changes based on charge delay
 }
 // end += totalDpsHeaderLength - 1;
 for (var i = end; i < end + totalDpsHeaderLength - 1; i++) {
     DPS_COLUMNS.push(i); // dps columns are all of the total columns
+    CHARGE_DELAY_COLUMNS.push(i); // changes based on charge delay
 }
+
 
 var types = {};
 
@@ -67,6 +75,16 @@ $('#slider').on("change", function () {
         ga('send', 'event', 'Super Effective Modifier', "Changed Value to " + $('#slider').val());
     }
     calculateTypeModifiers();
+});
+
+$('#charge-delay-slider').on("input", function () {
+    var slider = $('#charge-delay-slider');
+    $('#charge-delay-slider-value').text(slider.val());
+    CHARGE_DELAY = parseFloat(slider.val());
+});
+
+$('#charge-delay-slider').on("change", function () {
+    calculateChargeDelay();
 });
 
 populateStaticPokemon(function () {
@@ -200,7 +218,11 @@ $(document).ready(function () {
             title: "Type", data: "chargeMove.type.name", render: function (data, type, pokemon) {
                 return capitalize(data);
             }
-        }, {title: "Pow", data: "chargeMove.damage"}, {title: "Duration", data: "chargeMove.duration"}, {
+        }, {title: "Pow", data: "chargeMove.damage"},
+            {title: "Duration", data: "chargeMove.duration", render: function (data, type, pokemon) {
+                var chargeDelayString = CHARGE_DELAY > 0 ? " + " + CHARGE_DELAY : "";
+                return data + chargeDelayString;
+            }}, {
             title: "Energy", data: "chargeMove.energyRequired", render: function (data, type, pokemon) {
                 return Math.round(data * 100) / 100 + "%"; // round to 2 decimal places
             }
@@ -479,6 +501,16 @@ function calculateTypeModifiers(draw) {
         console.timeEnd("update table");
     }
     // console.timeEnd("calc type mod");
+}
+
+function calculateChargeDelay() {
+    if (typeof ga !== 'undefined') {
+        ga('send', 'event', 'Charge Delay', "Updating Charge Delay to " + CHARGE_DELAY);
+    }
+    console.time("update table");
+    dataTable.cells(null, CHARGE_DELAY_COLUMNS).invalidate();
+    dataTable.draw();
+    console.timeEnd("update table");
 }
 
 function loadInitialComboBoxes() {

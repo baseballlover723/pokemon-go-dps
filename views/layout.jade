@@ -59,7 +59,7 @@ body
           li
             a.modal-trigger(herf='#' data-toggle='modal', data-target='#todo-list') TODO List
           li
-            a.modal-trigger(herf='#' data-toggle='modal', data-target='#change-log') Change Log (Updated: 11/26/16)
+            a.modal-trigger(herf='#' data-toggle='modal', data-target='#change-log') Change Log (Updated: 12/29/16)
           li
             a.modal-trigger(herf='#' data-toggle='modal', data-target='#disclaimer') Disclaimer
           li
@@ -118,6 +118,10 @@ body
           button.close(type='button', data-dismiss='modal') ×
           h4.modal-title Change Log
         .modal-body
+          p 12/29/2016:
+            ul
+              li Fixed a bug where a suboptimal DPS was shown when a chrage move was barely worth using
+              li Added a slider to change the amount of time calculated for when using using your charge move. (This takes 0.5 seconds but can run concurrently)
           p 11/26/2016:
             ul
               li Updated base stats to reflect base stats change on 11/21/2016 (note Lapras was not updated)

@@ -30,6 +30,10 @@ input[type=range] {
     width: 75%;
 }
 
+#charge-delay-slider {
+    width: 75%;
+}
+
 #typeSpan {
     text-align: left;
 }

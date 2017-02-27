@@ -4,7 +4,6 @@
  * Module dependencies.
  */
 require('dotenv').config();
-require('./../migrator.js');
 var app = require('../app');
 var debug = require('debug')('pokemon-go-dps:server');
 var http = require('http');
@@ -30,16 +29,18 @@ var server = http.createServer(app);
 models.sequelize.sync().then(function () {
   models.sequelize
     .authenticate()
-    .then(function(err) {
+    .then(function (err) {
       console.log('Connection has been established successfully.');
+      app.onStartUp().then(function () {
+        server.listen(port);
+        server.on('error', onError);
+        server.on('listening', onListening);
+      });
     })
     .catch(function (err) {
       console.log('Unable to connect to the database:', err);
       server.close();
     });
-  server.listen(port);
-  server.on('error', onError);
-  server.on('listening', onListening);
 });
 
 /**
@@ -100,4 +101,5 @@ function onListening() {
     ? 'pipe ' + addr
     : 'port ' + addr.port;
   debug('Listening on ' + bind);
+  console.log('Listening on ' + bind);
 }

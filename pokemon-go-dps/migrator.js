@@ -1,4 +1,5 @@
 'use strict';
+console.log("called");
 //////////////////////////////////
 // How to use?
 // 1. Create `sequelize-schema-file-generator.js` in your app root

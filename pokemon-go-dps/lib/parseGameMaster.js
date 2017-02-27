@@ -1,51 +1,57 @@
 var POGOProtos = require('node-pogo-protos');
 var fs = require("fs");
+var models = require("../models");
 
 // TODO make this more async
 // TODO delete database
 var promise = new Promise(function (fulfill, reject) {
-  console.log("here");
-  fs.readFile('./data/00000156B50BE126_GAME_MASTER', function read(err, data) {
+  try {
+    console.log("here");
+    console.log(models.Type);
+    fs.readFile('./data/00000156B50BE126_GAME_MASTER', function read(err, data) {
 // fs.readFile('./json/2_GAME_MASTER', function read(err, data) {
-    if (err) {
-      throw err;
-    }
-    var encoded = data;
-
-    var decodedAgain = POGOProtos.Networking.Responses.DownloadItemTemplatesResponse.decode(encoded);
-    var pokemon = [];
-    var moves = {};
-//console.log(decodedAgain.item_templates);
-    for (var item of decodedAgain.item_templates) {
-      deleteNull(item);
-      if (item.pokemon_settings) {
-        deleteNull(item);
-        trimPokemon(item.pokemon_settings);
-        pokemon.push(item.pokemon_settings);
-      } else if (item.move_settings) {
-        deleteNull(item);
-        trimMove(item.move_settings);
-        moves[parseInt(item.move_settings.movement_id)] = item.move_settings;
-        // delete item.move_settings.movement_id;
+      if (err) {
+        throw err;
       }
-    }
-    console.log("number of pokemon read from game master: " + pokemon.length);
-    console.log(pokemon[0]);
-    console.log(moves[13]);
-    fs.writeFile('./data/master.json', JSON.stringify(decodedAgain), {}, function () {
-      console.log("done writing master");
-    });
-    fs.writeFile('./data/masterPokemon.json', JSON.stringify(pokemon), {}, function () {
-      console.log("done writing pokemon");
-      fulfill();
-    });
-    fs.writeFile('./data/masterMoves.json', JSON.stringify(moves), {}, function () {
-      console.log("done writing moves");
-    });
+      var encoded = data;
 
-    // Invoke the next step here however you like
+      var decodedAgain = POGOProtos.Networking.Responses.DownloadItemTemplatesResponse.decode(encoded);
+      var pokemon = [];
+      var moves = {};
+//console.log(decodedAgain.item_templates);
+      for (var item of decodedAgain.item_templates) {
+        deleteNull(item);
+        if (item.pokemon_settings) {
+          deleteNull(item);
+          trimPokemon(item.pokemon_settings);
+          pokemon.push(item.pokemon_settings);
+        } else if (item.move_settings) {
+          deleteNull(item);
+          trimMove(item.move_settings);
+          moves[parseInt(item.move_settings.movement_id)] = item.move_settings;
+          // delete item.move_settings.movement_id;
+        }
+      }
+      console.log("number of pokemon read from game master: " + pokemon.length);
+      console.log(pokemon[0]);
+      console.log(moves[13]);
+      fs.writeFile('./data/master.json', JSON.stringify(decodedAgain), {}, function () {
+        console.log("done writing master");
+      });
+      fs.writeFile('./data/masterPokemon.json', JSON.stringify(pokemon), {}, function () {
+        console.log("done writing pokemon");
+        fulfill();
+      });
+      fs.writeFile('./data/masterMoves.json', JSON.stringify(moves), {}, function () {
+        console.log("done writing moves");
+      });
 
-  });
+      // Invoke the next step here however you like
+
+    });
+  } catch (e) {
+    reject(e);
+  }
 
 });
 

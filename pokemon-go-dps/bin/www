@@ -35,6 +35,9 @@ models.sequelize.sync().then(function () {
         server.listen(port);
         server.on('error', onError);
         server.on('listening', onListening);
+      }, function (e) {
+        console.log("error on startup", e);
+        server.close();
       });
     })
     .catch(function (err) {

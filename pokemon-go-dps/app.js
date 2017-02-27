@@ -60,7 +60,10 @@ app.onStartUp = function () {
   console.log("on start up");
   return new Promise(function (fulfill, reject) {
     require('./lib/parseGameMaster.js').then(function() {
+      console.log("after require");
       fulfill();
+    }, function(e){
+      console.log("error", e);
     });
   });
 };

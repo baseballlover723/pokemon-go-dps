@@ -1,0 +1,10 @@
+{
+  "dev": {
+    "driver": "pg",
+    "user": {"ENV": "PGUSER"},
+    "password": {"ENV": "PGPASSWORD"},
+    "host": "localhost",
+    "database": {"ENV": "PGDATABASE"},
+    "schema": "my_schema"
+  }
+}

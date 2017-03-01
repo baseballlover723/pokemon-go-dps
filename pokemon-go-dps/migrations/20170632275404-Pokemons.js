@@ -27,6 +27,26 @@ module.exports = {
                 "updatedAt": {
                     "type": "TIMESTAMP WITH TIME ZONE",
                     "allowNull": false
+                },
+                "type1Id": {
+                    "type": "INTEGER",
+                    "allowNull": true,
+                    "references": {
+                        "model": "Types",
+                        "key": "id"
+                    },
+                    "onDelete": "SET NULL",
+                    "onUpdate": "CASCADE"
+                },
+                "type2Id": {
+                    "type": "INTEGER",
+                    "allowNull": true,
+                    "references": {
+                        "model": "Types",
+                        "key": "id"
+                    },
+                    "onDelete": "SET NULL",
+                    "onUpdate": "CASCADE"
                 }
             })
 ;

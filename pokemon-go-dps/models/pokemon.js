@@ -8,21 +8,19 @@ module.exports = function(sequelize, DataTypes) {
   }, {
     classMethods: {
       associate: function(models) {
-        models.Pokemon.belongsToMany(models.Type, {
-          through: 'type1',
+        models.Pokemon.belongsTo(models.Type, {
           as: 'type1'
         });
-        models.Pokemon.belongsToMany(models.Type, {
-          through: 'type2',
+        models.Pokemon.belongsTo(models.Type, {
           as: 'type2'
         });
         models.Pokemon.belongsToMany(models.FastMove, {
           through: 'pokemon_fast_moves',
-          as: 'fast_moves'
+          as: 'fastMoves'
         });
         models.Pokemon.belongsToMany(models.ChargeMove, {
           through: 'pokemon_charge_moves',
-          as: 'charge_moves'
+          as: 'chargeMoves'
         });
 
       }

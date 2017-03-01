@@ -1,10 +1,10 @@
 'use strict';
-module.exports = function(sequelize, DataTypes) {
+module.exports = function (sequelize, DataTypes) {
   var Type = sequelize.define('Type', {
     name: DataTypes.STRING
   }, {
     classMethods: {
-      associate: function(models) {
+      associate: function (models) {
         models.Type.belongsToMany(models.Type, {
           through: 'weaknesses',
           as: 'weaknesses'

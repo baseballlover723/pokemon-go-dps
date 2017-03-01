@@ -23,7 +23,6 @@ var fs = require('fs');
 delete models.default;
 
 const sequelize = new Sequelize();
-console.log(models);
 
 for(let model in models) {
 
@@ -114,7 +113,7 @@ module.exports = {
   if (model == 'Pokemon') {
     mod += 4;
   }
-  if (model == 'pokemon_charge_moves' || model == 'pokemon_fast_moves' || model == 'type1' || model == 'type2') {
+  if (model == 'pokemon_charge_moves' || model == 'pokemon_fast_moves') {
     mod += 5;
   }
   let filename = [d.getFullYear(), d.getMonth()+1, d.getDate(), d.getHours(), d.getMinutes(), d.getSeconds()]

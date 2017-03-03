@@ -10,8 +10,6 @@ var Pokemon = models.Pokemon;
 var GameMaster = models.GameMaster;
 
 // DONE with database population
-// TODO create routes to get data
-// TODO hook up front end to new back end
 String.prototype.capitalize = function () {
   return this.replace(/\w\S*/g, function (txt) {
     return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();

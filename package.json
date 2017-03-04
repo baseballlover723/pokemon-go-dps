@@ -5,34 +5,19 @@
   "scripts": {
     "start": "node ./bin/www"
   },
-  "engines": {
-    "node": "6.3.1",
-    "npm": "3.10.7"
-  },
   "dependencies": {
-    "async": "^2.0.1",
+    "async": "^2.1.5",
     "body-parser": "~1.15.1",
-    "cheerio": "^0.20.0",
-    "circular-json": "^0.3.0",
     "cookie-parser": "~1.4.3",
-    "db-migrate": "^0.10.0-beta.20",
-    "db-migrate-pg": "^0.1.11",
     "debug": "~2.2.0",
     "dotenv": "^4.0.0",
     "express": "~4.13.4",
-    "express-state": "^1.4.0",
     "jade": "~1.11.0",
-    "moment": "^2.14.1",
-    "moment-timezone": "^0.5.5",
     "morgan": "~1.7.0",
     "node-pogo-protos": "^1.5.0",
-    "parse-duration": "^0.1.1",
     "pg": "^6.1.2",
     "pg-hstore": "^2.3.2",
-    "request": "^2.74.0",
-    "select2": "^4.0.3",
     "sequelize": "^3.30.2",
-    "serve-favicon": "~2.3.0",
-    "sticky-table-headers": "^0.1.19"
+    "serve-favicon": "~2.3.0"
   }
 }

@@ -1,0 +1,120 @@
+body {
+    font: 12.25px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+
+a {
+    color: #00B7FF;
+    cursor: pointer;
+}
+
+nav {
+    color: white
+}
+
+th {
+    background-color: white;
+}
+
+img {
+    margin: 3px 20px 8px 0;
+    max-width: 100%;
+}
+
+input[type=range] {
+    display: inline-block;
+    vertical-align: middle;
+    margin: 5px;
+}
+
+#slider {
+    width: 75%;
+}
+
+#typeSpan {
+    text-align: left;
+}
+
+#data-table th {
+    border: 1px solid #ddd;
+    border-collapse: collapse;
+    padding-right: 15px;
+    padding-left: 3px;
+}
+
+#data-table {
+    width: 100% !important;
+}
+
+#top-column-header th {
+    border-collapse: collapse;
+    border-bottom-width: 0px;
+    text-align: center;
+}
+
+#gym-defender-header {
+    font-size: 16.5px;
+    margin: 5px 0;
+}
+
+.navbar-right {
+    margin-right: 50px;
+}
+
+.profile {
+    font: 24px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+
+.main-content {
+    margin: 0 50px;
+}
+
+#data-table_filter {
+    text-align: left;
+}
+
+#data-table_length {
+    text-align: right;
+}
+
+.fast-move-highlight {
+    background-color: #e3eef2;
+}
+
+.charge-move-highlight {
+    background-color: #e3f2ea;
+}
+
+.buttons-columnVisibility, #data-table_wrapper .btn {
+    padding: 6px 8px;
+    /*font-size: 9.0pt;*/
+}
+
+.btn-group {
+    margin-bottom: 10px;
+}
+
+.select2 {
+    width: 100%;
+!important;
+}
+
+.typeRow {
+    padding-left: 5px;
+    padding-right: 5px;
+    padding-top: 3px;
+    padding-bottom: 2px;
+    border: 1px solid black;
+}
+
+.td-right {
+    margin-left: 15px;
+    float: right;
+}
+
+.defender-toggle {
+    margin-bottom: 10px;
+}
+
+#defenders .toggled-off {
+    background-color: lightGrey !important;
+}

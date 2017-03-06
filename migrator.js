@@ -1,5 +1,4 @@
 'use strict';
-console.log("called");
 //////////////////////////////////
 // How to use?
 // 1. Create `sequelize-schema-file-generator.js` in your app root
@@ -17,12 +16,12 @@ console.log("called");
 
 /* jscs:disable */
 var models = require('./models').sequelize.models;
-var Sequelize = require('sequelize');
+var Sequelize = models.Sequelize;
 var fs = require('fs');
 
 delete models.default;
 
-const sequelize = new Sequelize();
+const sequelize = models.sequelize;
 
 for(let model in models) {
 

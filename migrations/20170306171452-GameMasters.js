@@ -11,6 +11,12 @@ module.exports = {
                 "json": {
                     "type": "JSON"
                 },
+                "superEffectiveModifier": {
+                    "type": "DOUBLE PRECISION"
+                },
+                "stabModifier": {
+                    "type": "DOUBLE PRECISION"
+                },
                 "createdAt": {
                     "type": "TIMESTAMP WITH TIME ZONE",
                     "allowNull": false

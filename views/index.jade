@@ -3,7 +3,7 @@ extends layout
 block content
     .row
         .col-md-9.col-sm-8
-            p This site will soon update every 30 minutes from the latest game master file from <a href="https://github.com/BrunnerLivio/pokemongo-game-master">https://github.com/BrunnerLivio/pokemongo-game-master</a>
+            //p This site will soon update every 30 minutes from the latest game master file from <a href="https://github.com/BrunnerLivio/pokemongo-game-master">https://github.com/BrunnerLivio/pokemongo-game-master</a>
             p This is the equation for Fast & Charge DPS. It is the dps you would expect if you used your charge move as fast as possible, using your fast move when you couldn't use your charge move. fm is data from the fast move and cm is data from the charge move. Note you add 0.5 seconds for the charge move, since you have to hold for 0.5 seconds to activate it
             img(src='/images/equation.gif')
             img(src='/images/adjustedDps.gif')
@@ -15,8 +15,8 @@ block content
             p To use the Gym Defenders feature, select a pokemon that you want to consider attacking from the dropdown box below (another one will pop up for you to add more), you'll see the pokemon type modifiers table update to reflect the current modifier multiplier for a move of each type. The main table below will update all of its DPS values to use the damage of the move multiplied by the moves type modifier. You can uncheck one of the boxes to temporarily not include that pokemon in the calculation or the checkbox under Gym Defenders to include or omit all the pokemon defenders.
         .col-md-3.col-sm-4
             p User updating data is temporarily disabled
+            p This site gets its data from the game master file
             s
-                p This site gets its data from the game master file
                 p Data last loaded at: <span id='last-update-time'>#{lastUpdatedTime.format("LLLL")} UTC</span>
                 p Next data update at: <span id='next-update-time'>#{nextUpdateTime.format("LLLL")} UTC</span>
             div Mess with the super (and not very) effectiveness modifier, currently: <span id="slider-value">1.25</span>x
@@ -35,5 +35,4 @@ block content
                 option
             span Include in Calc? &nbsp;
             input.defender-toggle(type="checkbox" checked)
-
     table#data-table.display.cell-border.table-striped.table-bordered.table.compact

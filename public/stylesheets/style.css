@@ -26,6 +26,10 @@ input[type=range] {
     margin: 5px;
 }
 
+.row {
+    width: 100%;
+}
+
 #slider {
     width: 75%;
 }
@@ -37,18 +41,34 @@ input[type=range] {
 #data-table th {
     border: 1px solid #ddd;
     border-collapse: collapse;
-    padding-right: 15px;
+    padding-right: 13px;
     padding-left: 3px;
+    text-align: left;
 }
 
+/*table.data-table, .floatThread-container */
 #data-table {
-    width: 100% !important;
+    width: 1% !important;
+    /*min-width: 0 !important;*/
+    max-width: 100% !important;
+}
+
+table.dataTable {
+    margin-top: 0 !important;
+}
+
+#data-table_filter {
+    margin-bottom: 6px; !important;
 }
 
 #top-column-header th {
     border-collapse: collapse;
     border-bottom-width: 0px;
     text-align: center;
+}
+
+th:after {
+    right: 3px !important
 }
 
 #gym-defender-header {

@@ -34,6 +34,10 @@ input[type=range] {
     width: 75%;
 }
 
+#charge-delay-slider {
+    width: 75%;
+}
+
 #typeSpan {
     text-align: left;
 }
@@ -137,4 +141,10 @@ th:after {
 
 #defenders .toggled-off {
     background-color: lightGrey !important;
+}
+
+.deprecation-notice {
+    font-size: 30px;
+    text-decoration: underline;
+    font-weight: bold;
 }

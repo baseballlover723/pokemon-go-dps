@@ -42,7 +42,11 @@ for (var id in moveNames) {
 
 isCachedValid(true, function (movesCopy, isValid) {
     for (var id in movesCopy) {
-        moves[id].load(movesCopy[id]);
+        if (moves[id] == undefined) {
+            moves[id] = movesCopy[id];
+        } else {
+            moves[id].load(movesCopy[id]);
+        }
     }
     if (isValid) {
         fixLoadingMoves(moves);
@@ -150,6 +154,10 @@ function populateBaseStats() {
                 data = data.next().next();
                 var name = data.text().trim();
 
+                if (name.includes("Mega") || name.includes("mega")) {
+                    return;
+                }
+
                 data = data.next();
                 var hp = parseInt(data.text());
 
@@ -173,6 +181,10 @@ function populateBaseStats() {
                 pokemon.stamina = calculateStamina(hp);
                 pokemon.attack = calculateAttack(attack, spAttack, speed);
                 pokemon.defense = calculateDefense(defense, spDefense, speed);
+                if (number == 131) { // lapras exeception
+                    pokemon.attack = oldCalculateAttack(attack, spAttack, speed);
+                    pokemon.defense = oldCalculateDefense(defense, spDefense, speed);
+                }
                 // var titleText = data.text();
                 // if (titleText == "Pokémon GO") {
                 //     parseMove($, move, data.parent());
@@ -181,6 +193,7 @@ function populateBaseStats() {
                 // }
             });
             fs.writeFile("json/pokemonTypeStats.json", JSON.stringify(pokemonWithTypesStats), function () {
+                console.timeEnd("base stats request");
                 console.log("wrote file");
             });
             if (!c.html()) {
@@ -191,9 +204,11 @@ function populateBaseStats() {
         } else {
             if (error.Error == "ESOCKETTIMEDOUT") {
                 console.log("base stats request: timed out");
+                console.timeEnd("base stats request");
             } else {
                 console.log("error scraping base stats");
                 console.log(error);
+                console.timeEnd("base stats request");
             }
         }
     });
@@ -203,13 +218,28 @@ function calculateStamina(hp) {
     return hp * 2;
 }
 
-function calculateAttack(attack, spAttack, speed) {
+function oldCalculateAttack(attack, spAttack, speed) {
     return 2 * Math.round(Math.sqrt(attack) * Math.sqrt(spAttack) + Math.sqrt(speed));
 }
 
-function calculateDefense(defense, spDefense, speed) {
+function oldCalculateDefense(defense, spDefense, speed) {
     return 2 * Math.round(Math.sqrt(defense) * Math.sqrt(spDefense) + Math.sqrt(speed));
 }
+
+function calculateAttack(attack, spAttack, speed) {
+    var higher = Math.max(attack, spAttack);
+    var lower = Math.min(attack, spAttack);
+    var atk = Math.round(2 * (7 * higher / 8 + lower / 8));
+    return Math.round(atk * 0.85 + (atk * speed / 500));
+}
+
+function calculateDefense(defense, spDefense, speed) {
+    var higher = Math.max(defense, spDefense);
+    var lower = Math.min(defense, spDefense);
+    var def = Math.round(2 * (7 * higher / 8 + lower / 8));
+    return Math.round(def * 0.85 + (def * speed / 500));
+}
+
 
 function populatePokemonTypes(callback = function () {}) {
     var limit = 10;
@@ -370,13 +400,14 @@ function writeCachedMoves(moves, callback = function () {}) {
 
 function fixLoadingMoves(moves) {
     var loadingMoves = [];
-    for (var id in moves) {
+    for (var id in moveNames) {
         var move = moves[id];
-        if (move.hasAnyLoading()) {
+        if (move == undefined || move.hasAnyLoading()) {
             loadingMoves.push(move);
         }
     }
     if (loadingMoves.length > 0) {
+        var limit = 5;
         console.log("reloading these moves: " + loadingMoves.map(function (move) {return move.name}));
         console.time("reloading loop");
         async.eachLimit(loadingMoves, limit, function (move, callback) {
@@ -494,8 +525,19 @@ function parseCritChance(row) {
 // "137": "Wrap Pink",
 // "233": "Mud Slap", -> Mud-Slap
 
+// before 200 is Legacy quick moves
+// before 13 is Legacy charge moves
+
 function convertToUrl(move) {
     var name = move.name;
+
+    // legacy moves
+    if (move.id < 13 || (move.id < 200 && move.id > 137)) {
+        console.log("replaced name " + move.name);
+        name = name.replace(" (Legacy)", "");
+        console.log(name);
+    }
+
     if (move.id == 134 || move.id == 135 || move.id == 232) { // blastoise
         name = name.replaceAll(" Blastoise", "");
     } else if (move.id == 136 || move.id == 137) { // wrap

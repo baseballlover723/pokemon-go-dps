@@ -18,18 +18,30 @@ var chargeHeaderLength = 9;
 var totalDpsHeaderLength = 7;
 
 var DPS_COLUMNS = []; // these are the columns that need to be recalculated after adjusting the calculating types
+var CHARGE_DELAY_COLUMNS = [];
+
 var end = pokemonHeaderLength + fastHeaderLength;
 for (var i = end - 3; i < end; i++) {
   DPS_COLUMNS.push(i); // dps columns are the last 3 of fast move
 }
+
+CHARGE_DELAY_COLUMNS.push(end + 3); // duration column is 4 past the start of the charge columns
 end += chargeHeaderLength;
+
 for (var i = end - 3; i < end; i++) {
   DPS_COLUMNS.push(i); // dps columns are the last 3 of charge move
+  CHARGE_DELAY_COLUMNS.push(i); // changes based on charge delay
 }
 // end += totalDpsHeaderLength - 1;
 for (var i = end; i < end + totalDpsHeaderLength - 1; i++) {
   DPS_COLUMNS.push(i); // dps columns are all of the total columns
+  CHARGE_DELAY_COLUMNS.push(i); // changes based on charge delay
 }
+
+String.prototype.replaceAll = function(search, replacement) {
+  var target = this;
+  return target.replace(new RegExp(search, 'g'), replacement);
+};
 
 var types = {};
 
@@ -68,6 +80,16 @@ $('#slider').on("change", function() {
     ga('send', 'event', 'Super Effective Modifier', "Changed Value to " + $('#slider').val());
   }
   calculateTypeModifiers();
+});
+
+$('#charge-delay-slider').on("input", function() {
+  var slider = $('#charge-delay-slider');
+  $('#charge-delay-slider-value').text(slider.val());
+  CHARGE_DELAY = parseFloat(slider.val());
+});
+
+$('#charge-delay-slider').on("change", function() {
+  calculateChargeDelay();
 });
 
 $('#global-defender-toggle').change(function() {
@@ -176,10 +198,6 @@ function calculatePokemonCombinations() {
   return pokemons;
 }
 
-String.prototype.replaceAll = function(search, replacement) {
-  var target = this;
-  return target.replace(new RegExp(search, 'g'), replacement);
-};
 $(document).ready(function() {
   $('#last-update-time').text(moment.tz(jsVars.lastUpdatedTime, moment.tz.guess()).format("LLLL z"));
   $('#next-update-time').text(moment.tz(jsVars.nextUpdateTime, moment.tz.guess()).format("LLLL z"));
@@ -247,69 +265,73 @@ $(document).ready(function() {
         dps *= (pokemon.attack + 7) / 2;
         return dps.toFixed(1);
       }
-      // render to see whats going on
     }, {title: "Move Name", data: "chargeMove.name"}, {
       title: "Type", data: "chargeMove.type.name", render: function(data, type, pokemon) {
         return capitalize(data);
       }
-    }, {title: "Pow", data: "chargeMove.damage"}, {title: "Duration", data: "chargeMove.duration"}, {
-      title: "Energy", data: "chargeMove.energyRequired", render: function(data, type, pokemon) {
-        return Math.round(data * 100) / 100 + "%"; // round to 2 decimal places
+    }, {title: "Pow", data: "chargeMove.damage"},
+      {
+        title: "Duration", data: "chargeMove.duration", render: function(data, type, pokemon) {
+        var chargeDelayString = CHARGE_DELAY > 0 ? " + " + CHARGE_DELAY : "";
+        return data + chargeDelayString;
       }
-    }, {
-      title: "Crit %", data: "chargeMove.critChance", render: function(data, type, pokemon) {
-        return Math.round(data * 100) / 100 + "%"; // convert to percent
-      }
-    }, {
-      title: "DPS", data: "chargeMove", render: function(data, type, pokemon) {
-        var dps = pokemon.calculateChargeMoveDPS({stab: false});
-        return dps.toFixed(3);
-      }
-    }, {
-      title: "STAB DPS", data: "chargeMove", render: function(data, type, pokemon) {
-        var dps = pokemon.calculateChargeMoveDPS({stab: true});
-        return dps.toFixed(3);
-      }
-    }, {
-      title: "Adjusted DPS", data: "chargeMove", render: function(data, type, pokemon) {
-        var dps = pokemon.calculateChargeMoveDPS({stab: true, chargeDelay: true});
-        dps *= (pokemon.attack + 7) / 2;
-        return dps.toFixed(1);
-      }
-    }, {
-      title: "DPS", data: null, render: function(data, type, pokemon) {
-        return pokemon.calculateDPS({stab: false}).toFixed(3);
-      }
-    }, {
-      title: "STAB DPS", data: null, render: function(data, type, pokemon) {
-        return pokemon.calculateDPS({stab: true}).toFixed(3);
-      }
-    }, {
-      title: "Charge Damage %", data: null, render: function(data, type, pokemon) {
-        var percent = pokemon.calculateChargeMoveDamagePercent({stab: true});
-        return percent.toFixed(2) + "%";
-      }
-    }, {
-      title: "Duration", data: null, render: function(data, type, pokemon) {
-        var duration = pokemon.calculateCycleDuration();
-        return duration.toFixed(2);
-      }
-    }, {
-      title: "Adjusted DPS", data: null, render: function(data, type, pokemon) {
-        var dps = (pokemon.attack + 7) * pokemon.calculateDPS({stab: true}) / 2;
-        return dps.toFixed(1);
-      }
-    }, {
-      title: "STAB Offensive Rating", data: null, render: function(data, type, pokemon) {
-        var dps = (pokemon.attack + 7) * (pokemon.stamina + 7) * (pokemon.defense + 7) * pokemon.calculateDPS({stab: true}) / 100 / 1000;
-        return dps.toFixed(1);
-      }
-    }, {
-      title: "Rank", data: null, orderable: false
-    }],
+      }, {
+        title: "Energy", data: "chargeMove.energyRequired", render: function(data, type, pokemon) {
+          return Math.round(data * 100) / 100 + "%"; // round to 2 decimal places
+        }
+      }, {
+        title: "Crit %", data: "chargeMove.critChance", render: function(data, type, pokemon) {
+          return Math.round(data * 100) / 100 + "%"; // convert to percent
+        }
+      }, {
+        title: "DPS", data: "chargeMove", render: function(data, type, pokemon) {
+          var dps = pokemon.calculateChargeMoveDPS({stab: false});
+          return dps.toFixed(3);
+        }
+      }, {
+        title: "STAB DPS", data: "chargeMove", render: function(data, type, pokemon) {
+          var dps = pokemon.calculateChargeMoveDPS({stab: true});
+          return dps.toFixed(3);
+        }
+      }, {
+        title: "Adjusted DPS", data: "chargeMove", render: function(data, type, pokemon) {
+          var dps = pokemon.calculateChargeMoveDPS({stab: true, chargeDelay: true});
+          dps *= (pokemon.attack + 7) / 2;
+          return dps.toFixed(1);
+        }
+      }, {
+        title: "DPS", data: null, render: function(data, type, pokemon) {
+          return pokemon.calculateDPS({stab: false}).toFixed(3);
+        }
+      }, {
+        title: "STAB DPS", data: null, render: function(data, type, pokemon) {
+          return pokemon.calculateDPS({stab: true}).toFixed(3);
+        }
+      }, {
+        title: "Charge Damage %", data: null, render: function(data, type, pokemon) {
+          var percent = pokemon.calculateChargeMoveDamagePercent({stab: true});
+          return percent.toFixed(2) + "%";
+        }
+      }, {
+        title: "Duration", data: null, render: function(data, type, pokemon) {
+          var duration = pokemon.calculateCycleDuration();
+          return duration.toFixed(3);
+        }
+      }, {
+        title: "Adjusted DPS", data: null, render: function(data, type, pokemon) {
+          var dps = (pokemon.attack + 7) * pokemon.calculateDPS({stab: true}) / 2;
+          return dps.toFixed(1);
+        }
+      }, {
+        title: "STAB Offensive Rating", data: null, render: function(data, type, pokemon) {
+          var dps = (pokemon.attack + 7) * (pokemon.stamina + 7) * (pokemon.defense + 7) * pokemon.calculateDPS({stab: true}) / 100 / 1000;
+          return dps.toFixed(1);
+        }
+      }, {
+        title: "Rank", data: null, orderable: false
+      }],
     autoWidth: true,
     pageLength: 50,
-    // fixedHeader: {headerOffset: 0},
     order: [[pokemonHeaderLength + fastHeaderLength + chargeHeaderLength + totalDpsHeaderLength - 2, "desc"]],
     buttons: [{text: "Export to Excel", extend: "excel"}, {text: "Visibility Options"}, 'columnsToggle'],
     search: {
@@ -492,6 +514,16 @@ function calculateTypeModifiers(draw) {
     console.timeEnd("update table");
   }
   // console.timeEnd("calc type mod");
+}
+
+function calculateChargeDelay() {
+  if (typeof ga !== 'undefined') {
+    ga('send', 'event', 'Charge Delay', "Updating Charge Delay to " + CHARGE_DELAY);
+  }
+  console.time("update table");
+  dataTable.cells(null, CHARGE_DELAY_COLUMNS).invalidate();
+  dataTable.draw();
+  console.timeEnd("update table");
 }
 
 function loadInitialComboBoxes() {

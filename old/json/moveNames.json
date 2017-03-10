@@ -1,4 +1,11 @@
 {
+  "002": "Hurricane (Legacy)",
+  "003": "Moonblast (Legacy)",
+  "004": "Play Rough (Legacy)",
+  "005": "Psybeam (Legacy)",
+  "006": "Sludge Wave (Legacy)",
+  "007": "Stomp (Legacy)",
+
   "013": "Wrap",
   "014": "Hyper Beam",
   "016": "Dark Pulse",
@@ -94,6 +101,13 @@
   "135": "Hydro Pump Blastoise",
   "136": "Wrap Green",
   "137": "Wrap Pink",
+
+  "194": "Acid (Legacy)",
+  "195": "Dragon Breath (Legacy)",
+  "196": "Mud Shot (Legacy)",
+  "197": "Quick Attack (Legacy)",
+  "198": "Rock Throw (Legacy)",
+  "199": "Water Gun (Legacy)",
   "200": "Fury Cutter",
   "201": "Bug Bite",
   "202": "Bite",

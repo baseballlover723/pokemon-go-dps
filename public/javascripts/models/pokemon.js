@@ -34,7 +34,7 @@ function Pokemon(id, name, fastMove, chargeMove, stamina, attack, defense, type1
 
 Pokemon.prototype = {
   getSTABDamage: function (move) {
-    if (move.type.name == this.type1 || move.type.name == this.type2) {
+    if (move.type.name == this.type1.name || move.type.name == this.type2.name) {
       return move.damage * STAB;
     } else {
       return move.damage;
@@ -44,6 +44,7 @@ Pokemon.prototype = {
   calculateFastMoveDPS: function (options) {
     var fmDamage = options.stab ? this.getSTABDamage(this.fastMove) : this.fastMove.damage;
     fmDamage *= this.fastMove.type.getModifierAgainstDefenders();
+    // console.log(this.name, this.fastMove.name, this.chargeMove.name, options.stab, fmDamage, fmDamage / this.fastMove.duration);
     return fmDamage / this.fastMove.duration;
   },
 

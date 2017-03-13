@@ -3,6 +3,8 @@
 // fm.duration + cm.duration + 0.5} offensive power rating at 10pt with 150 resolution OffensivePowerRating =
 // OffensiveRating = \frac{(pokemon.attack + 7) * (pokemon.stamina + 7) * (pokemon.defense + 7) * stabDps}{100,000}
 // AdjustedDPS = \frac{(pokemon.attack + 7) * stabDps}{2}
+
+// STAB doesn't work
 var dataTable;
 var inited = false;
 var staticPokemons = [];
@@ -151,6 +153,7 @@ function loadStaticPokemonAndTypes(data) {
     pokemon.type2 = types[pokemonHash.type2Id];
     staticPokemons.push(pokemon);
   }
+  // staticPokemons = staticPokemons.slice(0, 1);
   for (var type in types) {
     type = types[type];
     Type.typeModifiers[type.name] = 1;

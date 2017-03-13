@@ -59,7 +59,7 @@ body
           li
             a.modal-trigger(herf='#' data-toggle='modal', data-target='#todo-list') TODO List
           li
-            a.modal-trigger(herf='#' data-toggle='modal', data-target='#change-log') Change Log (Updated: 12/29/16)
+            a.modal-trigger(herf='#' data-toggle='modal', data-target='#change-log') Change Log (Updated: 3/12/17)
           li
             a.modal-trigger(herf='#' data-toggle='modal', data-target='#disclaimer') Disclaimer
           li
@@ -71,11 +71,6 @@ body
                 a(href="https://www.linkedin.com/pub/philip-ross/a5/569/575") Philip's LinkedIn
               li
                 a(href="https://github.com/baseballlover723") Philip's Github
-          li.dropdown
-            a.profile.dropdown-toggle(href="#" data-toggle="dropdown") Jared Hoffman <span class='caret'></span>
-            ul.dropdown-menu
-              li
-                a(href="https://github.com/hoffmaj2") Jared's Github
   #contribute.modal.fade(role='dialog')
     .modal-dialog.modal-lg
       .modal-content
@@ -118,6 +113,9 @@ body
           button.close(type='button', data-dismiss='modal') ×
           h4.modal-title Change Log
         .modal-body
+          p 3/12/2017:
+            ul
+              li Rewrote the backend to read from the game master file instead of web scrapping.
           p 12/29/2016:
             ul
               li Fixed a bug where a suboptimal DPS was shown when a chrage move was barely worth using

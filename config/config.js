@@ -9,10 +9,7 @@ module.exports = {
     "dialect": "postgres"
   },
   "production": {
-    "username": process.env.PGUSER,
-    "password": process.env.PGPASSWORD,
-    "database": process.env.PGDATABASE,
-    "host": "127.0.0.1",
+    "use_env_variable": "DATABASE_URL",
     "dialect": "postgres"
   }
 };

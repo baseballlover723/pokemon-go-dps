@@ -3,8 +3,9 @@ var router = express.Router();
 var async = require('async');
 var data = require('../lib/data.js');
 var moment = require('moment-timezone');
+var fs = require('fs');
 
-var lastUpdatedTime = moment();
+var lastUpdatedTime = moment(fs.statSync("./data/GAME_MASTER").mtime);
 var nextUpdateTime = moment();
 
 router.get('/', function(req, res, next) {
@@ -13,7 +14,7 @@ router.get('/', function(req, res, next) {
   req.query.gym = req.query.gym || [];
   req.query.toggleOff = req.query.toggleOff || [];
   res.expose(req.query, "query");
-  // res.expose(lastUpdatedTime, "lastUpdatedTime");
+  res.expose(lastUpdatedTime, "lastUpdatedTime");
   // res.expose(nextUpdateTime, "nextUpdateTime");
   // res.expose(data.getNextRefreshTime(), "nextClientRefreshTime");
   res.render('index', {

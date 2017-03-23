@@ -44,7 +44,6 @@ Pokemon.prototype = {
   calculateFastMoveDPS: function (options) {
     var fmDamage = options.stab ? this.getSTABDamage(this.fastMove) : this.fastMove.damage;
     fmDamage *= this.fastMove.type.getModifierAgainstDefenders();
-    // console.log(this.name, this.fastMove.name, this.chargeMove.name, options.stab, fmDamage, fmDamage / this.fastMove.duration);
     return fmDamage / this.fastMove.duration;
   },
 
